@@ -16,8 +16,8 @@ function preload() {
 
 function setup() {
   // the canvas has to be created with WEBGL mode
-  myCanvas = createCanvas(windowWidth, windowHeight, WEBGL);
-  shaderTexture = createGraphics(windowWidth, windowHeight, WEBGL)
+  myCanvas = createCanvas(displayWidth, displayHeight, WEBGL);
+  shaderTexture = createGraphics(displayWidth, displayHeight, WEBGL)
   shaderTexture.noStroke()
   noStroke();
 }
@@ -59,22 +59,6 @@ function draw() {
 	}
 	
 	rect(0,0,width,height)
-	
-	// shader() sets the active shader, which will be applied to what is drawn next
-	//shaderTexture.shader(shader1);
-
-	// apply the shader to a rectangle taking up the full canvas
-	//shaderTexture.rect(0,0,width,height);
-	  
-	//texture(shaderTexture)
-	//translate(0,0,-width/4)
-	//rotateX(PI/4)
-	//rotateY(PI/2)
-	//rotateZ(PI/12)
-	//rotateZ(-0.02*frameCount)
-	//sphere(width/4,50)
-	//box(width)
-	//noLoop()
 }
 
 function keyPressed() {
@@ -96,4 +80,8 @@ function keyPressed() {
 	if (keyCode === 54) { //6
 		shaderIndex = 5
 	}
+}
+
+function windowResized() {
+  resizeCanvas(displayWidth, displayHeight);
 }
