@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+	
+	<link rel="stylesheet" href="../myStyle.css">
+	<title>dan's site</title>
+	<link rel="icon" type="image/x-icon" href="../favicon.ico">
+
+  </head>
+  <body class = "noBar">
+	<script>
+	
+	const CANVAS_FACTOR = 2
+	const CANVAS_WIDTH = window.innerWidth//1280*CANVAS_FACTOR;
+	const CANVAS_HEIGHT = window.innerHeight//800*CANVAS_FACTOR;
+
+	const ORIGINX = CANVAS_WIDTH/2
+	const ORIGINY = CANVAS_HEIGHT/2
+	
+	const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+	
+	
+	class clothNode{
+		constructor(x,y,k){
+			this.x = x
+			this.y = y
+			this.vx = 0
+			this.vy = 0
+			this.fx = 0
+			this.fy = 0
+			this.E = 0
+			this.k = k
+			this.moveable = true
+			this.active = true
+		} 
+		
+		fixNode(){
+			this.moveable = false
+		}
+		unfixNode(){
+			this.moveable = true
+		}
+		deactivateNode(){
+			this.active = false
+		}
+	}
+	
+	let K0 = 0.01
+	let numsq = 40
+	let nodeList = []
+	let scale = 0.5
+	let equDist = scale*2/(numsq-1)
+	let M = 0.000001
+	let B = 0.9
+	let g = 9.8
+
+	let timeFactor = 1/300.0
+	
+	let s = 0
+	let anim = 0
+
+	let indicies = [0,0]
+
+	let clickFlag = true
+	let holeMode = false
+	let pinMode = false
+
+	let mouseNode = new clothNode(0,0)
+
+	
+	function setup() {
+		var myCanvas = createCanvas(CANVAS_WIDTH,CANVAS_HEIGHT);
+		myCanvas.parent("canvasDiv")
+		background(bgdColour)
+		submitParams()
+		initCloth(numsq)
+		//document.getElementById("canvasDiv").style.cursor = 'none';
+	}	
+
+	function draw() {
+		anim = s/200
+		background(bgdColour)
+		submitParams()
+		if(mouseIsPressed && mouseX <= CANVAS_WIDTH && mouseX >= 0 && mouseY <= CANVAS_HEIGHT && mouseY >= 0){
+			let mousePosx = (width/height)*(mouseX-ORIGINX)/ORIGINX
+			let mousePosy = (mouseY-ORIGINY)/ORIGINY
+			
+			if (clickFlag == true){
+				indicies = minDistNode(mousePosx,mousePosy)
+			}
+
+			mouseNode = nodeList[indicies[0]][indicies[1]]
+			if(holeMode == false){mouseNode.fixNode()}
+			mouseNode.x = mousePosx
+			mouseNode.y = mousePosy
+			
+			if(holeMode){mouseNode.deactivateNode()}
+			
+			if(holeMode == false){clickFlag = false}
+		} else {
+			if (holeMode == false){
+				clickFlag = true
+			}
+			if (pinMode == false){
+				mouseNode.unfixNode()
+			}
+		}
+		
+		calcForces()
+		updateCloth()
+		showCloth()
+		//noLoop()
+		s++;
+	}
+
+	function minDistNode(sourcex,sourcey){
+		let minIndex1 = 0
+		let minIndex2 = 0
+		let minDist = 100000
+		for (let i = 0;i < numsq;i++){
+			for (let j = 0;j < numsq;j++){
+				let distx = nodeList[i][j].x - sourcex
+				let disty = nodeList[i][j].y - sourcey
+				let dist = distx*distx + disty*disty
+				if (dist < minDist){
+					minDist = dist
+					minIndex1 = i
+					minIndex2 = j
+				}
+			}
+		}
+		return [minIndex1,minIndex2]
+	}
+	
+	function initCloth(numsq){
+		nodeList = []
+		for(let i = 0;i < numsq;i++){
+			let rowList = []
+			for(let j = 0;j < numsq;j++){
+				let param1 = i/(numsq-1)
+				let param2 = j/(numsq-1)
+				let newNode = new clothNode(scale*(-1+2*param2),-0.95 + scale*2*param1,K0)
+				//let newNode = new clothNode(scale*(param1*cos(2*PI*param2+PI*param1)),scale*(param1*sin(2*PI*param2+PI*param1)),K0)
+				if (i == 0){newNode.fixNode();}
+				rowList.push(newNode)
+			}
+			nodeList[i] = rowList
+		}
+	}
+	
+	function showCloth(){
+		for (let i = 0; i < nodeList.length; i++){
+			for (let j = 0; j < nodeList[i].length;j++){
+				//noStroke()
+				//fill(255,50)
+				let centralNode = nodeList[i][j]
+				if(centralNode.active){
+				//ellipse(ORIGINX + ORIGINY*(centralNode.x),ORIGINY + ORIGINY*(centralNode.y),10,10)
+				
+				stroke(255,100)
+				strokeWeight(0.5)
+				if(i-1 >= 0){
+					clothLine(centralNode,nodeList[i-1][j])
+				}
+				if(i+1 < nodeList.length){
+					clothLine(centralNode,nodeList[i+1][j])
+				}
+				if(j-1 >= 0){
+					clothLine(centralNode,nodeList[i][j-1])
+				}
+				if(j+1 < nodeList[i].length){
+					clothLine(centralNode,nodeList[i][j+1])
+				}
+				
+				}
+			}
+		}
+	}
+	
+	function clothLine(node1,node2){
+		if (node1.active && node2.active){
+			let node1x = ORIGINX + ORIGINY*(node1.x)
+			let node1y = ORIGINY + ORIGINY*(node1.y)
+			let node2x = ORIGINX + ORIGINY*(node2.x)
+			let node2y = ORIGINY + ORIGINY*(node2.y)
+			line(node1x,node1y,node2x,node2y)
+		}
+	}
+	
+	function calcForces(){
+		for (let i = 0; i < nodeList.length; i++){
+			for (let j = 0; j < nodeList[i].length;j++){
+				let centralNode = nodeList[i][j]
+				if(i-1 >= 0){
+					calcNodePairForces(centralNode,nodeList[i-1][j])
+				}
+				if(i+1 < nodeList.length){
+					calcNodePairForces(centralNode,nodeList[i+1][j])
+				}
+				if(j-1 >= 0){
+					calcNodePairForces(centralNode,nodeList[i][j-1])
+				}
+				if(j+1 < nodeList[i].length){
+					calcNodePairForces(centralNode,nodeList[i][j+1])
+				}
+			}
+		}
+	}
+	
+	function calcNodePairForces(node1,node2){
+		if (node1.active && node2.active){
+			let distx = 0
+			let disty = 0
+			let angle = 0
+			let dist = 0
+			
+			distx = node2.x - node1.x
+			disty = node2.y - node1.y
+			angle = atan2(disty,distx)
+			dist = Math.pow((distx*distx + disty*disty),0.5)-equDist
+			let cosa = cos(angle)
+			let sina = sin(angle)
+			let K = node1.k + node2.k
+			node1.fx += cosa*K*dist
+			node2.fx += -cosa*K*dist
+			node1.fy += sina*K*dist
+			node2.fy += -sina*K*dist
+		}
+	}
+	
+	function updateCloth(){
+		for (let rowList of nodeList){
+			let j = 0
+			for (let node of rowList){
+				if (node.moveable){
+					let accelx = node.fx/M
+					let accely = node.fy/M + g
+					
+					node.vx = B*node.vx + timeFactor*accelx
+					node.vy = B*node.vy + timeFactor*accely
+
+					node.x += timeFactor*node.vx
+					node.y += timeFactor*node.vy
+
+					}else{
+						//node.x = scale*(-1+2*j/(numsq-1)) - 0.1*sin(2*PI*anim)
+						//node.y = -scale + 0.05*sin(6*PI*Math.max(anim-0.25,0))
+						j++
+					}
+					
+					if (node.y > 0.95){node.y = 0.95; node.vy = -0.01*node.vy}
+					node.fx = 0
+					node.fy = 0	
+			}
+		}
+	}
+	
+	function submitParams(){
+		timeFactor = parseFloat(document.getElementById("timeFactor").value)
+		B = parseFloat(document.getElementById("B").value)
+		g = parseFloat(document.getElementById("g").value)
+		M = parseFloat(document.getElementById("M").value)/1000
+		holeMode = document.getElementById("holeMode").checked
+		pinMode = document.getElementById("pinMode").checked
+	}
+	
+	function formSubmit(){
+		numsq = parseInt(document.getElementById("numNodes").value)
+		K0 = parseFloat(document.getElementById("K").value)
+		equDist = scale*2/(numsq-1)
+		submitParams()
+		initCloth(numsq)
+	}
+	
+
+	
+	</script>
+	<div id = "canvasDiv"></div>
+	<div>
+		<form action = "javascript:formSubmit()">
+		<table>
+
+		<tr>
+			<th><label for="timeFactor">Time Factor</label></th>
+			<th><input type="number" id="timeFactor" name="timeFactor" value = "0.006" step = "0.0001" min = "0"></th>
+		</tr>
+
+		<tr>
+			<th><label for="K">Restoring Spring</label></th>
+			<th><input type="number" id="K" name="K" value = "0.01" step = "0.001" min = "0"></th>
+		</tr>
+				
+		<tr>
+			<th><label for="B">Dampening Constant</label></th>
+			<th><input type="number" id="B" name="B" value = "0.90" step = "0.01" min = "0" max = "0.99"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="M">Mass</label></th>
+			<th><input type="number" id="M" name="M" value = "0.004" step = "0.0001" min = "0.0001" max = "10"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="g">g</label></th>
+			<th><input type="number" id="g" name="g" value = "9.8" step = "0.1" min = "0" max = "19.6"></th>
+		</tr>
+
+		<tr>
+			<th><label for="numNodes">Nodes per column/row</label></th>
+			<th><input type="number" id="numNodes" name="numNodes" value = "40" step = "1" min = "2" max = "100"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="dragMode">Drag Mode</label>
+			<input type="radio" id="dragMode" name="modeRadio" checked></th>
+		</tr>
+		
+		<tr>
+			<th><label for="holeMode">Hole Mode</label>
+			<input type="radio" id="holeMode" name="modeRadio"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="pinMode">Pin Mode</label>
+			<input type="radio" id="pinMode" name="modeRadio"></th>
+		</tr>
+		
+		<tr>
+			<th colspan = "2"><input type="submit" value="Update"></th>
+		</tr>
+		</table>
+	</div>
+  </body>
+</html>

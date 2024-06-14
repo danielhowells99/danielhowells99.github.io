@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+		<script src="../libraries/p5.sound.js"></script>
+	
+		<link rel="stylesheet" href="../myStyle.css">
+		<title>dan's site</title>
+		<link rel="icon" type="image/x-icon" href="../favicon.ico">
+	</head>
+	
+	<body class = "noBar">
+	
+	<script>
+	
+	/*
+	0: CROSS
+	1: CIRCLE
+	2: SQUARE
+	3: TRIANGLE
+	4: L1
+	5: R1
+	6: L2
+	7: R2
+	8: SELECT
+	9: START
+	10: L3
+	11: R3
+	12: up
+	13: down
+	14: left
+	15: right
+	16: idk
+	*/
+
+	const CANVAS_FACTOR = 0.5
+	const CANVAS_WIDTH = 1280*CANVAS_FACTOR;
+	const CANVAS_HEIGHT = 800*CANVAS_FACTOR;
+	const ASPECT = CANVAS_WIDTH/CANVAS_HEIGHT
+
+	const ORIGINX = CANVAS_WIDTH/2
+	const ORIGINY = CANVAS_HEIGHT/2
+	
+	const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+	
+	let mic, fft, audioIn, spectrum;
+	let next,prev,myCanvas
+
+	let shift = 1.5
+	
+	function keyPressed() {
+		if (keyCode === LEFT_ARROW) {
+			noLoop()
+		}		
+		if (keyCode === RIGHT_ARROW) {
+			loop()
+		}		
+		if (keyCode === TAB) {
+			getAudioContext().resume();
+		}	
+		if (keyCode === 84) { //t
+			saveCanvas(next,'spectrum','png')
+		}
+	}
+
+	function visual(){
+		
+		[prev, next] = [next, prev];
+		
+		next = createGraphics(CANVAS_WIDTH, CANVAS_HEIGHT);
+
+		next.push()
+		next.noSmooth()
+		next.translate(ORIGINX-shift,ORIGINY)
+		next.image(prev,-ORIGINX,-ORIGINY)
+		next.pop()
+
+		next.push()
+		next.noStroke()
+
+		next.colorMode(HSB)
+		next.translate(CANVAS_WIDTH,CANVAS_HEIGHT)
+
+		let startFreq = 0
+		
+		spectrumSlice = spectrum.slice(0,625)
+
+		for (let i = startFreq; i < spectrumSlice.length; i++) {
+			
+			let y1 = map(i,startFreq,spectrumSlice.length,CANVAS_HEIGHT,0)
+			let y2 = map(i+1,startFreq,spectrumSlice.length,CANVAS_HEIGHT,0)
+
+			//let y1 = map(Math.log2(i+1),Math.log2(startFreq+1),Math.log2(spectrumSlice.length),CANVAS_HEIGHT,0)
+			//let y2 = map(Math.log2(i+2),Math.log2(startFreq+1),Math.log2(spectrumSlice.length),CANVAS_HEIGHT,0)
+
+			let colParam = spectrumSlice[i]/255
+			next.fill(360-colParam*360,100-100*colParam,100*colParam)
+			next.translate(0,y2-y1)
+			next.rect(0,0,-shift,-1.1*(y2-y1))
+			
+		}
+
+		next.pop()
+		
+		next.reset()
+		next.remove()
+	}
+	
+	function setup() {
+		myCanvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+		myCanvas.parent("canvasDiv")
+		
+		prev = createGraphics(CANVAS_WIDTH, CANVAS_HEIGHT);
+		next = createGraphics(CANVAS_WIDTH, CANVAS_HEIGHT);
+		
+		fft = new p5.FFT(0.5,1024);
+		
+		mic = new p5.AudioIn();
+		mic.start();
+		mic.connect()
+		fft.setInput(mic);
+		
+		console.log(sampleRate())
+		frameRate(30);
+		//background(0)
+	}
+	
+	function draw(){
+		
+		spectrum = fft.analyze();
+		
+		visual()
+		
+		background(0)
+		push()
+		translate(ORIGINX,ORIGINY)
+		image(next, -ORIGINX, -ORIGINY);
+		pop()
+	}
+	
+	</script>
+	<div id = "canvasDiv"></div>
+	<a href = "picutil.html">PICTURE UTILITY</a>
+	</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+	
+	<link rel="stylesheet" href="../myStyle.css">
+	<title>dan's site</title>
+	<link rel="icon" type="image/x-icon" href="../favicon.ico">
+
+  </head>
+  <body class = "noBar">
+	<script>
+	
+	const CANVAS_FACTOR = 1
+	const CANVAS_WIDTH = 800*CANVAS_FACTOR;
+	const CANVAS_HEIGHT = 800*CANVAS_FACTOR;
+
+	const ORIGINX = CANVAS_WIDTH/2
+	const ORIGINY = CANVAS_HEIGHT/2
+	
+	const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+	
+	
+	
+	
+	let anim = 0
+	let s = 0
+	
+	let N = 60000
+	let M = 4
+	let angle = 0.065
+	let step = 7*CANVAS_FACTOR
+	
+	
+	let angleFactor = 2//2
+	
+	let transx = CANVAS_WIDTH*0.25
+	let transy = CANVAS_HEIGHT*0.85
+	
+	let krand = []
+	let krandIndex = 0
+
+	let pg
+	
+	for (let k = 0;k < 1000000;k++){
+		krand.push(Math.random()-0.5)
+	}
+	
+	function setup() {
+		var myCanvas = createCanvas(CANVAS_WIDTH,CANVAS_HEIGHT);
+		myCanvas.parent("canvasDiv")
+		background(bgdColour)
+		//tree2(N,M)
+		//document.getElementById("canvasDiv").style.cursor = 'none';
+	}	
+
+	function draw() {
+		//anim = s/200
+
+		pg = createGraphics(CANVAS_WIDTH,CANVAS_HEIGHT)
+		let param1 = 0.5*(mouseX - ORIGINX)/ORIGINX + 0.5
+		let param2 = 0.5*(mouseY - ORIGINY)/ORIGINY + 0.5
+		
+		krandIndex = 0
+		background(bgdColour)
+		
+
+		
+		pg.translate(ORIGINX,ORIGINY)
+		tree1(6,4*param1,0.5,param2)
+		
+		s++;
+		image(pg,0,0)
+		pg.remove()
+	}
+
+	function keyPressed() {
+		if (keyCode === UP_ARROW) {
+			saveCanvas(pg,'recursion','png')
+		}
+	}
+	
+	function tree1(n,angle,branchlength,extraParam = 0){
+		if (n > 0){
+			pg.stroke(255)
+			pg.strokeWeight(2*branchlength)
+			
+			let numbranches = 5
+			
+			branchlength = branchlength/1.5
+			angle = angle/1.5
+			
+			for (let i = 0; i < numbranches; i++){
+				let c0 = (2*i/(numbranches-1) - 1)*angle*PI
+				pg.push()
+				pg.rotate(extraParam*krand[krandIndex]+c0)
+				pg.line(0,0,0,-branchlength*ORIGINY)
+				pg.translate(0,-branchlength*ORIGINY)
+				tree1(n-1,angle,branchlength,extraParam)
+				pg.pop()
+				krandIndex++
+			}
+		}
+	}
+	
+	function formSubmit(){
+		return 0
+	}
+	
+	</script>
+	<div id = "canvasDiv"></div>
+	<div>
+		<form action = "javascript:formSubmit()">
+		<table>
+
+		<tr>
+			<th><label for="timeFactor">Time Factor</label></th>
+			<th><input type="number" id="timeFactor" name="timeFactor" value = "0.006" step = "0.0001" min = "0"></th>
+		</tr>
+
+		<tr>
+			<th><label for="K">Restoring Spring</label></th>
+			<th><input type="number" id="K" name="K" value = "0.01" step = "0.001" min = "0"></th>
+		</tr>
+				
+		<tr>
+			<th><label for="B">Dampening Constant</label></th>
+			<th><input type="number" id="B" name="B" value = "0.90" step = "0.01" min = "0" max = "0.99"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="M">Mass</label></th>
+			<th><input type="number" id="M" name="M" value = "0.004" step = "0.0001" min = "0.0001" max = "10"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="g">g</label></th>
+			<th><input type="number" id="g" name="g" value = "9.8" step = "0.1" min = "0" max = "19.6"></th>
+		</tr>
+
+		<tr>
+			<th><label for="numNodes">Nodes per column/row</label></th>
+			<th><input type="number" id="numNodes" name="numNodes" value = "40" step = "1" min = "2" max = "100"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="dragMode">Drag Mode</label>
+			<input type="radio" id="dragMode" name="modeRadio" checked></th>
+		</tr>
+		
+		<tr>
+			<th><label for="holeMode">Hole Mode</label>
+			<input type="radio" id="holeMode" name="modeRadio"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="pinMode">Pin Mode</label>
+			<input type="radio" id="pinMode" name="modeRadio"></th>
+		</tr>
+		
+		<tr>
+			<th colspan = "2"><input type="submit" value="Update"></th>
+		</tr>
+		</table>
+	</div>
+  </body>
+</html>

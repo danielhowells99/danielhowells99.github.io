@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+	
+	<link rel="stylesheet" href="../myStyle.css">
+	<title>dan's site</title>
+	<link rel="icon" type="image/x-icon" href="../favicon.ico">
+
+  </head>
+  <body class = "noBar">
+	<script>
+	
+	const CANVAS_FACTOR = 1
+	const CANVAS_WIDTH = 800*CANVAS_FACTOR;
+	const CANVAS_HEIGHT = 800*CANVAS_FACTOR;
+
+	let s = 0;
+	let anim = 0;
+	
+	const hue = getComputedStyle(document.querySelector('body')).backgroundColor
+	
+	/*
+	var colorsOnly = hue.split(")");
+	colorsOnly = colorsOnly[0].split("(");
+	colorsOnly = colorsOnly[1].split(","); 
+	let red1 = colorsOnly[0]
+	let green1 = colorsOnly[1]
+	let blue1 = colorsOnly[2]
+	*/
+	
+	let opacity = 255
+	
+	let positionsX = []
+	let positionsY = []
+	
+	let krand1 = []
+	let krand2 = []
+	let krand3 = []
+	let krand4 = []
+	
+	
+	let spreadFactor = 60
+	let opacityFactor = 250
+	let length = 40
+	let density = 20
+	
+	let linesOn = true
+	let bgdRefresh = true
+	let dotsOn = true
+	let auto = false
+	let colourThres = -4
+	let framesPerLoop = 360
+	
+	let pg
+	
+	function preload(){
+		for (let kr = 0;kr < 100000;kr++){
+			krand1[kr] = Math.random()
+			krand2[kr] = randomGaussian()
+			krand3[kr] = randomGaussian()
+			krand4[kr] = randomGaussian()
+		}
+	}
+	
+	function setup() {
+		//CANVAS SET UP
+		var myCanvas = createCanvas(CANVAS_WIDTH,CANVAS_HEIGHT);
+		myCanvas.parent("canvasDiv")
+		background(hue)
+		submitParams()
+		
+		document.getElementById("canvasDiv").style.cursor = 'none';
+		//END CANVAS SET UP
+	}	
+
+	//DRAW AND CAPTURE LOOP
+	function draw() {
+		pg = createGraphics(CANVAS_WIDTH,CANVAS_HEIGHT)
+		if(bgdRefresh == true){
+			background(hue)
+		}
+		
+		anim = (s/framesPerLoop)%1
+		
+		if(auto){
+			positionsX.push(CANVAS_WIDTH/2+0.7*CANVAS_HEIGHT/2*sin(floor(1+4*(mouseX/CANVAS_WIDTH))*2*PI*anim));
+			positionsY.push(CANVAS_HEIGHT/2+0.7*CANVAS_HEIGHT/2*cos(floor(1+4*(mouseY/CANVAS_HEIGHT))*2*PI*anim));
+		}else{
+			positionsX.push(mouseX);
+			positionsY.push(mouseY);
+		}
+
+		for(let i = 0;i < length;i++){
+			opacity = opacityFactor*(1+i)/length
+			
+			let x = positionsX[i];
+			let y = positionsY[i];
+			
+			tracer1(x,y,i)
+		}
+
+		if(positionsX.length > length){
+			positionsX.shift();
+			positionsY.shift();
+		}
+
+		s = s+1; //Increase Frame
+		image(pg,0,0)
+		pg.remove()
+	}
+	
+	function tracer1(x,y,i){
+		pg.push()
+		pg.translate(x,y)
+		
+		for (let j = 0;j<density;j++){
+			if(dotsOn){
+				let rad22 = 3*krand1[i*density+j]
+				pg.noStroke()
+				//fill(255,opacity);
+				if (krand4[i+density*j]>colourThres){pg.fill(255,opacity)}
+				else {pg.fill(50+100*krand1[i*density+j],20+10*krand2[i*density+j],40,opacity)}
+				pg.ellipse(spreadFactor*krand2[i+density*j],spreadFactor*krand3[i+density*j],rad22,rad22)
+			}
+			
+			if(linesOn){
+				pg.rotate(2*PI*krand1[i*density+j])
+				if (krand4[i+density*j]>colourThres){pg.stroke(255,opacity)}
+				else {pg.stroke(150*krand1[i*density+j],20+10*krand2[i*density+j],20,opacity)}
+				pg.strokeWeight(0.5*krand1[i*density+j])
+				pg.line(-spreadFactor*krand3[i*density+j],-spreadFactor*krand2[i*density+j],spreadFactor*krand3[i*density+j],spreadFactor*krand2[i*density+j])
+			}
+		}
+		pg.pop()
+	}
+	
+	function keyPressed() {
+		if (keyCode === UP_ARROW) {
+			saveCanvas(pg,'fullscreenTest','png')
+		}
+	}
+	
+	function submitParams(){
+		spreadFactor = parseInt(document.getElementById("spreadFactor").value)
+		opacityFactor = parseInt(document.getElementById("opacity").value)
+		length = parseInt(document.getElementById("length").value)
+		density = parseInt(document.getElementById("density").value)
+		dotsOn = document.getElementById("dotsOn").checked
+		linesOn = document.getElementById("linesOn").checked
+		bgdRefresh = document.getElementById("bgdRefresh").checked
+		auto = document.getElementById("auto").checked
+		colourThres = parseFloat(document.getElementById("colourThres").value)
+		framesPerLoop = parseFloat(document.getElementById("framesPerLoop").value)
+		
+		if(auto){
+			document.getElementById("canvasDiv").style.cursor = '';
+		} else {
+			document.getElementById("canvasDiv").style.cursor = 'none';
+		}
+		
+		positionsX = []
+		positionsY = []
+	}
+	
+	</script>
+	
+	<div id = "canvasDiv"></div>
+	
+	<div>
+		<form action = "javascript:submitParams()">
+		<table>
+		<tr>
+			<th><label for="spreadFactor">Spread Factor</label></th>
+			<th><input type="number" id="spreadFactor" name="spreadFactor" value = "60" step = "1"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="opacity">Opacity</label></th>
+			<th><input type="number" id="opacity" name="opacity" value = "250" step = "1" min = "0" max = "255"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="length">Length</label></th>
+			<th><input type="number" id="length" name="length" value = "60" step = "1" min = "1"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="density">Density</label></th>
+			<th><input type="number" id="density" name="density" value = "20" step = "1" min = "1"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="colourThres">colourThres</label></th>
+			<th><input type="number" id="colourThres" name="colourThres" value = "-4" step = "0.1" min = "-4" max = "4"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="framesPerLoop">framesPerLoop</label></th>
+			<th><input type="number" id="framesPerLoop" name="colourThres" value = "360" step = "1" min = "0"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="bgdRefresh">Background Refresh?</label>
+			<input type="checkbox" id="bgdRefresh" name="bgdRefresh" checked = "true"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="linesOn">Lines On?</label>
+			<input type="checkbox" id="linesOn" name="linesOn" checked = "true"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="dotsOn">Dots On?</label>
+			<input type="checkbox" id="dotsOn" name="dotsOn" checked = "true"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="auto">Auto?</label>
+			<input type="checkbox" id="auto" name="auto"></th>
+		</tr>
+		
+		<tr>
+			<th colspan = "2"><input type="submit" value="Update"></th>
+		</tr>
+		
+		
+		</table>
+	</div>
+  </body>
+</html>

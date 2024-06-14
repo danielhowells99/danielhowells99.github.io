@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+	<!--<script src="../libraries/p5.sound.js"></script>-->
+	
+	<link rel="stylesheet" href="../myStyle.css">
+	<title>dan's site</title>
+	<link rel="icon" type="image/x-icon" href="../favicon.ico">
+
+  </head>
+  <body class = "noBar">
+	<script>
+	
+	const CANVAS_FACTOR = 1
+	const CANVAS_WIDTH = 800*CANVAS_FACTOR;
+	const CANVAS_HEIGHT = 800*CANVAS_FACTOR;
+
+	const ORIGINX = CANVAS_WIDTH/2
+	const ORIGINY = CANVAS_HEIGHT/2
+	
+	const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+	
+	let bgdRed
+	let bgdGreen
+	let bgdBlue
+		
+	
+	const ASPECT = CANVAS_WIDTH/CANVAS_HEIGHT
+	
+	class gravBody{
+		constructor(x,y){
+			this.x = x
+			this.y = y
+			this.vx = 0
+			this.vy = 0
+			this.ax = 0
+			this.ay = 0
+			this.fx = 0
+			this.fy = 0
+			this.M = 400 //kg
+			this.Ekin = 0
+			this.rad = 0.04 //m
+		} 
+		
+		fixNode(){
+			this.moveable = false
+		}
+		unfixNode(){
+			this.moveable = true
+		}
+		deactivateNode(){
+			this.active = false
+		}
+		velocity(vx,vy){
+			this.vx = vx
+			this.vy = vy
+		}
+		
+		acceleration(ax,ay){
+			this.ax = ax
+			this.ay = ay
+		}
+	}
+	
+	let G0 = 0.00001
+	let K0 = 8000
+	
+	let B = 0.99
+
+	let timeFactor = 0.1
+	
+	let s = 0
+	let anim = 0
+
+	let numBodies = 23*23
+
+	let colourScale = 300
+
+	let bodyList = []
+
+	let kinEnergyList = []
+	let potEnergyList = []
+	
+	let pause = false
+	
+	let clickFlag = true
+	
+	let activeBodyIndex = 0
+	
+	let activeBody = new gravBody(0,0)
+	
+	let plotLength = 250
+	
+	let pg
+	
+	function setup() {
+		var myCanvas = createCanvas(CANVAS_WIDTH,CANVAS_HEIGHT);
+		myCanvas.parent("canvasDiv")
+		background(bgdColour)
+		
+		bgdRed = red(bgdColour)
+		bgdGreen = green(bgdColour)
+		bgdBlue = blue(bgdColour)
+	
+		if(bgdRed + bgdGreen + bgdBlue == 0){
+			bgdRed = 10
+			bgdGreen = 10
+			bgdBlue = 10
+		}
+		
+		bodyList = initBodies(numBodies)
+		
+		kinEnergyList = initEnergyList()
+		submitParams()
+	}	
+
+	function draw(){
+		anim = s/200
+		background(bgdColour)
+		
+		pg = createGraphics(CANVAS_WIDTH,CANVAS_HEIGHT)
+		
+		let mousePosx = (mouseX-ORIGINX)/ORIGINY
+		let mousePosy = (mouseY-ORIGINY)/ORIGINY
+		let ax = 0
+		let ay = 0
+		if (mouseIsPressed && Math.abs(mousePosx) <= ASPECT && Math.abs(mousePosy) <= 1){
+			if (clickFlag == true){
+				activeBodyIndex = minDistNode(bodyList,mousePosx,mousePosy)
+				clickFlag = false
+			}
+			activeBody = bodyList[activeBodyIndex]
+			stroke(255,75)
+			strokeWeight(1)
+			line(normToCanvX(activeBody.x),normToCanvY(activeBody.y),normToCanvX(mousePosx),normToCanvY(mousePosy))
+		}else{
+			if (clickFlag == false){
+				activeBody = bodyList[activeBodyIndex]
+				ax = mousePosx - activeBody.x
+				ay = mousePosy - activeBody.y
+				activeBody.acceleration(2.5*ax,2.5*ay)
+			}
+			clickFlag = true
+		}
+		
+		calcForces(bodyList)
+		calcCollisions(bodyList)
+		wallCollisions(bodyList)
+		updatePos(bodyList)
+		
+		showBodies(bodyList)
+		resetForces(bodyList)
+		s++;
+		image(pg,0,0)
+		pg.remove()
+	}
+	/*
+	function touchStarted() {
+		getAudioContext().resume();
+	}
+	*/
+	function keyPressed() {
+		if (keyCode === UP_ARROW) {
+			saveCanvas(pg,'crystals','png')
+		}
+	}
+	
+	function normToCanvX(normx){
+		return ORIGINX + ORIGINY*normx
+	}
+	
+	function normToCanvY(normy){
+		return ORIGINY + ORIGINY*normy
+	}
+	
+	function minDistNode(objList,sourcex,sourcey){
+		let minIndex1 = 0
+		let minIndex2 = 0
+		let minDist = 100000
+		for (let i = 0;i < objList.length;i++){
+			let distx = objList[i].x - sourcex
+			let disty = objList[i].y - sourcey
+			let dist = distx*distx + disty*disty
+			if (dist < minDist){
+				minDist = dist
+				minIndex1 = i
+			}
+		}
+		return minIndex1
+	}
+	
+	function initBodies(n=9){
+		let tempList = []
+		let scale = 0.95
+
+		let nsq = floor(Math.sqrt(n))
+		for(let i = 0;i < nsq*nsq;i++){
+			let param1 = 2*(((i)%nsq)/(nsq-1))-1
+			let param2 = 2*floor(i/nsq)/(nsq-1)-1
+			tempList.push(new gravBody(scale*param1,scale*param2))
+		}
+		return tempList;
+	}
+
+	function initEnergyList(){
+		let tempList = []
+		for (let i = 0; i < plotLength;i++){
+			tempList.push(0)
+		}
+		return tempList
+	}
+
+	function plotList(List,length){
+		resetMatrix()
+		for (let i = 0; i < length-1;i++){
+			let x1 = (i/length)*CANVAS_WIDTH
+			let x2 = ((i+1)/length)*CANVAS_WIDTH
+			let y1 = (1-List[i])*CANVAS_HEIGHT
+			let y2 = (1-List[i+1])*CANVAS_HEIGHT
+			line(x1,y1,x2,y2)
+			//line(x1,CANVAS_HEIGHT-y1,x2,CANVAS_HEIGHT-y2)
+		}
+	}
+	
+	function showBodies(objList){
+		pg.noStroke()
+		for(let obj of objList){
+			pg.push()
+			pg.translate(normToCanvX(obj.x),normToCanvY(obj.y))
+			let colorParam = colourScale*Math.log(1+obj.M*obj.Ekin)
+			
+			//let redval = bgdRed*(160+colorParam)//*255 //*colorParam
+			//let greenval = bgdGreen*(160+colorParam)//*255 //-255*colorParam
+			//let blueval = bgdBlue*(160+colorParam)//*150
+			
+			pg.fill(255,5+0.25*colorParam)
+			pg.ellipse(0,0,2*ORIGINY*obj.rad,2*ORIGINY*obj.rad)
+
+			pg.fill(255,10+0.5*colorParam)
+			pg.ellipse(0,0,ORIGINY*obj.rad,ORIGINY*obj.rad)
+			
+			pg.fill(255,40+colorParam)
+			pg.ellipse(0,0,0.25*ORIGINY*obj.rad,0.25*ORIGINY*obj.rad)
+			pg.pop()
+		}
+	}
+
+	function calcForces(objList){
+		for (let i = 0;i<objList.length;i++){
+			for (let j = 1+i;j<objList.length;j++){
+				calcBodyPairForces(objList[i],objList[j])
+			}
+		}
+	}
+
+	function calcBodyPairForces(obj1,obj2){
+		let distx = 0
+		let disty = 0
+		let angle = 0
+		let dist = 0
+		
+		distx = obj2.x - obj1.x
+		disty = obj2.y - obj1.y
+		angle = atan2(disty,distx)
+		dist = (distx*distx + disty*disty)
+		if (Math.sqrt(dist) <= obj2.rad  + obj1.rad){dist = (obj2.rad  + obj1.rad)*(obj2.rad  + obj1.rad)}
+		let cosa = cos(angle)
+		let sina = sin(angle)
+		
+		obj1.fx += G0*cosa*obj1.M/dist
+		obj1.fy += G0*sina*obj1.M/dist
+		obj2.fx += -G0*cosa*obj1.M/dist
+		obj2.fy += -G0*sina*obj1.M/dist
+	}
+
+	function calcCollisions(objList){
+		for (let i = 0;i < objList.length;i++){
+			for (let j = 1+i;j < objList.length;j++){
+				calcCollisionPair(objList[i],objList[j])
+			}
+		}
+	}
+	
+	function calcCollisionPair(obj1,obj2){
+		let distx = obj1.x - obj2.x
+		let disty = obj1.y - obj2.y
+		let dist = Math.sqrt(distx*distx + disty*disty)
+		
+		if (dist <= (obj1.rad + obj2.rad)){
+			let distAlt = (obj1.rad + obj2.rad)-dist
+			angle = atan2(disty,distx)
+			let cosa = cos(angle)
+			let sina = sin(angle)
+			obj1.fx += cosa*K0*distAlt
+			obj2.fx += -cosa*K0*distAlt
+			obj1.fy += sina*K0*distAlt
+			obj2.fy += -sina*K0*distAlt
+		}
+	} 
+
+	function wallCollisions(objList){
+		for (let obj of objList){
+			if (obj.x > ASPECT-obj.rad) {obj.fx += -K0*(obj.x - ASPECT + obj.rad);}
+			if (obj.x < -ASPECT+obj.rad) {obj.fx += -K0*(obj.x + ASPECT - obj.rad);}
+			if (obj.y > 1-obj.rad) {obj.fy += -K0*(obj.y - 1 + obj.rad);}
+			if (obj.y < -1+obj.rad) {obj.fy += -K0*(obj.y + 1 - obj.rad);}
+		}
+	}
+	
+	function updatePos(objList){
+		for (let obj of objList){
+			obj.ax += obj.fx/obj.M 
+			obj.ay += obj.fy/obj.M 
+
+			obj.vx = B*obj.vx + timeFactor*obj.ax
+			obj.vy = B*obj.vy + timeFactor*obj.ay
+			
+			obj.x += timeFactor*(obj.vx)
+			obj.y += timeFactor*(obj.vy)
+
+			obj.Ekin += obj.vx*obj.vx + obj.vy*obj.vy //"kinetic energy" (independent of mass)
+		}
+	}
+	
+	function resetForces(objList){
+		for (let obj of objList){
+			obj.ax = 0
+			obj.ay = 0
+			obj.fx = 0
+			obj.fy = 0
+			obj.Ekin = 0
+		}
+	}
+
+	function calcTotalEnergy(objList){
+		let totalKinEnergy = 0
+		
+		for (let obj of objList){
+			totalKinEnergy += obj.Ekin
+		}
+		
+		return totalKinEnergy/objList.length
+	}
+	
+	function calcTotalVelocity(objList){
+		let totalVelx = 0
+		let totalVely = 0
+		for (let obj of objList){
+			totalVelx += obj.vx
+			totalVely += obj.vy
+		}
+		return Math.sqrt(totalVelx*totalVelx + totalVely*totalVely)/objList.length
+	}
+	
+	function arrow(length){
+		line(0,0,length,0)
+		line(length,0,0.8*length,length*0.2)
+		line(length,0,0.8*length,-length*0.2)
+	}
+
+	function drawNormalPlane(obj1,obj2){
+		let distx = obj1.x - obj2.x
+		let disty = obj1.y - obj2.y
+		let dist = Math.sqrt(distx*distx + disty*disty)
+
+		let midPointx = (obj1.x + obj2.x)/2
+		let midPointy = (obj1.y + obj2.y)/2
+		push()
+		strokeWeight(5)
+		stroke(0,255,0)
+		translate(normToCanvX(midPointx),normToCanvY(midPointy))
+		let planeSize = 100/dist
+		line(-planeSize*disty,planeSize*distx,planeSize*disty,-planeSize*distx)
+		pop()
+	}
+
+	function drawDistVector(obj1,obj2){
+		push()
+		strokeWeight(5)
+		stroke(200,100,0)
+		line(normToCanvX(obj1.x),normToCanvY(obj1.y),normToCanvX(obj2.x),normToCanvY(obj2.y))
+		pop()
+	}
+
+	function arrayMin(arr) {
+			  var len = arr.length, min = Infinity;
+			  while (len--) {
+				if (arr[len] < min) {
+				  min = arr[len];
+				}
+			  }
+			  return min;
+	};
+
+	function arrayMax(arr) {
+			  var len = arr.length, max = -Infinity;
+			  while (len--) {
+				if (arr[len] > max) {
+				  max = arr[len];
+				}
+			  }
+			  return max;
+	};	
+
+	function submitParams(){
+		if (document.getElementById("mode1").checked){
+
+			G0 = 0.000010
+			document.getElementById("gravity").value = G0
+
+			K0 = 8000
+			document.getElementById("spring").value = K0
+
+			B = 0.99
+			document.getElementById("dampening").value = B
+
+			timeFactor = 0.10
+			document.getElementById("timeScale").value = timeFactor
+
+			let mass = 400
+			document.getElementById("mass").value = mass
+
+			let radius = 0.04
+			document.getElementById("rad").value = radius
+
+			colourScale = 500
+			document.getElementById("colourScale").value = colourScale
+			updateMassAndRad(bodyList,mass,radius)	
+
+		} else if (document.getElementById("mode2").checked){
+
+			G0 = 0.000010
+			document.getElementById("gravity").value = G0
+
+			K0 = 1000000
+			document.getElementById("spring").value = K0
+
+			B = 0.82
+			document.getElementById("dampening").value = B
+
+			timeFactor = 0.116
+			document.getElementById("timeScale").value = timeFactor
+
+			let mass = 7200
+			document.getElementById("mass").value = mass
+
+			let radius = 0.020
+			document.getElementById("rad").value = radius
+
+			colourScale = 300
+			document.getElementById("colourScale").value = colourScale
+			updateMassAndRad(bodyList,mass,radius)
+
+		} else {
+
+			G0 = parseFloat(document.getElementById("gravity").value)
+			K0 = parseFloat(document.getElementById("spring").value)
+			B = parseFloat(document.getElementById("dampening").value)
+			timeFactor = parseFloat(document.getElementById("timeScale").value)
+			
+			let numBodiessq = parseInt(document.getElementById("numBodies").value)
+			numBodies = numBodiessq*numBodiessq
+			
+			let mass = parseFloat(document.getElementById("mass").value)
+			let radius = parseFloat(document.getElementById("rad").value)
+			updateMassAndRad(bodyList,mass,radius)
+
+			colourScale = parseFloat(document.getElementById("colourScale").value)
+		
+		}
+	}
+
+	function updateMassAndRad(objList,mass,rad){
+		for (let obj of objList){
+			obj.M = mass
+			obj.rad = rad
+		}
+	}
+	
+	</script>
+	<div id = "canvasDiv"></div>
+	<div>
+	<form action="javascript:submitParams()">
+		<table>
+
+		<tr>
+			<th><label for="mode1">Bouncy Crystal</label>
+			<input type="radio" id="mode1" name="modeRadio" checked></th>
+		</tr>
+		
+		<tr>
+			<th><label for="mode2">Popcorn</label>
+			<input type="radio" id="mode2" name="modeRadio"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="custom">Custom</label>
+			<input type="radio" id="custom" name="modeRadio"></th>
+		</tr>
+
+
+		<tr>
+			<th><label for="timeScale">Time Scaling</label></th>
+			<th><input type="number" id="timeScale" name="timeScale" value = "0.10" step = "0.001"></th>
+		</tr>
+
+		<tr>
+			<th><label for="gravity">Attractive Force Scaling</label></th>
+			<th><input type="number" id="gravity" name="gravity" value = "0.000010" step = "0.000001"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="spring">Spring Force Scaling</label></th>
+			<th><input type="number" id="spring" name="spring" value = "8000" step = "100"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="dampening">Velocity Bleed</label></th>
+			<th><input type="number" id="dampening" name="dampening" value = "0.990" step = "0.001" max = "1.0000000000000000" min = "0"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="numBodies"># of Bodies (squared)</label></th>
+			<th><input type="number" id="numBodies" name="numBodies" value = "23"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="mass">Body Mass</label></th>
+			<th><input type="number" id="mass" name="mass" value = "400" step = "10"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="rad">Body Radius<br></label></th>
+			<th><input type="number" id="rad" name="rad" value = "0.04" step = "0.001"></th>
+		</tr>
+
+		<tr>
+		<th><label for="colourScale">Colour Scale</label></th>
+		<th><input type="number" id="colourScale" name="colourScale" value = "300"></th>
+		</tr>
+
+		<tr>
+		<th colspan = "2"><input type="submit" value="Update"></th>
+		</tr>
+		
+		</table>
+		
+	</form>
+	</div>
+  </body>
+</html>

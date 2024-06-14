@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+		<!--<script src="../libraries/p5.sound.js"></script>-->
+	
+		<link rel="stylesheet" href="../myStyle.css">
+		<title>dan's site</title>
+		<link rel="icon" type="image/x-icon" href="../favicon.ico">
+	</head>
+	
+	<body class = "noBar">
+	
+	<script>
+	
+	/*
+	0: CROSS
+	1: CIRCLE
+	2: SQUARE
+	3: TRIANGLE
+	4: L1
+	5: R1
+	6: L2
+	7: R2
+	8: SELECT
+	9: START
+	10: L3
+	11: R3
+	12: up
+	13: down
+	14: left
+	15: right
+	16: idk
+	*/
+
+	const CANVAS_FACTOR = 1
+	const CANVAS_WIDTH = window.innerWidth//1280*CANVAS_FACTOR;
+	const CANVAS_HEIGHT = window.innerHeight//800*CANVAS_FACTOR;
+	const ASPECT = CANVAS_WIDTH/CANVAS_HEIGHT
+
+	const ORIGINX = CANVAS_WIDTH/2
+	const ORIGINY = CANVAS_HEIGHT/2
+	
+	const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+	
+	let img,prev
+	let matrix
+	let tempMatrix
+	
+	let scaleVal = 0.25
+	
+	let op1 = 0
+	let op2 = 50
+	let op3 = 200
+	
+	function keyPressed() {
+		if (keyCode === LEFT_ARROW) {
+			noLoop()
+		}		
+		if (keyCode === RIGHT_ARROW) {
+			loop()
+		}
+		if (keyCode === 80) { //p
+			let snap = createGraphics(CANVAS_WIDTH, CANVAS_HEIGHT)
+			snap.pixelDensity(1)
+			//snap.noSmooth()
+			snap.copy(img,0, 0, img.width, img.height,0, 0, snap.width, snap.height);
+			saveCanvas(snap,'waveform','png')
+		}
+		if (keyCode === 79) { //0
+			makeCircle(img,0.05)
+		}
+	}
+	
+	function initGrid(){
+		img.loadPixels()
+		
+		for (let i = 0; i < img.width; i++){
+			for (let j = 0; j < img.height; j++){
+				let pixIndex = 4*(i+j*img.width)
+				let colSelct = Math.random()//noise(0.1*i,0.1*j)
+
+				if (colSelct < 1/3.0){
+					img.pixels[pixIndex+0] = 255
+					img.pixels[pixIndex+1] = 255
+					img.pixels[pixIndex+2] = 255
+					img.pixels[pixIndex+3] = op1
+				} else if (colSelct < 2/3.0){
+					img.pixels[pixIndex+0] = 255
+					img.pixels[pixIndex+1] = 255
+					img.pixels[pixIndex+2] = 255
+					img.pixels[pixIndex+3] = op2
+				}else{
+					img.pixels[pixIndex+0] = 255
+					img.pixels[pixIndex+1] = 255
+					img.pixels[pixIndex+2] = 255
+					img.pixels[pixIndex+3] = op3
+				}
+			}
+		}
+		img.updatePixels()
+	}
+	
+	function updateGrid(){
+		prev.remove()
+		prev = createGraphics(scaleVal*CANVAS_WIDTH, scaleVal*CANVAS_HEIGHT)
+		prev.pixelDensity(1)
+		prev.noSmooth()
+		prev.copy(img,0, 0, img.width, img.height,0, 0, prev.width, prev.height);
+		
+		img.loadPixels()
+		prev.loadPixels()
+		
+		for (let i = 0; i < img.width; i++){
+			for (let j = 0; j < img.height; j++){
+				let pixIndex = 4*(i+j*img.width)
+
+				if (prev.pixels[pixIndex+3] <= op1){
+					updatePoint(i,j,0)
+				} else if (prev.pixels[pixIndex+3] < op3 && prev.pixels[pixIndex+3] > op1){
+					updatePoint(i,j,1)
+				} else if (prev.pixels[pixIndex+3] >= op3){
+					updatePoint(i,j,2)
+				}
+			}
+		}
+		img.updatePixels()
+	}
+	
+	function updatePoint(i,j,losesToo){
+		let losses = 0
+		let pCenter = 4*(i+j*img.width)
+		for (let k1 = -1;k1 <= 1;k1++){
+			for (let k2 = -1;k2 <= 1;k2++){
+				//if ((i+k1 > 0) && (i+k1 < img.width) && (j+k2 > 0) && (j+k2 < img.height)){
+					let pComp = 4*(((i+k1)%img.width)+((j+k2)%img.height)*img.width)
+					if (losesToo == 0 && prev.pixels[pComp + 3] < op3 && prev.pixels[pComp + 3] > op1){losses++}
+					if (losesToo == 1 && prev.pixels[pComp + 3] >= op3){losses++}
+					if (losesToo == 2 && prev.pixels[pComp + 3] <= op1){losses++}
+				//}
+			}
+		}
+		if (losses > 2){
+			if (losesToo == 0){
+				img.pixels[pCenter] = 255
+				img.pixels[pCenter + 1] = 255
+				img.pixels[pCenter + 2] = 255
+				img.pixels[pCenter + 3] = op2
+			}
+			if (losesToo == 1){
+				img.pixels[pCenter] = 255
+				img.pixels[pCenter + 1] = 255
+				img.pixels[pCenter + 2] = 255
+				img.pixels[pCenter + 3] = op3
+			}
+			if (losesToo == 2){
+				img.pixels[pCenter] = 255
+				img.pixels[pCenter + 1] = 255
+				img.pixels[pCenter + 2] = 255
+				img.pixels[pCenter + 3] = op1
+			}
+		}
+	}
+	
+	function makeCircle(graphic,rad){
+		graphic.loadPixels();
+		graphic.colorMode(HSB)
+		for (let i = 0; i < graphic.width; i++) {
+			for (let j = 0; j < graphic.height; j++) {
+				// loop over
+				let xPos = 2*(i/graphic.width - 0.5)
+				let yPos = 2*(j/graphic.height - 0.5)
+				if (xPos*xPos + yPos*yPos >= rad){
+					let index = 4*(j*graphic.width+i);
+					graphic.pixels[index] = pixels[index]
+					graphic.pixels[index+1] = pixels[index+1]
+					graphic.pixels[index+2] = pixels[index+2]
+					graphic.pixels[index+3] = 0;
+				}
+			}
+		}
+		graphic.updatePixels();
+	}
+
+	
+	function setup() {
+		myCanvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+		myCanvas.parent("canvasDiv")
+		
+		prev = createGraphics(scaleVal*CANVAS_WIDTH, scaleVal*CANVAS_HEIGHT);
+		img = createGraphics(scaleVal*CANVAS_WIDTH, scaleVal*CANVAS_HEIGHT);
+		
+		img.pixelDensity(1)
+		prev.pixelDensity(1)
+		
+		initGrid()
+		frameRate(30)
+	}
+	
+	function draw(){
+		
+		background(bgdColour)
+		noSmooth()
+		
+		if (mouseIsPressed){
+			//img.blendMode(REMOVE)
+			img.noStroke()
+			img.fill(bgdColour)
+			img.ellipse(mouseX*scaleVal,mouseY*scaleVal,64,64)
+		}
+	
+		updateGrid()
+		
+		scale(1/scaleVal)
+
+		image(img,0,0)
+	}
+	
+	</script>
+	<div id = "canvasDiv"></div>
+	</body>
+</html>

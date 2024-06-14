@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/p5/lib/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+	<script src="../libraries/concaveHull.min.js"></script>
+	
+	<link rel="stylesheet" href="../myStyle.css">
+	<title>dan's site</title>
+	<link rel="icon" type="image/x-icon" href="../favicon.ico">
+
+  </head>
+  <body class = "noBar">
+	<script>
+	
+	const CANVAS_FACTOR = 2
+	const CANVAS_WIDTH = window.innerWidth//1280*CANVAS_FACTOR;
+	const CANVAS_HEIGHT = window.innerHeight//800*CANVAS_FACTOR;
+
+	const ORIGINX = CANVAS_WIDTH/2
+	const ORIGINY = CANVAS_HEIGHT/2
+	
+	const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+	
+	const ASPECT = CANVAS_WIDTH/CANVAS_HEIGHT
+	let MAX_FRAMES = 720;
+	
+	let s = 0
+	let anim = 0
+	
+	let myCol
+	
+	let g = 9.8
+	let l1 = ORIGINY*(4/9)
+	let l2 = ORIGINY*(4/9)
+	let m1 = 1
+	let m2 = 1
+	
+	let y0 = [1.57+3.14*Math.random(),6.28*Math.random(),0,0]
+	let t0 = 0
+	let h = 0.005
+	
+	let waiting = false
+	let waitTime = 0
+	
+	let pg
+	let accentHue = 350
+	
+	function setup() {
+		var myCanvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+		myCanvas.parent("canvasDiv")
+		pg = createGraphics(CANVAS_WIDTH, CANVAS_HEIGHT);
+	}
+
+	function draw() {
+		anim = s/MAX_FRAMES;
+		background(bgdColour)
+		
+		if (anim >= 1){
+			s = 0
+			g = 9.8
+			l1 = ORIGINY*(4/9)
+			l2 = ORIGINY*(4/9)
+			m1 = 1
+			m2 = 1
+	
+			y0 = [1.57+3.14*Math.random(),6.28*Math.random(),0,0]
+			t0 = 0
+			h = 0.005
+			
+			waiting = true
+		}
+
+		if(waiting){
+			waitTime++;
+			push()
+			tint(255,255*(1-waitTime/100))
+			image(pg,0,0)
+			pop()
+			if(waitTime > 100){
+				waiting = false
+				pg.remove()
+				pg = createGraphics(CANVAS_WIDTH, CANVAS_HEIGHT);
+				MAX_FRAMES = 650 + 400*Math.random()
+				waitTime = 0
+			}
+		} else {
+			let linesPerFrame = 30
+			for (let i = 0; i < linesPerFrame; i++){
+				l1 = l1+ORIGINY/(linesPerFrame*(9/4)*MAX_FRAMES)
+				l2 = l2-ORIGINY/(linesPerFrame*(9/4)*MAX_FRAMES)
+				pg.push()
+				pg.translate(ORIGINX,ORIGINY)
+				pg.rotate(PI/2)
+				let stateTheta1 = y0[0]
+				let stateTheta2 = y0[1]
+				let stateOmega1 = y0[2]
+				let stateOmega2 = y0[3]
+				//pg.colorMode(HSB)
+				//pg.blendMode(OVERLAY)
+				
+				let param = ((i+s*linesPerFrame)/(MAX_FRAMES*linesPerFrame))
+				let rad1 = (2+6*Math.abs(stateOmega1))*CANVAS_FACTOR
+				let rad2 = (2+6*Math.abs(stateOmega2))*CANVAS_FACTOR
+				
+				/*
+				pg.strokeWeight(0.01)
+				pg.stroke(255)
+				pg.line(0,0,l1*cos(stateTheta1),l1*sin(stateTheta1))
+				*/
+
+				pg.translate(l1*cos(stateTheta1),l1*sin(stateTheta1))
+		
+				/*
+				pg.noStroke()
+				pg.fill(255,1)
+				pg.push()
+				pg.rotate(PI/2+stateTheta1)
+				pg.ellipse(0,0,rad1,2*rad1) 
+				pg.pop()
+				*/
+				
+				/*
+				pg.stroke(hue(bgdColour)+150,75,80)
+				pg.line(0,0,l2*cos(stateTheta2),l2*sin(stateTheta2))
+				*/
+				pg.translate(l2*cos(stateTheta2),l2*sin(stateTheta2))
+
+				pg.noStroke()
+				pg.fill(255)
+				//pg.fill(hue(bgdColour),75,80)
+				pg.push()
+				pg.rotate(PI+stateTheta2)
+				pg.ellipse(0,0,0.25*rad2,1.25*rad2)
+				pg.pop()
+				
+				t0 = t0 + h
+				let newy = RK4(t0,y0,h)
+				y0[0] = y0[0]+h*newy[0]
+				y0[1] = y0[1]+h*newy[1]
+				y0[2] = y0[2]+h*newy[2]
+				y0[3] = y0[3]+h*newy[3]
+				pg.pop()
+			}
+		s++;
+		//tint(255)
+		image(pg,0,0)
+		}
+	}
+
+	function keyPressed() {
+		if (keyCode === LEFT_ARROW) {
+			noLoop()
+		}		
+		if (keyCode === RIGHT_ARROW) {
+			loop()
+		}
+		/*
+		if (keyCode === TAB) {
+			saveCanvas(pg,'dancingLines','png')
+		}
+		*/
+	}
+	
+	function f(t,y){
+		let theta1 = y[0]
+		let theta2 = y[1]
+		let w1 = y[2]
+		let w2 = y[3]
+		let delta_theta = theta1-theta2
+		
+		let f0 = w1
+		let f1 = w2
+		let f2 = (-g*(2*m1+m2)*sin(theta1)-m2*g*sin(theta1-2*theta2)-2*sin(delta_theta)*m2*(w2*w2*l2+w1*w1*l1*cos(delta_theta)))/(l1*(2*m1+m2-m2*cos(2*theta1-2*theta2)))
+		let f3 = (2*sin(theta1-theta2)*(w1*w1*l1*(m1+m2)+g*(m1+m2)*cos(theta1)+w2*w2*l2*m2*cos(delta_theta)))/(l1*(2*m1+m2-m2*cos(2*theta1-2*theta2)))
+	  
+		return [f0,f1,f2,f3]
+	  }
+	  
+	function RK4(t,y,h){
+		let k1 = f(t,y)
+		let k2 = f(t+h/2,[y[0]+(h/2)*k1[0],y[1]+(h/2)*k1[1],y[2]+(h/2)*k1[2],y[3]+(h/2)*k1[3]])
+		let k3 = f(t+h/2,[y[0]+(h/2)*k2[0],y[1]+(h/2)*k2[1],y[2]+(h/2)*k2[2],y[3]+(h/2)*k2[3]])
+		let k4 = f(t+h,[y[0]+(h)*k3[0],y[1]+(h)*k3[1],y[2]+(h)*k3[2],y[3]+(h)*k3[3]])
+		let sxth = 1.0/6.0
+		return [sxth*(k1[0]+2*k2[0]+2*k3[0]+k4[0]),sxth*(k1[1]+2*k2[1]+2*k3[1]+k4[1]),sxth*(k1[2]+2*k2[2]+2*k3[2]+k4[2]),sxth*(k1[3]+2*k2[3]+2*k3[3]+k4[3])]
+	}
+
+
+
+
+	</script>
+	<div id = "canvasDiv"></div>
+  </body>
+</html>

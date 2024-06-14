@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+	<script src="../libraries/concaveHull.min.js"></script>
+	
+	<link rel="stylesheet" href="../myStyle.css">
+	<title>dan's site</title>
+	<link rel="icon" type="image/x-icon" href="../favicon.ico">
+
+  </head>
+  <body class = "noBar">
+	<script>
+	
+	const CANVAS_FACTOR = 2
+	const CANVAS_WIDTH = window.innerWidth//1280*CANVAS_FACTOR;
+	const CANVAS_HEIGHT = window.innerHeight//800*CANVAS_FACTOR;
+
+	const ORIGINX = CANVAS_WIDTH/2
+	const ORIGINY = CANVAS_HEIGHT/2
+	
+	const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+	
+	const ASPECT = CANVAS_WIDTH/CANVAS_HEIGHT
+
+	const B = 0.98
+	const h = 0.045
+	const K0 = 64
+	const KW = 0.5*K0
+	const g = 0.098
+	const rho = 100
+	
+	const N = 31*31
+	
+	let gravSwapx = 0
+	let gravSwapy = 1
+	
+	class Body{
+		constructor(x,y,radius){
+			this.position = new p5.Vector(x,y)
+			this.velocity = new p5.Vector(0,0)
+			this.force = new p5.Vector(0,0)
+			this.radius = radius
+			this.mass = radius*radius*rho
+		}
+		
+		applyForces(){
+			let ax = this.force.x/this.mass - gravSwapx*g
+			let ay = this.force.y/this.mass - gravSwapy*g
+
+			this.velocity.x = B*this.velocity.x + h*ax 
+			this.velocity.y = B*this.velocity.y + h*ay
+
+			this.position.x += h*this.velocity.x
+			this.position.y += h*this.velocity.y
+			this.force = new p5.Vector(0,0)
+		}
+		
+		wallCollisions(){
+			if (this.position.x > ASPECT-this.radius) {this.force.x += -KW*(this.position.x - ASPECT + this.radius);}
+			if (this.position.x < -ASPECT+this.radius) {this.force.x += -KW*(this.position.x + ASPECT - this.radius);}
+			if (this.position.y > 1-this.radius) {this.force.y += -KW*(this.position.y - 1 + this.radius);}
+			if (this.position.y < -1+this.radius) {this.force.y += -KW*(this.position.y + 1 - this.radius);}
+		}
+		
+		bodyCollision(otherBody){
+			let distVector = p5.Vector.sub(otherBody.position,this.position)
+			let distMag = distVector.mag()
+			
+			let collisionDistance = this.radius + otherBody.radius 
+			
+			if (distMag <= collisionDistance){
+				let compenstationMag = 0.5*(collisionDistance-distMag)
+
+				let angle = distVector.heading();
+				let sina = sin(angle);
+				let cosa = cos(angle);
+				
+				this.force.x += -cosa*K0*compenstationMag
+				otherBody.force.x += cosa*K0*compenstationMag
+				this.force.y += -sina*K0*compenstationMag
+				otherBody.force.y += sina*K0*compenstationMag
+			}	
+		}
+	}
+	
+	let s = 0
+	let anim = 0
+	
+	let bodyList = []
+	
+	let activeBody = new Body(0,0,0)
+	let activeBodyIndex = 0
+	let clickFlag = true
+
+	let autoRotate = false
+	
+	let hull = []
+
+	function setup() {
+		var myCanvas = createCanvas(CANVAS_WIDTH,CANVAS_HEIGHT);
+		myCanvas.parent("canvasDiv")
+		background(bgdColour)
+		bodyList = initBodies(N)
+		frameRate(60)
+	}	
+
+	function draw(){
+		background(bgdColour)
+		
+		let mousePosx = (mouseX-ORIGINX)/ORIGINY
+		let mousePosy = -(mouseY-ORIGINY)/ORIGINY
+		
+		if (mouseIsPressed && Math.abs(mousePosx) <= ASPECT && Math.abs(mousePosy) <= 1){
+			if (clickFlag == true){
+				activeBodyIndex = minDistNode(bodyList,mousePosx,mousePosy)
+				clickFlag = false
+			}
+			activeBody = bodyList[activeBodyIndex]
+			stroke(255,75)
+			strokeWeight(1)
+			line(normToCanvX(activeBody.position.x),normToCanvY(activeBody.position.y),mouseX,mouseY)
+		}else{
+			if (clickFlag == false){
+				activeBody = bodyList[activeBodyIndex]
+				activeBody.force.x += 20*activeBody.mass*(mousePosx - activeBody.position.x)
+				activeBody.force.y += 20*activeBody.mass*(mousePosy - activeBody.position.y)
+			}
+			clickFlag = true
+		}
+		calcWallCollisions(bodyList)
+		calcCollisions(bodyList)
+		updateBodies(bodyList)
+		showBodies(bodyList)
+		
+		//hull = computeHull(bodyList)
+		//drawHull(hull)
+		//drawShape(hull)
+		
+		//console.log(systemKinetic(bodyList))
+		
+		if (autoRotate === true){
+			gravSwapy = cos(0.0005*s)
+			gravSwapx = sin(0.0005*s)
+		}
+		s++;
+	}
+
+	function getRadius(){
+		return 0.035
+	}
+
+	function keyPressed() {
+		if (keyCode === UP_ARROW) {
+			gravSwapy = -1
+			gravSwapx = 0
+			autoRotate = false
+		}
+		if (keyCode === LEFT_ARROW) {
+			gravSwapx = 1
+			gravSwapy = 0
+			autoRotate = false
+		}
+		if (keyCode === RIGHT_ARROW) {
+			gravSwapx = -1
+			gravSwapy = 0
+			autoRotate = false
+		}
+		if (keyCode === DOWN_ARROW) {
+			gravSwapy = 1
+			gravSwapx = 0
+			autoRotate = false
+		}
+		if (keyCode == 32) {
+			gravSwapy = 0
+			gravSwapx = 0
+			autoRotate = false
+		}
+		if (keyCode == TAB) {
+			if (autoRotate){autoRotate = false}
+			else{autoRotate = true}
+		}
+	}
+
+	function computeHull(objList){
+		let points = []
+		for (let obj of objList){
+			points.push([obj.position.x,obj.position.y])
+		}
+		let hullpoints = concaveHull.calculate(points, 10);
+		return hullpoints
+	}
+
+	function drawHull(hullpoints){
+		stroke(0)
+		strokeWeight(5)
+		for (let i = 0; i < hullpoints.length-1;i++){
+			let point1 = hullpoints[i]
+			let point2 = hullpoints[i+1]
+			line(normToCanvX(point1[0]),normToCanvY(point1[1]),normToCanvX(point2[0]),normToCanvY(point2[1]))
+		}
+		let point1 = hullpoints[hullpoints.length-1]
+		let point2 = hullpoints[0]
+
+		line(normToCanvX(point1[0]),normToCanvY(point1[1]),normToCanvX(point2[0]),normToCanvY(point2[1]))
+	}
+
+	function drawShape(hull) {
+		let organicConstant = 0.5
+		curveTightness(organicConstant);
+		fill(255,50);
+		noStroke()
+		beginShape();
+		curveVertex(ORIGINX+ORIGINY*hull[0][0], ORIGINY-ORIGINY*hull[0][1]);
+		for (let i = 0; i < hull.length; i++){
+			curveVertex(ORIGINX+ORIGINY*hull[i][0], ORIGINY-ORIGINY*hull[i][1]);
+		}
+		curveVertex(ORIGINX+ORIGINY*hull[hull.length-1][0], ORIGINY-ORIGINY*hull[hull.length-1][1]);
+		endShape(CLOSE);
+	}
+	
+	function initBodies(n=9){
+		let tempList = []
+		let scale = 0.95
+
+		let nsq = floor(Math.sqrt(n))
+		for(let i = 0;i < nsq*nsq;i++){
+			let param1 = 2*(((i)%nsq)/(nsq-1))-1
+			let param2 = 2*floor(i/nsq)/(nsq-1)-1
+			tempList.push(new Body(scale*(param1+0.25*Math.random()/nsq),scale*(param2+0.25*Math.random()/nsq),getRadius()))
+		}
+		return tempList;
+	}
+	
+	function calcCollisions(objList){
+		for (let i = 0;i<objList.length;i++){
+			for (let j = 1+i;j<objList.length;j++){
+				objList[i].bodyCollision(objList[j])
+			}
+		}
+	}
+
+	function calcWallCollisions(objList){
+		for (let i = 0;i<objList.length;i++){
+			objList[i].wallCollisions()
+		} 			
+	}
+	
+	function updateBodies(objList){
+		for (let obj of objList){
+			obj.applyForces()
+		}
+	}
+	
+	function systemKinetic(objList){
+		let totalKin = 0
+		for (let obj of objList){
+			totalKin += obj.velocity.dot(obj.velocity)
+		}
+		return 0.5*totalKin
+	}
+	
+	function showBodies(objList){
+		noStroke()
+		for (let obj of objList){
+			let size = 0.8*Math.min(150*obj.velocity.mag(),2*ORIGINY*obj.radius)
+			fill(255,10+400*obj.velocity.mag())
+			ellipse(normToCanvX(obj.position.x),normToCanvY(obj.position.y),2*ORIGINY*obj.radius,2*ORIGINY*obj.radius)
+			fill(255,200)
+			ellipse(normToCanvX(obj.position.x),normToCanvY(obj.position.y),size,size)
+		}
+	}
+	
+	function minDistNode(objList,sourcex,sourcey){
+		let minIndex1 = 0
+		let minIndex2 = 0
+		let minDist = 100000
+		for (let i = 0;i < objList.length;i++){
+			let distx = objList[i].position.x - sourcex
+			let disty = objList[i].position.y - sourcey
+			let dist = distx*distx + disty*disty
+			if (dist < minDist){
+				minDist = dist
+				minIndex1 = i
+			}
+		}
+		return minIndex1
+	}
+	
+	function normToCanvX(normx){
+		return ORIGINX + ORIGINY*normx
+	}
+	
+	function normToCanvY(normy){
+		return ORIGINY - ORIGINY*normy
+	}
+	
+	</script>
+	<div id = "canvasDiv"></div>
+  </body>
+</html>

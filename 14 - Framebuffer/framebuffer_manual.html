@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/p5/lib/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+	<script src="../libraries/p5.sound.js"></script>
+	
+	<link rel="stylesheet" href="../myStyle.css">
+	<title>dan's site</title>
+	<link rel="icon" type="image/x-icon" href="../favicon.ico">
+
+  </head>
+  <body class = "noBar">
+	<script>
+	
+	const CANVAS_FACTOR = 1
+	const CANVAS_WIDTH = 1280*CANVAS_FACTOR;
+	const CANVAS_HEIGHT = 800*CANVAS_FACTOR;
+	const ASPECT = CANVAS_WIDTH/CANVAS_HEIGHT
+
+	const ORIGINX = CANVAS_WIDTH/2
+	const ORIGINY = CANVAS_HEIGHT/2
+	const DIAG = Math.ceil(Math.sqrt(CANVAS_WIDTH*CANVAS_WIDTH + CANVAS_HEIGHT*CANVAS_HEIGHT))
+	const HALF_DIAG = Math.ceil(DIAG*0.5)
+	
+	const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+	
+	let s = 0
+	let anim = 0
+	
+	let mic, fft, carrier, modulator, audioIn, spectrum;
+	let next,prev
+	
+	let resize=1.075,transparent=253,rotation=0.005,lowpass = 0.1,blendMethod
+	
+	let resizeVals = [1.010,1.010,1.040,1.040,1.075,1.075,1.075,1.1]
+	let transparentVals = [200,250,252,253,253,253,254,254,254,254]
+	let rotationVals = [0.005,-0.005,0.004,-0.004,0.003,-0.002,0.001]
+	let lowpassVals = [0.1,0.1,0.1,0.2,0.2,0.3]
+	let blendMethodVals
+	
+	let counter = 0
+	let counterThres = 1000
+	let randomise = false
+
+	function setup() {
+		var myCanvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+		myCanvas.parent("canvasDiv")
+		
+		prev = createGraphics(DIAG, DIAG);
+		next = createGraphics(DIAG, DIAG);
+		noFill()
+		
+		fft = new p5.FFT();
+		
+		mic = new p5.AudioIn();
+		mic.start();
+		//mic.amp(1.0)
+		mic.connect()
+		fft.setInput(mic);
+
+		blendMethod = OVERLAY
+		blendMethodVals = [DIFFERENCE,DIFFERENCE,HARD_LIGHT,HARD_LIGHT,OVERLAY,OVERLAY,SOFT_LIGHT,SOFT_LIGHT,BURN,DODGE]
+		
+		background(0)
+		//outputVolume(1.0)
+	}
+
+	function draw() {
+		spectrum = fft.analyze();
+		[prev, next] = [next, prev];
+
+		randomiseParams(counter)
+		visual(resize,transparent,rotation,lowpass,blendMethod)
+		
+		push()
+		translate(ORIGINX,ORIGINY)
+		//rotate(2*PI*frameCount*0.001)
+		//scale(0.4)
+		image(next, -HALF_DIAG, -HALF_DIAG);
+		//filter(POSTERIZE,5);
+		pop()
+		
+	}
+
+	function visual(resize=1.075,transparent=253,rotation=0.005,lowpass = 0.1,blendMethod = OVERLAY){
+		
+		next = createGraphics(DIAG, DIAG);
+		//background(20-20*sin(PI+2*PI*0.002*frameCount))
+		background(1)
+		
+		next.push()
+		next.translate(HALF_DIAG,HALF_DIAG)
+		next.tint(255,transparent);
+		next.scale(resize)
+		next.rotate(-2*PI*rotation)
+		next.image(prev,-HALF_DIAG,-HALF_DIAG)
+		next.pop()
+
+		next.blendMode(blendMethod)
+		next.push()
+		next.translate(HALF_DIAG,HALF_DIAG)
+		next.colorMode(HSB)
+		next.stroke(360-360*((frameCount*0.0001)%1),60+30*sin(2*PI*0.002*frameCount),60-30*sin(2*PI*0.002*frameCount));
+		next.strokeWeight(2*CANVAS_FACTOR)
+		next.noFill()
+		
+		next.beginShape();
+		let maxfreq = floor(spectrum.length*lowpass)
+		let spectrumSubset = spectrum.slice(0,maxfreq)
+
+		let correctionpoint = map(spectrumSubset[ceil(Math.sqrt(spectrumSubset.length))],0,255,0, HALF_DIAG)/2
+
+		curveVertex(-HALF_DIAG,correctionpoint)
+		for (let i = 0; i < spectrumSubset.length; i++) {
+			let x = map(log(i+1), 0, log(spectrumSubset.length), -HALF_DIAG, HALF_DIAG);
+			let y = map(spectrumSubset[i], 0, 255, 0, HALF_DIAG);
+			curveVertex(x,correctionpoint-y/2);
+		}
+
+		next.endShape();
+		next.pop()
+		next.reset()
+		next.remove()
+	}
+
+	function randomiseParams(){
+		if (counter > counterThres && randomise){
+			counter = 0
+			resize = resizeVals[Math.floor(Math.random() * resizeVals.length)];
+			document.getElementById("resize").value = resize
+			
+			transparent = transparentVals[Math.floor(Math.random() * transparentVals.length)];
+			document.getElementById("transparent").value = transparent
+			
+			rotation = rotationVals[Math.floor(Math.random() * rotationVals.length)];
+			document.getElementById("rotation").value = rotation
+			
+			lowpass = lowpassVals[Math.floor(Math.random() * lowpassVals.length)];
+			document.getElementById("lowpass").value = lowpass
+			
+			blendMethod = blendMethodVals[Math.floor(Math.random() * blendMethodVals.length)];
+
+			switch(blendMethod){
+				case DIFFERENCE:
+					document.getElementById("blendMethod").value = "DIFFERENCE";
+					break;
+				case HARD_LIGHT:
+					document.getElementById("blendMethod").value = "HARD_LIGHT"
+					break;
+				case SOFT_LIGHT:
+					document.getElementById("blendMethod").value = "SOFT_LIGHT"
+					break;
+				case BURN:
+					document.getElementById("blendMethod").value = "BURN"
+					break;
+				case DODGE:
+					document.getElementById("blendMethod").value = "DODGE"
+					break;
+				case OVERLAY:
+					document.getElementById("blendMethod").value = "OVERLAY"
+					break;
+				default:
+					document.getElementById("blendMethod").value = ""
+			}
+		}
+		counter++;
+	}
+
+	function crosshair(){
+		push()
+		stroke(255)
+		translate(ORIGINX,ORIGINY)
+		line(0,-ORIGINY,0,ORIGINY)
+		line(-ORIGINX,0,ORIGINX,0)
+		pop()
+	}
+
+	function keyPressed() {
+		if (keyCode === LEFT_ARROW) {
+			noLoop()
+		}		
+		if (keyCode === RIGHT_ARROW) {
+			loop()
+		}		
+		if (keyCode === TAB) {
+			getAudioContext().resume();
+		}	
+	}
+	
+	function submitParams(){
+		resize = parseFloat(document.getElementById("resize").value)
+		transparent = parseFloat(document.getElementById("transparent").value)
+		rotation = parseFloat(document.getElementById("rotation").value)
+		lowpass = parseFloat(document.getElementById("lowpass").value)
+		counterThres = parseFloat(document.getElementById("counterThres").value)
+			
+		let bm = document.getElementById("blendMethod").value
+		switch(bm){
+			case "DIFFERENCE":
+				blendMethod = DIFFERENCE;
+				break;
+			case "HARD_LIGHT":
+				blendMethod = HARD_LIGHT;
+				break;
+			case "SOFT_LIGHT":
+				blendMethod = SOFT_LIGHT;
+				break;
+			case "BURN":
+				blendMethod = BURN;
+				break;
+			case "DODGE":
+				blendMethod = DODGE;
+				break;
+			case "OVERLAY":
+				blendMethod = OVERLAY;
+				break;
+			default:
+				blendMethod = OVERLAY;
+		}
+		
+		randomise = document.getElementById("randomise").checked
+	}
+
+	</script>
+	<div id = "canvasDiv"></div>
+	<div>
+		<form action = "javascript:submitParams()">
+		<table>		
+		
+		<tr>
+			<th><label for="resize">resize</label></th>
+			<th><input type="number" id="resize" name="resize" value = "1.075" step = "0.0001" min = "0" max = "2"></th>
+		</tr>		
+		
+		<tr>
+			<th><label for="transparent">transparent</label></th>
+			<th><input type="number" id="transparent" name="transparent" value = "253" step = "0.1" min = "0" max = "255"></th>
+		</tr>	
+
+		<tr>
+			<th><label for="rotation">rotation</label></th>
+			<th><input type="number" id="rotation" name="rotation" value = "0.005" step = "0.0001" min = "-1" max = "1"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="lowpass">lowpass</label></th>
+			<th><input type="number" id="lowpass" name="lowpass" value = "0.1" step = "0.01" min = "0.00" max = "1.0"></th>
+		</tr>		
+		
+		<tr>
+			<th><label for="counterThres">counterThres</label></th>
+			<th><input type="number" id="counterThres" name="counterThres" value = "1000" min = "1"></th>
+		</tr>
+		
+		<tr>
+		<th>
+			<select id="blendMethod" name="blendMethod">
+			<option value="DIFFERENCE">DIFFERENCE</option>
+			<option value="HARD_LIGHT">HARD_LIGHT</option>
+			<option value="SOFT_LIGHT">SOFT_LIGHT</option>
+			<option value="BURN">BURN</option>
+			<option value="DODGE">DODGE</option>
+			<option value="OVERLAY" selected>OVERLAY</option>
+		  </select>
+		</th>
+		</tr>
+		
+		<tr>
+			<th><label for="randomise">randomise?</label></th>
+			<th><input type="checkbox" id="randomise" name="randomise"></th>
+		</tr>
+		
+		<tr>
+			<th colspan = "2"><input type="submit" value="Update"></th>
+		</tr>
+		</table>
+	</div>
+  </body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+	
+	<link rel="stylesheet" href="../myStyle.css">
+	<title>dan's site</title>
+	<link rel="icon" type="image/x-icon" href="../favicon.ico">
+
+  </head>
+  <body class = "noBar">
+	<script>
+	
+	const CANVAS_FACTOR = 2
+	const CANVAS_WIDTH = window.innerWidth//1280*CANVAS_FACTOR;
+	const CANVAS_HEIGHT = window.innerHeight//800*CANVAS_FACTOR;
+
+	const ORIGINX = CANVAS_WIDTH/2
+	const ORIGINY = CANVAS_HEIGHT/2
+	
+	const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+	
+	
+	
+	
+	let anim = 0
+	let s = 0
+	
+	let N = 60000
+	let M = 4
+	let angle = 0.065
+	let step = 7*CANVAS_FACTOR
+	
+	
+	let angleFactor = 2//2
+	
+	let transx = CANVAS_WIDTH*0.25
+	let transy = CANVAS_HEIGHT*0.85
+	
+	let krand = []
+	let krandIndex = 0
+	
+	for (let k = 0;k < 100000;k++){
+		krand.push(Math.random()-0.5)
+	}
+	
+	function setup() {
+		var myCanvas = createCanvas(CANVAS_WIDTH,CANVAS_HEIGHT);
+		myCanvas.parent("canvasDiv")
+		background(bgdColour)
+		//tree2(N,M)
+		//document.getElementById("canvasDiv").style.cursor = 'none';
+	}	
+
+	function draw() {
+		//anim = s/200
+		let param1 = (mouseX - ORIGINX)/ORIGINX + 1
+		let param2 = -0.5*(mouseY - ORIGINY)/ORIGINY + 0.5
+		
+		krandIndex = 0
+		background(bgdColour)
+		
+
+		
+		translate(ORIGINX,ORIGINY)
+		tree1(6,param1,0.5,param2)
+		
+		s++;
+	}
+	
+	function tree1(n,angle,branchlength,extraParam = 0){
+		if (n > 0){
+			stroke(255)
+			strokeWeight(branchlength)
+			
+			let numbranches = 5
+			
+			branchlength = branchlength/1.5
+			angle = angle
+			
+			for (let i = 0; i < numbranches; i++){
+				let c0 = (2*i/(numbranches-1) - 1)*angle*PI
+				push()
+				rotate(extraParam*krand[krandIndex]+c0)
+				line(0,0,0,-branchlength*ORIGINY)
+				translate(0,-branchlength*ORIGINY)
+				tree1(n-1,angle,branchlength,extraParam)
+				pop()
+				krandIndex++
+			}
+		}
+	}
+	
+	function formSubmit(){
+		return 0
+	}
+	
+	</script>
+	<div id = "canvasDiv"></div>
+  </body>
+</html>

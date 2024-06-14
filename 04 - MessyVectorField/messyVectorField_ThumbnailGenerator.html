@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+		<script src="../libraries/complex.js"></script>
+		
+		<link rel="stylesheet" href="../myStyle.css">
+		<title>dan's site</title>
+		<link rel="icon" type="image/x-icon" href="../favicon.ico">
+	</head>
+	<body class = "noBar">
+		<div id = "canvasDiv">
+		<script>
+			const CANVAS_FACTOR = 1
+			const CANVAS_WIDTH = 800*CANVAS_FACTOR;
+			const CANVAS_HEIGHT = 800*CANVAS_FACTOR;
+			const ORIGINX = CANVAS_WIDTH/2
+			const ORIGINY = CANVAS_HEIGHT/2
+	  
+			const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+			
+			let frame = 0;
+			let t = 0;
+			let rad = 0.7
+			let scale = 1
+			
+			let krand = []
+			for (let kr = 0;kr < 10000;kr++){
+				krand[kr] = Math.random()
+			}
+			
+			let pg
+			
+			//PERFORMS CAPTURE AND CANVAS SET UP
+			function setup() {
+				//CANVAS SET UP
+				var myCanvas = createCanvas(CANVAS_WIDTH,CANVAS_HEIGHT);
+				pixelDensity(1)
+				myCanvas.parent("canvasDiv")
+				colorMode(HSB)
+				background('black');
+				//vectorField(20)
+			}	
+
+			//DRAW AND CAPTURE LOOP
+			function draw() {
+				t = 1-2*abs((frame/1080)%1-0.5); // Increases 0 -> 1 over entire animation (time parameter)
+				
+				pg = createGraphics(CANVAS_WIDTH,CANVAS_HEIGHT)
+				
+				colorMode(HSB)
+				background(bgdColour);
+				//vectorField(40)
+				
+				let dropY =	6
+				let dropX = floor((width/height)*dropY)
+				
+				for (let dropValX = 0; dropValX < dropX; dropValX++){
+					for (let dropValY = 0; dropValY < dropY; dropValY++){
+						let x = (width/height)*(-1+2*((dropValX+0.5)/dropX))
+						let y = (-1+2*((dropValY+0.5)/dropY))
+						droplet(rad*x,rad*y,dropValX*dropX + dropValY)
+					}
+				}
+				
+				frame = frame+1; //Increase Frame*/
+				makeCircle(pg)
+				image(pg,0,0)
+				pg.remove()
+				// END DRAW
+			}
+			
+			function keyPressed() {
+				if (keyCode === UP_ARROW) {
+					saveCanvas(pg,'messyVectorField','png')
+				}
+			}
+				
+			function makeCircle(graphic){
+				graphic.loadPixels();
+				graphic.colorMode(HSB)
+				for (let i = 0; i < graphic.width; i++) {
+					for (let j = 0; j < graphic.height; j++) {
+						// loop over
+						let xPos = 2*(i/graphic.width - 0.5)
+						let yPos = 2*(j/graphic.height - 0.5)
+						if (xPos*xPos + yPos*yPos >= 0.9){
+							let index = 4*(j*graphic.width+i);
+							graphic.pixels[index] = pixels[index]
+							graphic.pixels[index+1] = pixels[index+1]
+							graphic.pixels[index+2] = pixels[index+2]
+							graphic.pixels[index+3] = 0;
+						}
+					}
+				}
+			graphic.updatePixels();
+			}
+			
+			function f(x,y,param=1){
+				let fx = 0
+				let fy = 0
+
+				let f1x = sin(2*PI*(x-1)*y)+cos(2*PI*y)
+				let f1y = sin(2*PI*(x+1))
+
+				let fmag = 2*Math.pow(f1x*f1x+f1y*f1y,0.5)
+
+				fx = f1x/fmag
+				fy = f1y/fmag
+
+				//fx = sin(2*PI*(y))+0.5*sin(2*2*PI*x)+0.33*sin(3*2*PI*y)
+				//fy = sin(2*PI*(x+t))+0.5*sin(2*2*PI*y)+0.33*sin(3*2*PI*x)
+				
+				return [fx,-fy]
+			}
+			
+			function vectorField(cells){
+				let cellsY = cells
+				let cellsX = floor((width/height)*cellsY)
+				 
+				for (let i = 0; i < cellsX; i++){
+					for (let j = 0; j < cellsY; j++){
+						let x = (width/height)*(-1+2*((i+0.5)/cellsX))
+						let y = (-1+2*((j+0.5)/cellsY))
+						push();
+						translate(ORIGINX+ORIGINY*x,ORIGINY+ORIGINY*y)
+						let fxy = f(scale*x,scale*y)
+
+						let cellWid = 2/cellsY
+						let length = Math.min(Math.sqrt(fxy[1]*fxy[1]+fxy[0]*fxy[0])*cellWid,2*cellWid)
+						rotate(atan2(fxy[1],fxy[0]))
+						let lenFactor = 0.75
+						colorMode(RGB)
+						stroke(2*red(bgdColour),2*green(bgdColour),2*blue(bgdColour))
+						strokeWeight(2)
+						arrow(lenFactor*ORIGINY*length)
+						//text(dropValX*dropX + dropValY,ORIGINX+ORIGINX*(-1+2*(dropValX/dropX)),ORIGINY+ORIGINY*(-1+2*(dropValY/dropY)))
+						pop();
+					}
+				}
+
+			}
+			
+			function arrow(length){
+				line(-length,0,length,0)
+				line(length,0,0.8*length,length*0.2)
+				line(length,0,0.8*length,-length*0.2)
+			}
+			
+			function droplet(x0,y0,id,vx0=0,vy0=0,steps=150){
+				let lengthParam = x0
+				let x = scale*x0
+				let y = scale*y0
+				let influence = 0.7
+				let stepSize = 6/steps
+				for (let i = 0;i<steps*t;i++){
+					pg.push()
+					let param2 = i/steps
+					let fxy = f(scale*x,scale*y,param2)
+					let vx = (1-influence)*vx0 + influence*fxy[0]
+					let vy = (1-influence)*vy0 + influence*fxy[1]
+					x = x0 + stepSize*vx
+					y = y0 + stepSize*vy
+					
+					pg.translate(ORIGINX,ORIGINY)
+					pg.stroke(255)
+					pg.strokeWeight(1)
+					pg.line(ORIGINY*x0,ORIGINY*y0,ORIGINY*x,ORIGINY*y)
+					
+					vx0 = vx
+					vy0 = vy
+					x0 = x
+					y0 = y
+					pg.pop()
+				}
+			}
+		</script>
+		</div>
+	</body>
+</html>

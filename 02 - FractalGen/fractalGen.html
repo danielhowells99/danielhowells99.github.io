@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<link rel="stylesheet" href="../myStyle.css">
+	<title>dan's site</title>
+	<link rel="icon" type="image/x-icon" href="../favicon.ico">
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+	<script src="../libraries/complex.js"></script>
+  </head>
+  <body class = "noBar">
+	<div id = "canvasDiv"></div>
+    <script>
+
+		const CANVAS_FACTOR = 2
+		const CANVAS_WIDTH = 1280*CANVAS_FACTOR;
+		const CANVAS_HEIGHT = 800*CANVAS_FACTOR;
+		
+		const ORIGIN = CANVAS_HEIGHT/2;
+		
+		let magVal = 0
+		let w = 6
+		let cx = 0
+		let cy = 0
+		let zoomFactor = 0.2
+		
+		let scaleFactor = 0.2
+		
+		let s = 0
+		let img
+		
+		const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+		
+		let bgdHue
+		let bgdRed
+		let bgdBlue
+		let bgdGreen
+		
+		let blackOn = false
+
+		//PERFORMS CAPTURE AND CANVAS SET UP
+		function setup() {
+			var myCanvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+			myCanvas.parent("canvasDiv")
+			document.getElementById("canvasDiv").style.cursor = 'none';
+			pixelDensity(1);
+			colorMode(HSB)
+			
+			bgdHue = hue(bgdColour)
+			bgdRed = red(bgdColour)
+			bgdGreen = green(bgdColour)
+			bgdBlue = blue(bgdColour)
+			
+			blackOn = (bgdRed + bgdGreen + bgdBlue == 0)
+			
+			typedParams()
+		}	
+		function draw(){
+			scaleFactor = parseFloat(document.getElementById("scaleFactor").value)
+			
+			image(img,0,0)
+			noFill()
+			strokeWeight(1)
+			if (document.getElementById("crosshair").checked){
+				document.getElementById("canvasDiv").style.cursor = 'none';
+				stroke("white")
+				rect(mouseX-CANVAS_WIDTH*scaleFactor/2,mouseY-CANVAS_HEIGHT*scaleFactor/2,CANVAS_WIDTH*scaleFactor,CANVAS_HEIGHT*scaleFactor)
+			}else{
+				document.getElementById("canvasDiv").style.cursor = 'auto';
+			}
+			if(mouseIsPressed && mouseX < CANVAS_WIDTH && mouseX > 0 && mouseY < CANVAS_HEIGHT && mouseY > 0){
+				mouseParams(mouseX,mouseY)
+			}
+		}
+
+		//DRAW AND CAPTURE LOOP
+		function typedParams() {
+			w = parseFloat(document.getElementById("scaleVal").value)
+			cx = parseFloat(document.getElementById("cxPos").value)
+			cy = parseFloat(document.getElementById("cyPos").value)
+			generateFractal(w,cx,cy);
+	    }
+		
+		function mouseParams(mousex,mousey) {
+			cx = cx + ((mousex - CANVAS_WIDTH/2.0)/CANVAS_WIDTH)*w
+			cy = cy + ((mousey - CANVAS_HEIGHT/2.0))*w/CANVAS_WIDTH
+			w = w*scaleFactor
+			
+			document.getElementById("scaleVal").value = Number((w).toFixed(16))
+			document.getElementById("cxPos").value = Number((cx).toFixed(16))
+			document.getElementById("cyPos").value = Number((cy).toFixed(16))
+			
+			generateFractal(w,cx,cy);
+			
+	    }
+		
+		
+		
+		function generateFractal(w,cx,cy){
+			
+			let bgdHue = hue(bgdColour)
+			let bgdSat = saturation(bgdColour)
+			let bgdBrt = brightness(bgdColour)
+			
+			console.log(bgdHue,bgdSat,bgdBrt)
+			
+			img = createImage(CANVAS_WIDTH,CANVAS_HEIGHT)
+			
+			const yw = (CANVAS_HEIGHT/CANVAS_WIDTH)*w
+			
+			const xmin = -w/2 + cx
+			const ymin = -yw/2 + cy
+			
+			const xmax = xmin + w;
+			const ymax = ymin + yw;
+			
+			const dx = (xmax - xmin) / (img.width);
+			const dy = (ymax - ymin) / (img.height);
+			
+			img.loadPixels();
+
+			let y = ymin;
+			let x1 = 0, y1=0;
+			let x2 = 0, y2=0;
+			let z1;
+			let iterations = parseInt(document.getElementById("iterations").value);
+			let modParam = parseFloat(document.getElementById("modParam").value);
+			
+			let haze_color = color(0,0,100)
+			
+			for (let j = 0; j < img.height; j++) {
+				let x = xmin;
+				for (let i = 0; i < img.width; i++) {
+					haze_color = color(bgdHue,bgdSat,bgdBrt)
+					let finalk= 0;
+					x1 = 0;
+					y1 = 0;
+					for (let k = 0; k < iterations;k++){ 
+						//z1 = [abs(2*x1*y1),x1*x1 - y1*y1]
+						
+						z1 = [x1*x1 - y1*y1,2*x1*y1]
+						
+						//z1 = [2*x1*y1*sin(6*(y1*y1+x1)),2*x1*y1*cos(6*(x1*x1+y1))]
+						
+						//z1 = comPow([x1,y1],modParam)
+						
+						//let beta = 0.68
+						//z1 = comMul([(1-beta)*x1+beta*sin(x1),(1-beta)*y1+beta*sin(y1)],[x1,(1-beta)*y1+beta*sin(y1)])
+						
+						//z1 = [x1*sin(y1),y1*sin(x1)]
+						
+						//let sz = comSinh([x1,y1])
+						//z1 = conjDiv([sz[0]+0.5,sz[1]])
+						
+						x1 = z1[0]+y;
+						y1 = z1[1]+x;
+						
+						
+						magVal = comMag2(z1)
+						
+						if (magVal > 16){
+							finalk = k;
+							let hue1 = finalk/iterations
+							if (blackOn){
+								haze_color = color(75-50*sin(2*PI*hue1))
+							}else{
+								haze_color = color(bgdHue,45+30*sin(2*PI*hue1),51-35*sin(2*PI*hue1)) //(220,50,50)
+							}
+							break;
+						}
+						
+						
+					}
+					
+					//let hue1 = ((0.5*atan2(y1,x1)/PI+1)+0.5)%1
+					//haze_color = color((360*hue1)%360,33-20*sin(2*PI*hue1),75+20*sin(2*PI*hue1))
+					
+					
+					const pix1 = (i+j*width)*4; //pixeladdress for corresponding x1,y1
+					
+					img.pixels[pix1 + 0] = red(haze_color)//pixels[pix2 + 0]
+					img.pixels[pix1 + 1] = green(haze_color)//pixels[pix2 + 1]
+					img.pixels[pix1 + 2] = blue(haze_color)//pixels[pix2 + 2]
+					img.pixels[pix1 + 3] = 255//pixels[pix2 + 3];
+					x += dx;
+				}
+				y += dy;
+			}
+			img.updatePixels();
+			
+			console.log("scaleFactor = " + w + " yw = " + yw + "\n ymin: = " + ymin + " ymax: = " + ymax + "\n xmin: = " + xmin + " xmax: = " + xmax + "\n dx = " + dx + " dy = " + dy)
+		}
+    </script>
+	<div>
+	<form action="javascript:typedParams()">
+		<table>
+		<tr>
+			<th><label for="iterations">Iterations</label></th>
+			<th><input type="number" id="iterations" name="iterations" value = "150"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="scaleVal">Scale</label></th>
+			<th><input type="number" id="scaleVal" name="scaleVal" value = "0.02" step = "0.00000000000000001"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="cxPos">Center x Coord</label></th>
+			<th><input type="number" id="cxPos" name="cxPos" value = "-0.113" step = "0.00000000000000001"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="cyPos">Center y Coord</label></th>
+			<th><input type="number" id="cyPos" name="cyPos" value = "-0.746" step = "0.00000000000000001"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="scaleFactor">Scale Factor<br><small>&lt 1 for zoom-in<br>&gt 1 for zoom-out<br>= 1 for translate</small></label></th>
+			<th><input type="number" id="scaleFactor" name="scaleFactor" value = "0.2" step = "0.01" min = "0" max = "2"></th>
+		</tr>
+		
+		<tr>
+			<th><label for="modParam">modParam<br></label></th>
+			<th><input type="number" id="modParam" name="modParam" value = "2" step = "0.1"></th>
+		</tr>
+
+		<tr>
+		<th><label for="crosshair">Crosshair on?</label></th>
+		<th><input type="checkbox" id="crosshair" name="crosshair" checked = "true"></th>
+		</tr>
+
+		<tr>
+		<th colspan = "2"><input type="submit" value="Generate"></th>
+		</tr>
+		
+		</table>
+		
+	</form>
+	</div>
+  </body>
+</html>

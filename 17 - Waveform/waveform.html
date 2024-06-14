@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/p5@1.9.0/lib/p5.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+		<script src="../libraries/p5.sound.js"></script>
+	
+		<link rel="stylesheet" href="../myStyle.css">
+		<title>dan's site</title>
+		<link rel="icon" type="image/x-icon" href="../favicon.ico">
+	</head>
+	
+	<body class = "noBar">
+	
+	<script>
+	
+	/*
+	0: CROSS
+	1: CIRCLE
+	2: SQUARE
+	3: TRIANGLE
+	4: L1
+	5: R1
+	6: L2
+	7: R2
+	8: SELECT
+	9: START
+	10: L3
+	11: R3
+	12: up
+	13: down
+	14: left
+	15: right
+	16: idk
+	*/
+
+	const CANVAS_FACTOR = 1
+	const CANVAS_WIDTH = window.innerWidth//1280*CANVAS_FACTOR;
+	const CANVAS_HEIGHT = window.innerHeight//800*CANVAS_FACTOR;
+	const ASPECT = CANVAS_WIDTH/CANVAS_HEIGHT
+
+	const ORIGINX = CANVAS_WIDTH/2
+	const ORIGINY = CANVAS_HEIGHT/2
+	const DIAG = Math.ceil(Math.sqrt(CANVAS_WIDTH*CANVAS_WIDTH + CANVAS_HEIGHT*CANVAS_HEIGHT))
+	const HALF_DIAG = Math.ceil(DIAG*0.5)
+	
+	const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
+	
+	let mic, fft, audioIn, myWave, filter;
+	let next,prev,myCanvas
+
+	let resize=1.0055,transparent=230,rotation=0.0025,lowpass = 0.1,blendMethod
+	
+	let micToggle = false
+	let textToggle = false
+	let textTime = 0
+	
+	let filterFreq = 60;
+	
+	function keyPressed() {
+		if (keyCode === LEFT_ARROW) {
+			noLoop()
+		}		
+		if (keyCode === RIGHT_ARROW) {
+			loop()
+		}	
+		if (keyCode === TAB) {
+			getAudioContext().resume();
+		}	
+		if (keyCode === 80) { //p
+			saveCanvas(next,'waveform','png')
+		}
+		if (keyCode === 77) { //m
+			if (micToggle == false){
+				getAudioContext().resume();
+				micToggle = true
+				mic.start();
+			} else {
+				micToggle = false
+				mic.stop();
+			}
+		}
+		if (keyCode === 84) { //t
+			if (textToggle == false){
+				textToggle = true
+			} else {
+				textToggle = false
+			}
+		}
+	}
+
+	function visual(){
+		
+		[prev, next] = [next, prev];
+		
+		next = createGraphics(DIAG, DIAG);
+
+		//background(1)
+		
+		next.push()
+		next.translate(HALF_DIAG,HALF_DIAG)
+		next.tint(200,100,255,transparent);
+		//next.tint(255,120);
+		//next.colorMode(HSB)
+		//next.tint((frameCount)%360,75,100,0.9*transparent/255);
+		next.scale(resize)
+		//next.scale(1.1)
+		//next.rotate(-2*PI*rotation)
+		next.image(prev,-HALF_DIAG,-HALF_DIAG)
+		next.pop()
+		
+		
+		//next.blendMode(BURN)
+		
+		next.push()
+		next.translate(HALF_DIAG,HALF_DIAG)
+		//next.colorMode(HSB)
+		//next.stroke(360-360*((frameCount*0.0005)%1),60+30*sin(2*PI*0.01*frameCount),60-30*sin(2*PI*0.01*frameCount));
+		next.stroke(255,240,230);
+		next.strokeWeight(4*CANVAS_FACTOR)
+		next.noFill()
+		
+		next.beginShape();
+		next.curveTightness(0)
+		
+		for (let i = 0; i < myWave.length; i=i+Math.floor(myWave.length/128)) {
+			let amp = i/(myWave.length-1)
+			let x = map(i, 0, myWave.length, -0.8*HALF_DIAG, 0.8*HALF_DIAG);
+			let y = map(4*amp*(1-amp)*myWave[i], -1, 1, -0.8*HALF_DIAG, 0.8*HALF_DIAG);
+			curveVertex(x,y);
+		}
+
+		next.endShape();
+		next.pop()
+		next.reset()
+		next.remove()
+	}
+	
+	function setup() {
+		myCanvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+		myCanvas.parent("canvasDiv")
+		
+		prev = createGraphics(DIAG, DIAG);
+		next = createGraphics(DIAG, DIAG);
+		
+		fft = new p5.FFT(0.0,8192);
+		filter = new p5.BandPass();
+		
+		mic = new p5.AudioIn();
+		//mic.start();
+		mic.connect(soundOut)
+		mic.connect(filter)
+		filter.disconnect()
+		fft.setInput(filter);
+		
+		console.log(sampleRate())
+		frameRate(8*(sampleRate())/8192);
+		myWave = fft.waveform();
+		//background(0)
+	}
+	
+	function draw(){
+
+		if (keyIsDown(UP_ARROW)) { //1
+			filterFreq = min(filterFreq*1.05,11050)
+			console.log(filterFreq)
+		}
+		if (keyIsDown(DOWN_ARROW)) { //2
+			filterFreq = max(filterFreq*0.95,60)
+			console.log(filterFreq)
+		}
+
+		filter.freq(filterFreq);
+		//filter.res(100)
+			
+		visual()
+		
+		background(0)
+		push()
+		translate(ORIGINX,ORIGINY)
+		scale(CANVAS_WIDTH/DIAG)
+		image(next, -HALF_DIAG, -HALF_DIAG);
+		pop()
+		
+		if (textToggle){
+			textTime = 2.0
+		}
+		
+		if (textTime > 0){
+			push()
+			stroke(0,255*(textTime/2.0))
+			strokeWeight(1)
+			fill(255,255*(textTime/2.0))
+			textSize(15)
+			text("FILTER FREQUENCY: " + filterFreq.toFixed(2),50,50)
+			pop()
+			textTime = Math.max(textTime-1/30.0,0)
+		}
+		myWave = fft.waveform();
+	}
+	
+	</script>
+	<div id = "canvasDiv"></div>
+	</body>
+</html>
