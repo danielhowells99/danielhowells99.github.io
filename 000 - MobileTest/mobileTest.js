@@ -1,5 +1,6 @@
 let myCanvas
 let c = 0
+let shakeWait = 0
 
 function preload() {
 }
@@ -18,6 +19,7 @@ function draw() {
 	stroke(0)
 	textSize(25)
 	text(c,width/2,height/2)
+	shakeWait++
 }
 
 function windowResized() {
@@ -25,5 +27,8 @@ function windowResized() {
 }
 
 function deviceShaken() {
-	c = (c + 0.25)%2
+	if (shakeWait > 60){
+		c = (c + 0.25)%2
+		shakeWait = 0
+	}
 }

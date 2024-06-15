@@ -2,6 +2,7 @@ let shader0,shader1,shader2,shader3,shader4,shader5;
 let shaderTexture;
 let myCanvas
 let shaderIndex = 1
+let shakeWait = 0
 
 function preload() {
   // load each shader file (don't worry, we will come back to these!)
@@ -20,6 +21,12 @@ function setup() {
   shaderTexture = createGraphics(window.innerWidth, window.innerHeight, WEBGL)
   shaderTexture.noStroke()
   noStroke();
+  
+  myCanvas.mousePressed(function(){
+	DeviceOrientationEvent.requestPermission();
+  });
+  
+  setShakeThreshold(50)
 }
 
 function draw() {
@@ -59,6 +66,7 @@ function draw() {
 	}
 	
 	rect(0,0,width,height)
+	shakeWait++
 }
 
 function keyPressed() {
@@ -79,6 +87,13 @@ function keyPressed() {
 	}
 	if (keyCode === 54) { //6
 		shaderIndex = 5
+	}
+}
+
+function deviceShaken() {
+	if (shakeWait > 60){
+		shaderIndex = (shaderIndex + 1)%6
+		shakeWait = 0
 	}
 }
 
