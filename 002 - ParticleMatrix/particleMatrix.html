@@ -29,11 +29,11 @@
 	}
 	
 	const CANVAS_FACTOR = 2
-	const CANVAS_WIDTH = window.innerWidth//1280*CANVAS_FACTOR;
-	const CANVAS_HEIGHT = window.innerHeight//800*CANVAS_FACTOR;
+	let CANVAS_WIDTH = window.innerWidth//1280*CANVAS_FACTOR;
+	let CANVAS_HEIGHT = window.innerHeight//800*CANVAS_FACTOR;
 
-	const ORIGINX = CANVAS_WIDTH/2
-	const ORIGINY = CANVAS_HEIGHT/2
+	let ORIGINX = CANVAS_WIDTH/2
+	let ORIGINY = CANVAS_HEIGHT/2
 	
 	const bgdColour = getComputedStyle(document.querySelector('body')).backgroundColor
 
@@ -73,6 +73,13 @@
 	}	
 
 	function draw() {
+	
+		CANVAS_WIDTH = width//1280*CANVAS_FACTOR;
+		CANVAS_HEIGHT = height//800*CANVAS_FACTOR;
+
+		ORIGINX = CANVAS_WIDTH/2
+		ORIGINY = CANVAS_HEIGHT/2
+	
 		background(bgdColour)
 		
 		let mouseStar = new Star((width/height)*(mouseX-ORIGINX)/ORIGINX,(mouseY-ORIGINY)/ORIGINY,attractor)
@@ -240,7 +247,7 @@
 
 		<tr>
 			<th><label for="starNum"># of Stars</label></th>
-			<th><input type="number" id="starNum" name="starNum" value = "1000" step = "10" min = "0" max = "5000"></th>
+			<th><input type="number" id="starNum" name="starNum" value = "700" step = "10" min = "0" max = "5000"></th>
 		</tr>
 		
 		<tr>
