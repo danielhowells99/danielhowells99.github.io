@@ -26,7 +26,7 @@ function setup() {
 	DeviceOrientationEvent.requestPermission();
   });
   
-  setShakeThreshold(50)
+  setShakeThreshold(30)
 }
 
 function draw() {
@@ -91,7 +91,7 @@ function keyPressed() {
 }
 
 function deviceShaken() {
-	if (shakeWait > 60){
+	if (shakeWait > 30){
 		shaderIndex = (shaderIndex + 1)%6
 		shakeWait = 0
 	}
