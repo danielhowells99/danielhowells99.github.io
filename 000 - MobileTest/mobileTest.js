@@ -1,5 +1,6 @@
 let myCanvas
 let c = 0
+let btn
 
 function preload() {
 }
@@ -11,13 +12,13 @@ function setup() {
   btn.mousePressed(function(){
 	DeviceOrientationEvent.requestPermission();
   });
-  
-  noStroke();
 }
 
 function draw() {
 	background(255*c)
 	fill('red')
+	stroke(0)
+	textSize(25)
 	text(c,width/2,height/2)
 }
 
