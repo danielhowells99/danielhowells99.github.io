@@ -9,3 +9,8 @@ function draw() {
   rotateY(accelerationY * 0.01);
   box(100, 100, 100);
 }
+
+function mousePressed(){
+	DeviceOrientationEvent.requestPermission();
+	DeviceMotionEvent.requestPermission();
+}
