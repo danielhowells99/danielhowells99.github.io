@@ -9,8 +9,8 @@ function draw() {
   background(127);
   normalMaterial();
   
-  xRot += accelerationX * 0.01
-  yRot += accelerationY * 0.01
+  xRot = rotationX
+  yRot = rotationY
   
   rotateX(xRot);
   rotateY(yRot);
