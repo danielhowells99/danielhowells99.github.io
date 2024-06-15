@@ -5,15 +5,20 @@ function preload() {
 }
 
 function setup() {
-  // the canvas has to be created with WEBGL mode
   myCanvas = createCanvas(window.innerWidth, window.innerHeight);
-  shaderTexture = createGraphics(window.innerWidth, window.innerHeight)
-  shaderTexture.noStroke()
+  
+  btn = createButton("Motion");
+  btn.mousePressed(function(){
+	DeviceOrientationEvent.requestPermission();
+  });
+  
   noStroke();
 }
 
 function draw() {
 	background(255*c)
+	fill('red')
+	text(c,width/2,height/2)
 }
 
 function windowResized() {
