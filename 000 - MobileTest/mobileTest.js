@@ -1,6 +1,5 @@
 let myCanvas
 let c = 0
-let btn
 
 function preload() {
 }
@@ -8,8 +7,7 @@ function preload() {
 function setup() {
   myCanvas = createCanvas(window.innerWidth, window.innerHeight);
   
-  btn = createButton("Motion");
-  btn.mousePressed(function(){
+  myCanvas.mousePressed(function(){
 	DeviceOrientationEvent.requestPermission();
   });
 }
