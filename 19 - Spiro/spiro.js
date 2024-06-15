@@ -16,8 +16,8 @@ function preload() {
 
 function setup() {
   // the canvas has to be created with WEBGL mode
-  myCanvas = createCanvas(displayWidth, displayHeight, WEBGL);
-  shaderTexture = createGraphics(displayWidth, displayHeight, WEBGL)
+  myCanvas = createCanvas(window.innerWidth, window.innerHeight, WEBGL);
+  shaderTexture = createGraphics(window.innerWidth, window.innerHeight, WEBGL)
   shaderTexture.noStroke()
   noStroke();
 }
