@@ -10,6 +10,9 @@ body {
 	hsl(200,60%,10%) original blue
 	hsl(244,56%,12%) dark purply-blue
 	*/
+	
+	padding: 0; 
+	margin: 0;
 }
 .noBar::-webkit-scrollbar {
     display: none;
