@@ -51,8 +51,8 @@ void main() {
 	float homeDist = homeDisplacement.x*homeDisplacement.x + homeDisplacement.y*homeDisplacement.y;
 
 	
-	vec2 force = -0.012*mouseDisplacement/(mouseDist) + 0.1*homeDisplacement;
-	velocity = 0.98*velocity + force;
+	vec2 force = -0.015*mouseDisplacement/(mouseDist) + 0.1*homeDisplacement;
+	velocity = 0.99*velocity + force;
 	
 	position += 0.01*velocity;
 	
