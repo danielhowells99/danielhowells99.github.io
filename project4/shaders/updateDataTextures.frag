@@ -8,6 +8,7 @@ layout(location = 1) out vec4 outColor1;
 
 uniform sampler2D uPositionSampler; //TRY U SAMPLER TO GET UINT8 VALUE
 uniform sampler2D uVelocitySampler; //TRY U SAMPLER TO GET UINT8 VALUE
+uniform sampler2D uHomeSampler;
 
 uniform float uAspect;
 uniform float uParticleNumSqd;
@@ -31,42 +32,45 @@ vec2 untangle(float x){
 
 void main() {
 
+	vec4 homeData = floor(255.0*texture(uHomeSampler, vTexturePosition));
 	vec4 positionData = floor(255.0*texture(uPositionSampler, vTexturePosition));
 	vec4 velocityData = floor(255.0*texture(uVelocitySampler, vTexturePosition));
 	
 	vec2 position = 2.0*p(positionData)-1.0; // p.xy 2d
 	position.x *= uAspect;
+
+	vec2 homePosition = 2.0*p(homeData)-1.0; // p.xy 2d
+	homePosition.x *= uAspect;
+
 	vec2 velocity = 2.0*p(velocityData)-1.0; //v.xy 2d
 
-	vec2 displacement = uMousePos - position;
-	float dist = displacement.x*displacement.x + displacement.y*displacement.y;
+	vec2 mouseDisplacement = uMousePos - position;
+	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
+
+	vec2 homeDisplacement = homePosition - position;
+	float homeDist = homeDisplacement.x*homeDisplacement.x + homeDisplacement.y*homeDisplacement.y;
+
 	
-	/*
-	float angle = atan(displacement.x,displacement.y);
-	float s = sin(angle);
-	float c = cos(angle);
-	*/
-
-	vec2 force = 0.002*displacement/(dist);
-	velocity = 0.998*velocity + force;
-
-	//vec2 force = 0.1*displacement/(dist);
-	//velocity = 0.001*velocity + force;
-
+	vec2 force = -0.015*mouseDisplacement/(mouseDist) + 0.1*homeDisplacement;
+	velocity = 0.98*velocity + force;
+	
 	position += 0.01*velocity;
 	
 	if (position.x >= uAspect || position.x <= -uAspect){
 		velocity.x *= -1.0;
 		position += 0.02*velocity;
+		//position.x *= -1.0;
 	}
 	
 	if (position.y >= 1.0 || position.y <= -1.0){
 		velocity.y *= -1.0;
 		position += 0.02*velocity;
+		//position.y *= -1.0;
 	}
 	
 	
 	position.x /= uAspect;
+
 	position = 65535.0*(0.5*position + 0.5); // p.xy 2d
 	velocity = 65535.0*(0.5*velocity + 0.5); //v.xy 2d
 
