@@ -31,7 +31,10 @@ resizeCanvas();
 
 
 let mouse = {x: 0,y: 0}
+let finger = {x: 0,y: 0}
+
 onmousemove = function(e){mouse = {x: e.clientX/canvas.width, y: 1-e.clientY/canvas.height}}
+ontouchmove = function(e){finger = {x: e.touches[0].clientX/canvas.width, y: 1-e.touches[0].clientY/canvas.height}}
 
 const dataProgram = initShaderProgram(gl, 'shaders/updateDataTextures.vert', 'shaders/updateDataTextures.frag');
 const particleProgram = initShaderProgram(gl, 'shaders/renderParticles.vert', 'shaders/renderParticles.frag');
@@ -194,7 +197,9 @@ function render() {
 
 	gl.uniform1f(dataProgramInfo.uniformLocations.aspect,aspectRatio);
 	gl.uniform1f(dataProgramInfo.uniformLocations.frameCount,frameCounter);
-	gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
+	//gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
+	
+	gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*(2.0*finger.x-1.0),(2.0*finger.y-1.0)]);
 	
 	//gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*0.4*aspectRatio*Math.sin(3*frameCounter/540),0.4*Math.cos(5*frameCounter/540)]);
 	
