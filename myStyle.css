@@ -19,6 +19,7 @@ body {
   /*scrollbar-width: none;*/
   padding: 0px 0px 0px 0px;
   margin: 0px 0px 0px 0px;
+  touch-action: none;
 }
 
 h1 { 
