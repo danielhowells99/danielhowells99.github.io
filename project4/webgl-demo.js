@@ -65,7 +65,7 @@ const particleProgramInfo = {
 	},
 };
 
-const particleNumSqd = 150.0
+const particleNumSqd = 100.0
 const particleNum = particleNumSqd*particleNumSqd
 
 const particle_positions = []
@@ -194,9 +194,9 @@ function render() {
 
 	gl.uniform1f(dataProgramInfo.uniformLocations.aspect,aspectRatio);
 	gl.uniform1f(dataProgramInfo.uniformLocations.frameCount,frameCounter);
-	//gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
+	gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
 	
-	gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*0.4*aspectRatio*Math.sin(3*frameCounter/540),0.4*Math.cos(5*frameCounter/540)]);
+	//gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*0.4*aspectRatio*Math.sin(3*frameCounter/540),0.4*Math.cos(5*frameCounter/540)]);
 	
 	
 	gl.activeTexture(gl.TEXTURE0);
