@@ -33,8 +33,18 @@ resizeCanvas();
 let mouse = {x: 0,y: 0}
 let finger = {x: 0,y: 0}
 
+function isTouchDevice() {
+  return (('ontouchstart' in window) ||
+     (navigator.maxTouchPoints > 0) ||
+     (navigator.msMaxTouchPoints > 0));
+}
+
+if (isTouchDevice()){
+	ontouchmove = function(e){finger = {x: e.touches[0].clientX/canvas.width, y: 1-e.touches[0].clientY/canvas.height}}
+}
+
 onmousemove = function(e){mouse = {x: e.clientX/canvas.width, y: 1-e.clientY/canvas.height}}
-ontouchmove = function(e){finger = {x: e.touches[0].clientX/canvas.width, y: 1-e.touches[0].clientY/canvas.height}}
+
 
 const dataProgram = initShaderProgram(gl, 'shaders/updateDataTextures.vert', 'shaders/updateDataTextures.frag');
 const particleProgram = initShaderProgram(gl, 'shaders/renderParticles.vert', 'shaders/renderParticles.frag');
