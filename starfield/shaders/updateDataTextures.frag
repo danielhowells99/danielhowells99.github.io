@@ -49,7 +49,7 @@ void main() {
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
 
 	vec2 homeDisplacement = homePosition - position;
-	float homeDist = homeDisplacement.x*homeDisplacement.x + homeDisplacement.y*homeDisplacement.y;
+	//float homeDist = homeDisplacement.x*homeDisplacement.x + homeDisplacement.y*homeDisplacement.y;
 
 	
 	vec2 force = 1.0*(-uMouseForce*0.015*mouseDisplacement/(mouseDist) + 0.1*homeDisplacement);
