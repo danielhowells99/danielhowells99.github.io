@@ -5,7 +5,7 @@ precision highp float;
 uniform float uTimeParam;
 uniform float uAspect;
 
-uniform sampler2D uSampler;
+//uniform sampler2D uSampler;
 
 vec3 hsv2rgb(vec3 c)
 {
@@ -39,18 +39,18 @@ void main() {
 			break;
 		}
 	}
-	float d = 1.0*atan(z.y,z.x) - uTimeParam*0.1;
-	//float d = 1.0*(1.0+cos(frameNumber*0.01 + 0.3+3.0*atan(z.y,z.x)));//12.0*(1.0-iterationReached/150.0);
+	float d = 1.5*atan(z.y,z.x) - uTimeParam*0.1;
+	//float d = 1.0*(1.0+cos(uTimeParam*0.01 + 0.3+3.0*atan(z.y,z.x)));//12.0*(1.0-iterationReached/150.0);
 	
 	//vec4 myColor = vec4(palette(2.0*d), 1.0);
 	//vec4 myColor = vec4(1.0*d,2.0*d,3.0*d, 1.0);
 	//vec4 myColor = vec4(3.0*d,2.0*d,0.7*d, 1.0); //gold
-	//vec4 myColor = vec4(1.05*d,0.95*d,1.2*d, 1.0); //silver
-	//vec4 myColor = vec4(1.0*d,1.0*d,1.0*d, 1.0); //silver
+	//vec4 myColor = vec4(0.90*d,0.90*d,1.2*d, 1.0); //silver
+	//vec4 myColor = vec4(1.2*d,1.15*d,1.0*d, 1.0); //silver
 	//vec4 myColor = vec4(2.0*d,1.1*d,0.5*d, 1.0); //copper
 	//vec4 myColor = vec4(1.0*d,1.5*d,3.0*d, 1.0);
 	vec4 myColor = vec4(hsv2rgb(vec3(d + 0.01,0.33-0.25*sin(6.28*d),0.67+0.25*sin(6.28*d))), 1.0);
 	//vec4 myColor = vec4(0.5+0.5*sin(6.28*d),0.5+0.5*sin(6.28*d),0.5+0.5*sin(6.28*d), 1.0);
-	//gl_FragColor = myColor;
-	gl_FragColor = texture2D(uSampler, z/10.0);
+	gl_FragColor = myColor;
+	//gl_FragColor = texture2D(uSampler, z/11.0);
 }

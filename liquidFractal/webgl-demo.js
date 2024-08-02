@@ -22,12 +22,20 @@ function main() {
 	}
 
 	function resizeCanvas() {
-		canvas.width = window.innerWidth;
-		canvas.height = window.innerHeight;
+		let displayWidth = window.innerWidth;
+		let displayHeight = window.innerHeight;
+		let scale = 2;
+		canvas.style.width = displayWidth + 'px';
+		canvas.style.height = displayHeight + 'px';
+		canvas.width = displayWidth * scale;
+		canvas.height = displayHeight * scale;
+		
 		gl.viewport(0,0,canvas.width,canvas.height);
+		window.scrollTo(0,1)
 	}
 
 	window.addEventListener("resize", resizeCanvas);
+	
 	resizeCanvas();
 
 	// Set clear color to black, fully opaque
@@ -63,10 +71,12 @@ function main() {
 	// objects we'll be drawing.
 	const buffers = initBuffers(gl);
 	
+	/*
 	// Load texture
 	const texture = loadTexture(gl, "galaxy.png");
 	// Flip image pixels into the bottom-to-top order that WebGL expects.
 	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	*/
 
 	// Draw the scene
 	let then = 0;
@@ -78,7 +88,7 @@ function main() {
 		deltaTime = now - then;
 		then = now;
 
-		drawScene(gl, programInfo, buffers, texture, squareRotation);
+		drawScene(gl, programInfo, buffers, squareRotation);
 		squareRotation += deltaTime;
 
 		requestAnimationFrame(render);
