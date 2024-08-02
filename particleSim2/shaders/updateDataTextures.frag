@@ -28,8 +28,8 @@ void main() {
 
 	vec2 homeDisplacement = vec2(homeData.x*uAspect,homeData.y)- position;
 
-	vec2 force = (-uMouseForce*0.05*mouseDisplacement/(mouseDist+0.001) + 0.01*homeDisplacement);
-	velocity = 0.98*velocity + force;
+	vec2 force = (-uMouseForce*0.02*mouseDisplacement/(mouseDist+0.001) + 0.01*homeDisplacement);
+	velocity = 0.985*velocity + force;
 	
 	position += 0.01*velocity;
 	
