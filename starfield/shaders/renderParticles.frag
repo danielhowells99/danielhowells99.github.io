@@ -5,7 +5,7 @@ precision mediump float;
 uniform float uAspect;
 uniform float uParticleNumSqd;
 
-varying vec2 vTexturePosition;
+//varying vec2 vTexturePosition;
 
 void main() {
 	vec2 circCoord = 2.0 * gl_PointCoord - 1.0;
