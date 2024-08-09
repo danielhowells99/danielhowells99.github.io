@@ -74,7 +74,7 @@ function main() {
 		
 		gl.uniform1f(
 			programInfo.uniformLocations.timeParam,
-			timeParam,
+			0.5*timeParam,
 		);
 		gl.uniform1f(
 			programInfo.uniformLocations.aspect,
