@@ -1,0 +1,45 @@
+body { 
+	background-color: hsl(244,56%,0%);
+	/*
+	
+	hsl(151,74%,10%); chalkboard green (current favourite)
+	hsl(166,74%,5%); nice dark green
+	hsl(166,74%,15%); nice green 
+	hsl(166,47%,20%) nice light green
+
+	hsl(200,60%,10%) original blue
+	hsl(244,56%,12%) dark purply-blue
+	*/
+}
+.noBar::-webkit-scrollbar {
+    display: none;
+}
+.noBar {
+  -ms-overflow-style: none;
+  /*scrollbar-width: none;*/
+  padding: 0px 0px 0px 0px;
+  margin: 0px 0px 0px 0px;
+}
+
+h1 { 
+	color: white;
+	font-weight: 100;
+	text-align: center;
+	font-size: 300%;
+	font-family: "Helvetica";
+}
+
+p {
+	color: white;
+}
+table { 
+	color: white;
+}
+
+img {
+	
+}
+.menuIcons {
+	width: 200px;
+	height: 200px;
+}
