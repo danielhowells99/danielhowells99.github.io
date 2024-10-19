@@ -10,7 +10,7 @@ if (!ext) {
 	alert('need OES_texture_float');
 }
 
-gl.clearColor(0.01, 0.01, 0.1, 0.0);
+gl.clearColor(1.0, 0.01, 0.1, 1.0);
 gl.clearDepth(1.0);
 
 function resizeCanvas() {
@@ -64,6 +64,12 @@ onmouseup = function(e){
 	}
 
 
+let capFlag = 0;
+document.addEventListener("keypress", function onEvent(event) {
+	if (event.key == "p" || event.key == "P"){
+		capFlag = 1;
+	}
+});
 
 const dataProgram = initShaderProgram(gl, 'shaders/updateDataTextures.vert', 'shaders/updateDataTextures.frag');
 const particleProgram = initShaderProgram(gl, 'shaders/renderParticles.vert', 'shaders/renderParticles.frag');
@@ -209,6 +215,17 @@ function render() {
 	var f = f1;
 	f1 = f2;
 	f2 = f;
+
+	if (capFlag == 1){
+		console.log("saving picture")
+		var dataURL = gl.canvas.toDataURL("image/png");
+		var a = document.createElement('a');
+		a.href = dataURL;
+		a.download = "picture.png";
+		document.body.appendChild(a);
+		a.click();
+		capFlag = 0;
+	}
 
 	requestAnimationFrame(render);
 }

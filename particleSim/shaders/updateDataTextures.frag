@@ -39,12 +39,12 @@ void main() {
 	velocity = 0.9*velocity + 0.025*force;
 	
 	if (position.x >= uAspect || position.x <= -uAspect){
-		velocity.x += -0.005*(position.x-uAspect);
-		position.x *= -1.0;
+		velocity.x += -0.003*(position.x-uAspect);
+		//position.x *= -1.0;
 	}
 	
 	if (position.y >= 1.0 || position.y <= -1.0){
-		velocity.y += -0.005*(position.y-1.0);
+		velocity.y += -0.003*(position.y-1.0);
 		//position.y *= -1.0;
 	}
 	
