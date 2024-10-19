@@ -36,16 +36,25 @@ void main() {
 	//vec2 force = (uMouseForce*0.2*mouseDisplacement/(sqrt(mouseDist)+1.0/8192.0) + 0.0*homeDisplacement);
 	//vec2 force = uMouseForce*0.1*mouseDisplacement/(abs(mouseDisplacement.x) + abs(mouseDisplacement.y));// + 0.8*homeDisplacement;
 	//vec2 force = (0.01*uMouseForce*mouseDisplacement/(mouseDist+0.00001) + 0.1*homeDisplacement);
+	
 	velocity = 0.9*velocity + 0.025*force;
 	
-	if (position.x >= uAspect || position.x <= -uAspect){
-		velocity.x += -0.003*(position.x-uAspect);
-		//position.x *= -1.0;
+	float k0 = 0.015;
+	
+	if (position.x >= uAspect){
+		velocity.x += -k0*(position.x-uAspect);
 	}
 	
-	if (position.y >= 1.0 || position.y <= -1.0){
-		velocity.y += -0.003*(position.y-1.0);
-		//position.y *= -1.0;
+	if (position.x <= -uAspect){
+		velocity.x += -k0*(position.x+uAspect);
+	}
+	
+	if (position.y >= 1.0){
+		velocity.y += -k0*(position.y-1.0);
+	}
+	
+	if (position.y <= -1.0){
+		velocity.y += -k0*(position.y+1.0);
 	}
 	
 	position += uFrameCount*velocity;
