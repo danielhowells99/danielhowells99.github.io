@@ -16,7 +16,6 @@ varying vec2 vTexturePosition;
 void main() {
 
 	vec4 data = texture2D(uDataSampler, vTexturePosition);
-	vec4 homeData = texture2D(uHomeSampler, vTexturePosition);
 	
 	vec2 position = data.xy; // p.xy 2d
 	position.x *= uAspect;
@@ -25,21 +24,16 @@ void main() {
 
 	vec2 mouseDisplacement = uMousePos - position;
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
+	
+	vec2 force = 0.00075*(uMouseForce*mouseDisplacement/(mouseDist));
+	//vec2 force = (uMouseForce*0.001*mouseDisplacement/(mouseDist+1.0/8192.0));
 
+	/*
+	vec4 homeData = texture2D(uHomeSampler, vTexturePosition);
 	vec2 homeDisplacement = vec2(homeData.x*uAspect,homeData.y)- position;
+	vec2 force = (-uMouseForce*0.03*mouseDisplacement/(mouseDist) + homeDisplacement);
+	*/
 
-	//vec2 force = (-uMouseForce*0.008*mouseDisplacement/(mouseDist+1.0/4096.0) + 0.075*homeDisplacement);
-	
-	//vec2 force = (uMouseForce*0.01*mouseDisplacement/(mouseDist+1.0/4096.0));// + 0.001*homeDisplacement); //GOOD
-	
-	//vec2 force = (uMouseForce*0.03*mouseDisplacement/(mouseDist+1.0/4096.0));// + 0.001*homeDisplacement); //GOOD
-	vec2 force = (uMouseForce*0.03*mouseDisplacement/(mouseDist));// + 0.001*homeDisplacement); //GOOD
-	
-	//vec2 force = (uMouseForce*0.2*mouseDisplacement/(sqrt(mouseDist)+1.0/8192.0) + 0.0*homeDisplacement);
-	//vec2 force = uMouseForce*0.1*mouseDisplacement/(abs(mouseDisplacement.x) + abs(mouseDisplacement.y));// + 0.8*homeDisplacement;
-	//vec2 force = (0.01*uMouseForce*mouseDisplacement/(mouseDist+0.00001) + 0.1*homeDisplacement);
-	
-	velocity = 0.9*velocity + 0.025*force;
 	
 	float k0 = 0.015;
 	
@@ -58,7 +52,15 @@ void main() {
 	if (position.y <= -1.0){
 		velocity.y += -k0*(position.y+1.0);
 	}
-	
+	/*
+	float posmag = position.x*position.x + position.y*position.y - 0.85;
+	if (posmag >= 0.0){
+		float angle = atan(position.y,position.x);
+		velocity.x += -k0*cos(angle)*(posmag);
+		velocity.y += -k0*sin(angle)*(posmag);
+	}
+	*/
+	velocity = 0.9*velocity + force;
 	position += uFrameCount*velocity;
 	
 	position.x /= uAspect;
