@@ -25,7 +25,8 @@ void main() {
 	vec2 mouseDisplacement = uMousePos - position;
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
 	
-	vec2 force = 0.00075*(uMouseForce*mouseDisplacement/(mouseDist));
+	vec2 force = 0.0008*(uMouseForce*mouseDisplacement/(mouseDist+1.0/4096.0));
+	//vec2 force = 0.005*(uMouseForce*mouseDisplacement/(abs(mouseDisplacement.x)+abs(mouseDisplacement.y)));
 	//vec2 force = (uMouseForce*0.001*mouseDisplacement/(mouseDist+1.0/8192.0));
 
 	/*
@@ -35,8 +36,9 @@ void main() {
 	*/
 
 	
-	float k0 = 0.015;
-	
+	float k0 = 0.0025;
+	//float k0 = 0.015;
+	/*
 	if (position.x >= uAspect){
 		velocity.x += -k0*(position.x-uAspect);
 	}
@@ -52,15 +54,16 @@ void main() {
 	if (position.y <= -1.0){
 		velocity.y += -k0*(position.y+1.0);
 	}
-	/*
+	*/
+	
 	float posmag = position.x*position.x + position.y*position.y - 0.85;
 	if (posmag >= 0.0){
 		float angle = atan(position.y,position.x);
 		velocity.x += -k0*cos(angle)*(posmag);
 		velocity.y += -k0*sin(angle)*(posmag);
 	}
-	*/
-	velocity = 0.9*velocity + force;
+	
+	velocity = 0.91*velocity + force;
 	position += uFrameCount*velocity;
 	
 	position.x /= uAspect;
