@@ -31,7 +31,9 @@ void main() {
 	//vec2 force = (-uMouseForce*0.008*mouseDisplacement/(mouseDist+1.0/4096.0) + 0.075*homeDisplacement);
 	
 	//vec2 force = (uMouseForce*0.01*mouseDisplacement/(mouseDist+1.0/4096.0));// + 0.001*homeDisplacement); //GOOD
-	vec2 force = (uMouseForce*0.03*mouseDisplacement/(mouseDist+1.0/4096.0));// + 0.001*homeDisplacement); //GOOD
+	
+	//vec2 force = (uMouseForce*0.03*mouseDisplacement/(mouseDist+1.0/4096.0));// + 0.001*homeDisplacement); //GOOD
+	vec2 force = (uMouseForce*0.03*mouseDisplacement/(mouseDist));// + 0.001*homeDisplacement); //GOOD
 	
 	//vec2 force = (uMouseForce*0.2*mouseDisplacement/(sqrt(mouseDist)+1.0/8192.0) + 0.0*homeDisplacement);
 	//vec2 force = uMouseForce*0.1*mouseDisplacement/(abs(mouseDisplacement.x) + abs(mouseDisplacement.y));// + 0.8*homeDisplacement;
