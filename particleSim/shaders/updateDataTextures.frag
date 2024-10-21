@@ -68,7 +68,7 @@ void main() {
 	*/
 	
 	//velocity = 0.87*velocity + force;
-	velocity = 0.6*velocity + force;
+	velocity = 0.65*velocity + force;
 	position += 0.002*uFrameCount*velocity;
 	
 	position.x /= uAspect;
