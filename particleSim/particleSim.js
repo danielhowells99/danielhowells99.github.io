@@ -10,7 +10,7 @@ if (!ext) {
 	alert('need OES_texture_float');
 }
 
-gl.clearColor(1.0, 0.01, 0.1, 1.0);
+gl.clearColor(0.0, 0.0, 0.03, 1.0);
 gl.clearDepth(1.0);
 
 function resizeCanvas() {
@@ -101,7 +101,7 @@ const particleProgramInfo = {
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 500000;
+const particle_num = 1000000;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 
 const particle_data = []
@@ -165,6 +165,7 @@ let startTime = new Date().getTime();
 function render() {
 	aspectRatio = canvas.width/canvas.height
 	//frameCounter += 1;
+	gl.clear(gl.COLOR_BUFFER_BIT)
 	
 	let endTime = new Date().getTime();
 	let delayMilliseconds = (endTime - startTime);
@@ -204,7 +205,7 @@ function render() {
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	
 	gl.enable(gl.BLEND);
-	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 	
 	gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);
 	
