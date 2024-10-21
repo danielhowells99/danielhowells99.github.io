@@ -54,8 +54,8 @@ void main() {
 	if (position.y <= -1.0){
 		velocity.y += -k0*(position.y+1.0);
 	}
-	
 	/*
+	
 	float posmag = position.x*position.x + position.y*position.y - 0.85*min(1.0,uAspect*uAspect);
 	if (posmag >= 0.0){
 		float angle = atan(position.y,position.x);
@@ -64,7 +64,7 @@ void main() {
 	}
 	*/
 	
-	velocity = 0.91*velocity + force;
+	velocity = 0.91*velocity + force; //0.91
 	position += uFrameCount*velocity;
 	
 	position.x /= uAspect;

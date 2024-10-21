@@ -55,7 +55,7 @@ onmousedown = function(e){
 onmouseup = function(e){
 	
 	mouseEndTime = new Date().getTime()
-	if (mouseEndTime-mouseStartTime > 500){
+	if (mouseEndTime-mouseStartTime > 250){
 		mouseToggle = mouseToggle^1; 
 	}
 	
@@ -99,14 +99,18 @@ const particleProgramInfo = {
 	},
 };
 
+let aspectRatio = canvas.width/canvas.height;
+
 const particle_num = 500000;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 
 const particle_data = []
 
 for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
-	particle_data.push(0.8*(-1 + 2*Math.random()))
-	particle_data.push(0.8*(-1 + 2*Math.random()))
+	let point_angle = Math.random()*Math.PI*2
+	let point_dist = 0.6*Math.sqrt(Math.random())
+	particle_data.push(Math.cos(point_angle)*point_dist/aspectRatio)
+	particle_data.push(Math.sin(point_angle)*point_dist)
 	particle_data.push(0)
 	particle_data.push(0)
 }
@@ -125,7 +129,6 @@ gl.activeTexture(gl.TEXTURE1);
 gl.bindTexture(gl.TEXTURE_2D, textures.initTex);
 
 //set uniforms
-let aspectRatio = canvas.width/canvas.height;
 
 gl.useProgram(dataProgram);
 gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
