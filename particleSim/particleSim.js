@@ -10,7 +10,7 @@ if (!ext) {
 	alert('need OES_texture_float');
 }
 
-gl.clearColor(0.0, 0.0, 0.03, 1.0);
+gl.clearColor(0.0, 0.0, 0.02, 1.0);
 gl.clearDepth(1.0);
 
 function resizeCanvas() {
@@ -101,7 +101,7 @@ const particleProgramInfo = {
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 500000;
+const particle_num = 1000000;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 
 const particle_data = []
@@ -169,7 +169,7 @@ function render() {
 	
 	let endTime = new Date().getTime();
 	let delayMilliseconds = (endTime - startTime);
-	let animParam = delayMilliseconds/4.0; //4.0 milliseconds for standard frame
+	let animParam = delayMilliseconds/8.0; //4.0 milliseconds for standard frame
 	//console.log(animParam)
 	startTime = endTime
 	

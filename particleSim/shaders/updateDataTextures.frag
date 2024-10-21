@@ -25,7 +25,7 @@ void main() {
 	vec2 mouseDisplacement = uMousePos - position;
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
 	
-	vec2 force = 0.0008*(uMouseForce*mouseDisplacement/(mouseDist+1.0/4096.0));
+	vec2 force = 0.8*(uMouseForce*mouseDisplacement/(mouseDist+1.0/4096.0));
 	//vec2 force = 0.005*(uMouseForce*mouseDisplacement/(abs(mouseDisplacement.x)+abs(mouseDisplacement.y)));
 	//vec2 force = (uMouseForce*0.001*mouseDisplacement/(mouseDist+1.0/8192.0));
 
@@ -37,8 +37,8 @@ void main() {
 
 	
 	//float k0 = 0.0025;
-	float k0 = 0.015;
-	float boundary = 1.0;
+	float k0 = 15.0;
+	float boundary = 0.8;
 
 	
 	if (position.x >= boundary*uAspect){
@@ -67,7 +67,7 @@ void main() {
 	}
 	*/
 	velocity = 0.91*velocity + force;
-	position += uFrameCount*velocity;
+	position += 0.003*uAspect*velocity;
 	
 	position.x /= uAspect;
 	gl_FragColor = vec4(position,velocity);
