@@ -10,7 +10,7 @@ if (!ext) {
 	alert('need OES_texture_float');
 }
 
-gl.clearColor(0.0, 0.0, 0.02, 1.0);
+gl.clearColor(0.0, 0.0, 0.03, 1.0);
 gl.clearDepth(1.0);
 
 function resizeCanvas() {
