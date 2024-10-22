@@ -83,7 +83,7 @@ const dataProgramInfo = {
 		aspect: gl.getUniformLocation(dataProgram, "uAspect"),
 		dataSampler: gl.getUniformLocation(dataProgram, "uDataSampler"),
 		homeSampler: gl.getUniformLocation(dataProgram, "uHomeSampler"),
-		frameCount: gl.getUniformLocation(dataProgram, "uFrameCount"),
+		deltaTime: gl.getUniformLocation(dataProgram, "uDeltaTime"),
 		mousePos: gl.getUniformLocation(dataProgram, "uMousePos"),
 		mouseForce: gl.getUniformLocation(dataProgram, "uMouseForce")
 	},
@@ -168,16 +168,15 @@ function render() {
 	gl.clear(gl.COLOR_BUFFER_BIT)
 	
 	let endTime = new Date().getTime();
-	let delayMilliseconds = (endTime - startTime);
-	let animParam = delayMilliseconds/8.0; //4.0 milliseconds for standard frame
-	//console.log(animParam)
+	let delayMilliseconds = (endTime - startTime)/1000.0;
+	//console.log(delayMilliseconds)
 	startTime = endTime
 	
 	gl.useProgram(dataProgram);
 	gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
 	gl.uniform1f(dataProgramInfo.uniformLocations.aspect,aspectRatio);
 	//gl.uniform1f(dataProgramInfo.uniformLocations.frameCount,frameCounter);
-	gl.uniform1f(dataProgramInfo.uniformLocations.frameCount,animParam);
+	gl.uniform1f(dataProgramInfo.uniformLocations.deltaTime,delayMilliseconds);
 	gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
 	//gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*0.4*aspectRatio*Math.sin(3*frameCounter/540),0.4*Math.cos(5*frameCounter/540)]);
 	

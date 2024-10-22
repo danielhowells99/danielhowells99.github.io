@@ -7,7 +7,7 @@ uniform sampler2D uHomeSampler;
 
 uniform float uAspect;
 
-uniform float uFrameCount;
+uniform float uDeltaTime;
 uniform vec2 uMousePos;
 uniform float uMouseForce;
 
@@ -25,7 +25,7 @@ void main() {
 	vec2 mouseDisplacement = uMousePos - position;
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
 	
-	vec2 force = 1.2*(uMouseForce*mouseDisplacement/(mouseDist+1.0/4096.0));
+	vec2 force = 16.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/4096.0));
 	//vec2 force = 0.005*(uMouseForce*mouseDisplacement/(abs(mouseDisplacement.x)+abs(mouseDisplacement.y)));
 	//vec2 force = (uMouseForce*0.001*mouseDisplacement/(mouseDist+1.0/8192.0));
 
@@ -42,19 +42,19 @@ void main() {
 
 	
 	if (position.x >= boundary*uAspect){
-		velocity.x += -k0*(position.x-boundary*uAspect);
+		force.x += -k0*(position.x-boundary*uAspect);
 	}
 	
 	if (position.x <= -boundary*uAspect){
-		velocity.x += -k0*(position.x+boundary*uAspect);
+		force.x += -k0*(position.x+boundary*uAspect);
 	}
 	
 	if (position.y >= boundary*1.0){
-		velocity.y += -k0*(position.y-boundary*1.0);
+		force.y += -k0*(position.y-boundary*1.0);
 	}
 	
 	if (position.y <= -boundary*1.0){
-		velocity.y += -k0*(position.y+boundary*1.0);
+		force.y += -k0*(position.y+boundary*1.0);
 	}
 	
 	/*
@@ -66,8 +66,9 @@ void main() {
 	}
 	*/
 	
-	velocity = 0.87*velocity + force;
-	position += 0.002*uFrameCount*velocity;
+	//velocity = 0.87*velocity + force;
+	velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;
+	position += uDeltaTime*velocity;
 	
 	position.x /= uAspect;
 	gl_FragColor = vec4(position,velocity);
