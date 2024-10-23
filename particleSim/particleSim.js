@@ -10,7 +10,13 @@ if (!ext) {
 	alert('need OES_texture_float');
 }
 
-gl.clearColor(0.0, 0.0, 0.03, 1.0);
+gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
+//gl.clearColor(0.98, 0.92, 0.85, 1.0);
+
+//gl.clearColor(1.0-0.05, 1.0-0.1,1.0-0.15, 1.0);
+//gl.clearColor(0.025,0.05,0.075,1.0);
+
+//gl.clearColor(0.02,0.0,0.07,0.3);
 gl.clearDepth(1.0);
 
 function resizeCanvas() {
@@ -93,26 +99,44 @@ const particleProgramInfo = {
 	program: particleProgram,
 	attribLocations: {
 		vertexData: gl.getAttribLocation(particleProgram, "aVertexData"),
+		indexData: gl.getAttribLocation(particleProgram, "aIndexData"),
 	},
 	uniformLocations: {
 		aspect: gl.getUniformLocation(particleProgram, "uAspect"),
+		particleNumSq: gl.getUniformLocation(particleProgram, "uParticleNumSq"),
+		sizeSampler: gl.getUniformLocation(particleProgram, "uSizeSampler"),
 	},
 };
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 600000;
+const particle_num = 800*800;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 
 const particle_data = []
+const size_data = []
+const index_data = []
 
 for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
+	/*
 	let point_angle = Math.random()*Math.PI*2
 	let point_dist = 0.6*Math.sqrt(Math.random())
 	particle_data.push(Math.cos(point_angle)*point_dist/aspectRatio)
 	particle_data.push(Math.sin(point_angle)*point_dist)
+	*/
+	particle_data.push(0.4*(-1+Math.random()*2)/aspectRatio)
+	particle_data.push(0.4*(-1+Math.random()*2))
 	particle_data.push(0)
 	particle_data.push(0)
+	/*
+	let sizeval = Math.random();
+	sizeval = sizeval < 0.9 ? 0.0 : (sizeval < 0.99 ? 100.0 : (sizeval < 0.999 ? 150.0 : 200.0));
+	size_data.push(sizeval);
+	size_data.push(sizeval);
+	size_data.push(sizeval);
+	size_data.push(sizeval);
+	index_data.push(i)
+	*/
 }
 
 //set verticies for rectangle to render particles to
@@ -122,8 +146,19 @@ const positions = [1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0];
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 setPositionAttribute(gl, positionBuffer, dataProgramInfo)
 
+/*
+const indexBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, indexBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(index_data), gl.STATIC_DRAW);
+setParticleIndexAttribute(gl, indexBuffer, particleProgramInfo)
+*/
 
-var {textures,framebuffers} = prepare_textures_and_framebuffers(gl,particle_num_sqd,particle_data)
+var {textures,framebuffers} = prepare_textures_and_framebuffers(gl,particle_num_sqd,particle_data,size_data)
+
+/*
+gl.activeTexture(gl.TEXTURE2);
+gl.bindTexture(gl.TEXTURE_2D, textures.sizeTex);
+*/
 
 gl.activeTexture(gl.TEXTURE1);
 gl.bindTexture(gl.TEXTURE_2D, textures.initTex);
@@ -138,6 +173,8 @@ gl.uniform1i(dataProgramInfo.uniformLocations.homeSampler, 1);
 
 gl.useProgram(particleProgram);
 gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
+//gl.uniform1f(particleProgramInfo.uniformLocations.particleNumSq,particle_num_sqd);
+gl.uniform1i(particleProgramInfo.uniformLocations.sizeSampler, 2);
 
 let pixels = new Float32Array(4 * particle_num_sqd*particle_num_sqd);
 let particleDataBuffer = gl.createBuffer();
@@ -165,12 +202,14 @@ let startTime = new Date().getTime();
 function render() {
 	aspectRatio = canvas.width/canvas.height
 	//frameCounter += 1;
-	gl.clear(gl.COLOR_BUFFER_BIT)
+	//gl.clear(gl.COLOR_BUFFER_BIT)
 	
 	let endTime = new Date().getTime();
 	let delayMilliseconds = (endTime - startTime)/1000.0;
 	//console.log(delayMilliseconds)
 	startTime = endTime
+	
+	//console.log(delayMilliseconds)
 	
 	gl.useProgram(dataProgram);
 	gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
@@ -205,6 +244,7 @@ function render() {
 	
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	
 	gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);
 	
@@ -244,14 +284,14 @@ function setPositionAttribute(gl, buffer, programInfo) {
 	const offset = 0; // how many bytes inside the buffer to start from
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 	gl.vertexAttribPointer(
-		programInfo.attribLocations.position,
+		programInfo.attribLocations.vertexPosition,
 		numComponents,
 		type,
 		normalize,
 		stride,
 		offset,
 	);
-	gl.enableVertexAttribArray(programInfo.attribLocations.position);
+	gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
 }
 
 function setParticleDataAttribute(gl,buffer,programInfo){
@@ -265,4 +305,17 @@ function setParticleDataAttribute(gl,buffer,programInfo){
 		0,
 	);
 	gl.enableVertexAttribArray(programInfo.attribLocations.vertexData);
+}
+
+function setParticleIndexAttribute(gl,buffer,programInfo){
+	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+	gl.vertexAttribPointer(
+		programInfo.attribLocations.indexData,
+		1,
+		gl.FLOAT,
+		false,
+		0,
+		0,
+	);
+	gl.enableVertexAttribArray(programInfo.attribLocations.indexData);
 }
