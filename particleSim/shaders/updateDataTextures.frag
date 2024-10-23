@@ -36,7 +36,7 @@ void main() {
 	
 	//float k0 = 0.0025;
 	float k0 = 60.0;
-	float boundaryFactor = 1.0;
+	float boundaryFactor = 0.85;
 	
 	float boundaryX = boundaryFactor*uAspect;
 	float boundaryY = boundaryFactor;
@@ -64,6 +64,7 @@ void main() {
 	float posmag = position.x*position.x + position.y*position.y - boundaryFactor*min(1.0,uAspect*uAspect);
 	if (posmag >= 0.0){
 		float angle = atan(position.y,position.x);
+		posmag = length(posmag);
 		force.x += -k0*cos(angle)*(posmag);
 		force.y += -k0*sin(angle)*(posmag);
 	}
