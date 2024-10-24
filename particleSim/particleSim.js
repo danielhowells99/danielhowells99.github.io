@@ -121,9 +121,8 @@ for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
 	particle_data.push(Math.cos(point_angle)*point_dist/aspectRatio)
 	particle_data.push(Math.sin(point_angle)*point_dist)
 	*/
-	particle_data.push(0.0004*(-1+Math.random()*2)/aspectRatio)
-	particle_data.push(0.0004*(-1+Math.random()*2))
-	
+	particle_data.push(0.4*(-1+Math.random()*2)/aspectRatio)
+	particle_data.push(0.4*(-1+Math.random()*2))
 	particle_data.push(0)
 	particle_data.push(0)
 	/*
@@ -203,7 +202,7 @@ function render() {
 	gl.clear(gl.COLOR_BUFFER_BIT)
 	
 	let endTime = new Date().getTime();
-	let delayMilliseconds = Math.min(0.03125,(endTime - startTime)/1000.0)
+	let delayMilliseconds = (endTime - startTime)/1000.0;
 	//console.log(delayMilliseconds)
 	startTime = endTime
 	
@@ -240,19 +239,20 @@ function render() {
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	
-	//gl.enable(gl.BLEND);
+	gl.enable(gl.BLEND);
+	
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ZERO);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	//gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 	//gl.blendFunc(gl.DST_COLOR, gl.ZERO);
 	
-	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR BACKGROUND
+	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
 	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
 	
 	gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 	
-	//gl.disable(gl.BLEND);
+	gl.disable(gl.BLEND);
 	
 	// swap which texture we are rendering from and to
 	var t = pt1;

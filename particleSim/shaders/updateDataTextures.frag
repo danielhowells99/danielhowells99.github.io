@@ -76,9 +76,13 @@ void main() {
 	//velocity = pow(0.85,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	//velocity = pow(0.00763,uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	//velocity = pow(0.005,uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	/*
 	velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
-	
 	position += uDeltaTime*velocity;
+	*/
+	velocity = 0.8*velocity + 0.0005*force;//SETTING2
+	position += velocity;
+	
 	
 	position.x /= uAspect;
 	gl_FragColor = vec4(position,velocity);
