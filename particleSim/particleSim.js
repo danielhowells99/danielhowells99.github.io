@@ -11,7 +11,7 @@ if (!ext) {
 }
 
 //gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
-gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
+//gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
 //gl.clearColor(0.005,0.015,0.045,1.0);
 
 gl.clearDepth(1.0);
