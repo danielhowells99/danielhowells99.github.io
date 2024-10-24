@@ -29,14 +29,14 @@ void main() {
 
 	/*
 	vec4 homeData = texture2D(uHomeSampler, vTexturePosition);
-	vec2 homeDisplacement = vec2(homeData.x*uAspect,homeData.y)- position;
-	vec2 force = (-uMouseForce*0.03*mouseDisplacement/(mouseDist) + homeDisplacement);
+	vec2 homeDisplacement = vec2(homeData.x*uAspect,homeData.y) - position;
+	force += (-uMouseForce*0.03*mouseDisplacement/(mouseDist) + homeDisplacement);
 	*/
 
 	float k0 = 60.0; //SETTING1
 	//float k0 = 12.0; //SETTING2
 	
-	float boundaryFactor = 1.0;
+	float boundaryFactor = 0.8;
 	
 	
 	float boundaryX = boundaryFactor*uAspect;

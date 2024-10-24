@@ -10,7 +10,7 @@ if (!ext) {
 	alert('need OES_texture_float');
 }
 
-//gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
+gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
 //gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
 //gl.clearColor(0.005,0.015,0.045,1.0);
 
@@ -199,7 +199,7 @@ let startTime = new Date().getTime();
 function render() {
 	aspectRatio = canvas.width/canvas.height
 	//frameCounter += 1;
-	//gl.clear(gl.COLOR_BUFFER_BIT)
+	gl.clear(gl.COLOR_BUFFER_BIT)
 	
 	let endTime = new Date().getTime();
 	let delayMilliseconds = (endTime - startTime)/1000.0;
