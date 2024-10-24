@@ -202,7 +202,7 @@ function render() {
 	gl.clear(gl.COLOR_BUFFER_BIT)
 	
 	let endTime = new Date().getTime();
-	let delayMilliseconds = Math.min(0.0625,(endTime - startTime)/1000.0)
+	let delayMilliseconds = Math.min(0.03125,(endTime - startTime)/1000.0)
 	//console.log(delayMilliseconds)
 	startTime = endTime
 	
