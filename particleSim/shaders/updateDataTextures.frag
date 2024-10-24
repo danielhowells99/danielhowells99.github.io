@@ -33,10 +33,11 @@ void main() {
 	vec2 force = (-uMouseForce*0.03*mouseDisplacement/(mouseDist) + homeDisplacement);
 	*/
 
+	//float k0 = 60.0; //SETTING1
+	float k0 = 12.0; //SETTING2
 	
-	//float k0 = 0.0025;
-	float k0 = 60.0;
-	float boundaryFactor = 0.85;
+	float boundaryFactor = 0.8;
+	
 	
 	float boundaryX = boundaryFactor*uAspect;
 	float boundaryY = boundaryFactor;
@@ -60,6 +61,7 @@ void main() {
 		force.y += -k0*(position.y+boundaryY-transBoxY);
 	}
 	
+	
 	/*
 	float posmag = position.x*position.x + position.y*position.y - boundaryFactor*min(1.0,uAspect*uAspect);
 	if (posmag >= 0.0){
@@ -70,7 +72,10 @@ void main() {
 	}
 	*/
 	
-	velocity = pow(0.85,30.0*uDeltaTime)*velocity + uDeltaTime*force;
+	
+	//velocity = pow(0.85,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
+	
 	position += uDeltaTime*velocity;
 	
 	position.x /= uAspect;

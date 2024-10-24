@@ -10,13 +10,10 @@ if (!ext) {
 	alert('need OES_texture_float');
 }
 
-gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
-//gl.clearColor(0.98, 0.92, 0.85, 1.0);
+//gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
+gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
+//gl.clearColor(0.005,0.015,0.045,1.0);
 
-//gl.clearColor(1.0-0.05, 1.0-0.1,1.0-0.15, 1.0);
-//gl.clearColor(0.025,0.05,0.075,1.0);
-
-//gl.clearColor(0.02,0.0,0.07,0.3);
 gl.clearDepth(1.0);
 
 function resizeCanvas() {
@@ -110,7 +107,7 @@ const particleProgramInfo = {
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 800*800;
+const particle_num = 1000000;//800*800;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 
 const particle_data = []
@@ -202,7 +199,7 @@ let startTime = new Date().getTime();
 function render() {
 	aspectRatio = canvas.width/canvas.height
 	//frameCounter += 1;
-	//gl.clear(gl.COLOR_BUFFER_BIT)
+	gl.clear(gl.COLOR_BUFFER_BIT)
 	
 	let endTime = new Date().getTime();
 	let delayMilliseconds = (endTime - startTime)/1000.0;
@@ -243,10 +240,19 @@ function render() {
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	
 	gl.enable(gl.BLEND);
-	gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+	//gl.blendFunc(gl.SRC_ALPHA, gl.ZERO);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	//gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+	//gl.blendFunc(gl.DST_COLOR, gl.ZERO);
 	
-	gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);
+	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ZERO, gl.ONE);
+	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
+	
+	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE);
+	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE);
+	
+	gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 	
 	gl.disable(gl.BLEND);
 	
