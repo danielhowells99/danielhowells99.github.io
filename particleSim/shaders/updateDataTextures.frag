@@ -27,11 +27,9 @@ void main() {
 	
 	vec2 force = 16.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/4096.0));
 
-	/*
 	vec4 homeData = texture2D(uHomeSampler, vTexturePosition);
 	vec2 homeDisplacement = vec2(homeData.x*uAspect,homeData.y) - position;
-	force += (-uMouseForce*0.03*mouseDisplacement/(mouseDist) + homeDisplacement);
-	*/
+	force += -30.0*uDeltaTime*0.25*uMouseForce*homeDisplacement;
 
 	float k0 = 60.0; //SETTING1
 	//float k0 = 12.0; //SETTING2
@@ -73,7 +71,8 @@ void main() {
 	*/
 	
 	
-	velocity = pow(0.85,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	//velocity = pow(0.85,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	velocity = pow(0.00763,uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	//velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	
 	position += uDeltaTime*velocity;
