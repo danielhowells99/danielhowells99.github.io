@@ -25,11 +25,13 @@ void main() {
 	vec2 mouseDisplacement = uMousePos - position;
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
 	
-	vec2 force = 16.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/4096.0));
+	vec2 force = 15.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/4096.0));
 
-	vec4 homeData = texture2D(uHomeSampler, vTexturePosition);
-	vec2 homeDisplacement = vec2(homeData.x*uAspect,homeData.y) - position;
-	force += -30.0*uDeltaTime*0.25*uMouseForce*homeDisplacement;
+
+	//RANDOMNESS TO AVOID SINGULARITY
+	vec2 homeData = texture2D(uHomeSampler, vTexturePosition).xy;
+	//vec2 homeDisplacement = vec2(homeData.x*uAspect,homeData.y) - position;
+	force += 4.0*uMouseForce*homeData/(mouseDist+1.0);
 
 	float k0 = 60.0; //SETTING1
 	//float k0 = 12.0; //SETTING2
