@@ -107,7 +107,7 @@ const particleProgramInfo = {
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 1000000;//800*800;
+const particle_num = 750000;//800*800;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 
 const particle_data = []
@@ -239,19 +239,19 @@ function render() {
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	
-	//gl.enable(gl.BLEND);
+	gl.enable(gl.BLEND);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ZERO);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	//gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 	//gl.blendFunc(gl.DST_COLOR, gl.ZERO);
 	
-	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR BACKGROUND
+	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR BACKGROUND
 	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
 	
 	gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 	
-	//gl.disable(gl.BLEND);
+	gl.disable(gl.BLEND);
 	
 	// swap which texture we are rendering from and to
 	var t = pt1;
