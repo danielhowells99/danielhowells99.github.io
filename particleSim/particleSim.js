@@ -239,8 +239,8 @@ function render() {
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	
-	gl.enable(gl.BLEND);
-	gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+	//gl.enable(gl.BLEND);
+	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ZERO);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	//gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
@@ -251,7 +251,7 @@ function render() {
 	
 	gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 	
-	gl.disable(gl.BLEND);
+	//gl.disable(gl.BLEND);
 	
 	// swap which texture we are rendering from and to
 	var t = pt1;
