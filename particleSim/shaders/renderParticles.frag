@@ -16,7 +16,7 @@ void main() {
 	}
 	*/
 	
-	//gl_FragColor = vec4(1.0,1.0,1.0,0.15);
+	gl_FragColor = vec4(1.0,1.0,1.0,0.2);
 	
 	//gl_FragColor = vec4(0.75,0.9,1.0,0.15); //GALAXY BLUE
 	
@@ -25,6 +25,6 @@ void main() {
 	//gl_FragColor = vec4(0.05527125,0.0073695,0.1842375,0.3);//char1
 	//gl_FragColor = vec4(0.055,0.007,0.184,0.15);//char2
 	//gl_FragColor = vec4(0.055,0.007,0.184,0.3);//char3
-	gl_FragColor = vec4(0.04,0.005,0.14,0.15);//char4
+	//gl_FragColor = vec4(0.04,0.005,0.14,0.15);//char4
 
 }
