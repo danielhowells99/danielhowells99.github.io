@@ -28,6 +28,6 @@ void main() {
 	//gl_FragColor = vec4(0.055,0.007,0.184,0.15);//char2
 	//gl_FragColor = vec4(0.055,0.007,0.184,0.3);//char3
 	
-	gl_FragColor = vec4(0.04,0.005,0.14,0.3);//char4
+	gl_FragColor = vec4(0.04,0.005,0.14,0.15);//char4
 
 }

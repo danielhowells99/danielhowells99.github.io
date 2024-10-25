@@ -25,7 +25,7 @@ void main() {
 	vec2 mouseDisplacement = uMousePos - position;
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
 	
-	vec2 force = 12.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/4096.0));
+	vec2 force = 16.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));
 
 	//RANDOMNESS TO AVOID SINGULARITY
 	/*
@@ -34,8 +34,8 @@ void main() {
 	force += 2.0*uMouseForce*homeData/(mouseDist+1.0);
 	*/
 
-	//float k0 = 80.0; //SETTING 1
-	float k0 = 12.0; //SETTING 2
+	//float k0 = 60.0; //SETTING 1
+	float k0 = 6.0; //SETTING 2
 	
 	float boundaryFactor = 0.875;
 	
@@ -75,11 +75,11 @@ void main() {
 	
 	
 	//velocity = pow(0.85,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
-	//velocity = pow(0.00763,uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	velocity = pow(0.00763,uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	//velocity = pow(0.005,uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	//velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	
-	velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
+	//velocity = pow(0.825,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	position += uDeltaTime*velocity;
 	
 	position.x /= uAspect;
