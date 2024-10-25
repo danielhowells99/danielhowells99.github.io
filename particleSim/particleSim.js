@@ -208,7 +208,7 @@ function render() {
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	
 	let endTime = new Date().getTime();
-	let delayMilliseconds = (endTime - startTime)/1000.0;
+	let delayMilliseconds = Math.min(.025,(endTime - startTime)/1000.0);
 	//console.log(delayMilliseconds)
 	startTime = endTime
 	
@@ -247,8 +247,8 @@ function render() {
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	
 	gl.enable(gl.BLEND);
-	gl.enable(gl.DEPTH_TEST);
-	gl.depthFunc(gl.NOTEQUAL)
+	//gl.enable(gl.DEPTH_TEST);
+	//gl.depthFunc(gl.NOTEQUAL)
 	
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ZERO);
@@ -262,7 +262,7 @@ function render() {
 	gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 	
 	gl.disable(gl.BLEND);
-	gl.disable(gl.DEPTH_TEST)
+	//gl.disable(gl.DEPTH_TEST)
 	
 	// swap which texture we are rendering from and to
 	var t = pt1;
