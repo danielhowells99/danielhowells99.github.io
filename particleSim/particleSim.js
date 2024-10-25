@@ -122,9 +122,10 @@ for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
 	particle_data.push(Math.cos(point_angle)*point_dist/aspectRatio)
 	particle_data.push(Math.sin(point_angle)*point_dist)
 	*/
-	//particle_data.push(0.4*(-1+Math.random()*2)/aspectRatio)
-	particle_data.push(0)
-	particle_data.push(0)
+	particle_data.push(0.4*(-1+Math.random()*2)/aspectRatio)
+	particle_data.push(0.4*(-1+Math.random()*2)/aspectRatio)
+	//particle_data.push(0)
+	//particle_data.push(0)
 	particle_data.push((-1+Math.random()*2))
 	particle_data.push((-1+Math.random()*2))
 	//particle_data.push(0)
