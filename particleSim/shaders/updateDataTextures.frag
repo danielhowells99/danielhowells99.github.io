@@ -3,10 +3,7 @@ precision highp float;
 //manage storage buffer
 
 uniform sampler2D uDataSampler;
-uniform sampler2D uHomeSampler;
-
 uniform float uAspect;
-
 uniform float uDeltaTime;
 uniform vec2 uMousePos;
 uniform float uMouseForce;
@@ -25,24 +22,13 @@ void main() {
 	vec2 mouseDisplacement = uMousePos - position;
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
 	
-	vec2 force = 16.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));
-
-	//RANDOMNESS TO AVOID SINGULARITY
-	/*
-	vec2 homeData = texture2D(uHomeSampler, vTexturePosition).xy;
-	vec2 homeDisplacement = vec2(homeData.x*uAspect,homeData.y) - position;
-	force += 2.0*uMouseForce*homeData/(mouseDist+1.0);
-	*/
-
-	//float k0 = 60.0; //SETTING 1
-	float k0 = 6.0; //SETTING 2
+	vec2 force = 20.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));
 	
+	float k0 = 10.0; //SETTING 2
 	float boundaryFactor = 0.875;
-	
 	
 	float boundaryX = boundaryFactor*uAspect;
 	float boundaryY = boundaryFactor;
-	
 	float transBoxX = 0.0;
 	float transBoxY = 0.0;
 	
@@ -62,7 +48,7 @@ void main() {
 		force.y += -k0*(position.y+boundaryY-transBoxY);
 	}
 	
-	
+	//FOR CIRCULAR BOUNDARY
 	/*
 	float posmag = position.x*position.x + position.y*position.y - boundaryFactor*min(1.0,uAspect*uAspect);
 	if (posmag >= 0.0){
@@ -73,15 +59,10 @@ void main() {
 	}
 	*/
 	
+	//velocity = pow(0.00763,uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	
-	//velocity = pow(0.85,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
-	velocity = pow(0.00763,uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
-	//velocity = pow(0.005,uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
-	//velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
-	
-	//velocity = pow(0.825,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	position += uDeltaTime*velocity;
-	
 	position.x /= uAspect;
 	gl_FragColor = vec4(position,velocity);
 }

@@ -1,6 +1,6 @@
 precision highp float;
 //manage data stored in textures
-//general use vertex shader used for both position and velocity updates
+//renders positional and velocity data to texture bound to framebuffer
 
 attribute vec4 aVertexPosition;
 varying vec2 vTexturePosition;

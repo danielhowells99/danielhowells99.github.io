@@ -1,9 +1,9 @@
 export {prepare_textures_and_framebuffers}
 
-function prepare_textures_and_framebuffers(gl,particle_num,particle_data,size_data){
+function prepare_textures_and_framebuffers(gl,particle_num,particle_data){
     let textures = _prepare_textures(gl,
         particle_num,
-        particle_data,size_data)
+        particle_data)
     let framebuffers = _prepare_buffers(gl,
         textures.dataTexture1,
         textures.dataTexture2)
@@ -13,7 +13,7 @@ function prepare_textures_and_framebuffers(gl,particle_num,particle_data,size_da
     }
 }
 
-function _prepare_textures(gl,particle_num,particle_data,size_data) {
+function _prepare_textures(gl,particle_num,particle_data) {
 
     let dataTexture1 = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, dataTexture1);
@@ -32,31 +32,10 @@ function _prepare_textures(gl,particle_num,particle_data,size_data) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-    let initTex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, initTex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, particle_num, particle_num, 0, gl.RGBA,
-                gl.FLOAT, new Float32Array(particle_data));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	
-	/*
-	let sizeTex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, sizeTex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, particle_num, particle_num, 0, gl.RGBA,
-                gl.UNSIGNED_BYTE, new Uint8Array(size_data));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-	*/
     return {
         dataTexture1: dataTexture1,
         dataTexture2: dataTexture2,
-        initTex: initTex,
-		//sizeTex: sizeTex,
     }
 }
 
