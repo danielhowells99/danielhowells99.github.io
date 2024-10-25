@@ -10,8 +10,8 @@ if (!ext) {
 	alert('need OES_texture_float');
 }
 
-gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
-//gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
+//gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
+gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
 //gl.clearColor(0.005,0.015,0.045,1.0);
 
 gl.clearDepth(10.0);
@@ -28,7 +28,7 @@ resizeCanvas();
 
 let mouse = {x: 0,y: 0}
 let mouseForce = 0.0;
-let mouseToggle = 1.0
+let mouseToggle = 0.0
 
 function isTouchDevice() {
 return (('ontouchstart' in window) ||
@@ -109,7 +109,7 @@ const particleProgramInfo = {
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 800*800//524288;
+const particle_num = 900*900//524288;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 
 const particle_data = []
@@ -125,10 +125,10 @@ for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
 	*/
 	particle_data.push(0.4*(-1+Math.random()*2)/aspectRatio)
 	particle_data.push(0.4*(-1+Math.random()*2)/aspectRatio)
-	//particle_data.push(0)
-	//particle_data.push(0)
-	particle_data.push((-1+Math.random()*2))
-	particle_data.push((-1+Math.random()*2))
+	particle_data.push(0)
+	particle_data.push(0)
+	//particle_data.push((-1+Math.random()*2))
+	//particle_data.push((-1+Math.random()*2))
 	//particle_data.push(0)
 	//particle_data.push(0)
 	/*
@@ -209,7 +209,7 @@ let frameAverage = [];
 
 //const fpsElem = document.querySelector("#fps");
 
-const frameLimit = 50; //PAL TV?
+const frameLimit = 60; //PAL TV?
 
 function render() {
 	
@@ -280,8 +280,8 @@ function render() {
 		//gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 		//gl.blendFunc(gl.DST_COLOR, gl.ZERO);
 		
-		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
-		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
 		
 		//gl.bindBuffer(gl.ARRAY_BUFFER, indexBuffer);
 		setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
