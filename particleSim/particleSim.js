@@ -108,7 +108,7 @@ const particleProgramInfo = {
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 640000;//800*800;
+const particle_num = 524288;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 
 const particle_data = []
@@ -208,7 +208,7 @@ function render() {
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	
 	let endTime = new Date().getTime();
-	let delayMilliseconds = Math.min(.025,(endTime - startTime)/1000.0);
+	let delayMilliseconds = Math.min(.03,(endTime - startTime)/1000.0);
 	//console.log(delayMilliseconds)
 	startTime = endTime
 	
