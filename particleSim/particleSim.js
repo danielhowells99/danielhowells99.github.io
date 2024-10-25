@@ -139,7 +139,8 @@ for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
 	size_data.push(sizeval);
 	size_data.push(sizeval);
 	*/
-	index_data.push(i)
+	index_data.push((i%particle_num_sqd)/particle_num_sqd)
+	index_data.push(Math.floor(i/particle_num_sqd)/particle_num_sqd)
 }
 
 //set verticies for rectangle to render particles to
@@ -349,7 +350,7 @@ function setParticleIndexAttribute(gl,buffer,programInfo){
 	gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
 	gl.vertexAttribPointer(
 		programInfo.attribLocations.indexData,
-		1,
+		2,
 		gl.FLOAT,
 		false,
 		0,

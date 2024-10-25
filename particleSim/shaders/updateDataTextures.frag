@@ -28,12 +28,14 @@ void main() {
 	vec2 force = 16.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/4096.0));
 
 	//RANDOMNESS TO AVOID SINGULARITY
-	//vec2 homeData = texture2D(uHomeSampler, vTexturePosition).xy;
-	//vec2 homeDisplacement = vec2(homeData.x*uAspect,homeData.y) - position;
-	//force += 4.0*uMouseForce*homeData/(mouseDist+1.0);
+	/*
+	vec2 homeData = texture2D(uHomeSampler, vTexturePosition).xy;
+	vec2 homeDisplacement = vec2(homeData.x*uAspect,homeData.y) - position;
+	force += 2.0*uMouseForce*homeData/(mouseDist+1.0);
+	*/
 
-	//float k0 = 60.0; //SETTING 1
-	float k0 = 12.0; //SETTING 2
+	float k0 = 60.0; //SETTING 1
+	//float k0 = 12.0; //SETTING 2
 	
 	float boundaryFactor = 0.875;
 	
@@ -77,7 +79,7 @@ void main() {
 	//velocity = pow(0.005,uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	//velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	
-	velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
+	velocity = pow(0.85,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	position += uDeltaTime*velocity;
 	
 	position.x /= uAspect;
