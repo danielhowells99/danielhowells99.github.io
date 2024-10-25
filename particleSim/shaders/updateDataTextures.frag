@@ -36,7 +36,7 @@ void main() {
 	float k0 = 60.0; //SETTING1
 	//float k0 = 12.0; //SETTING2
 	
-	float boundaryFactor = 1.0;
+	float boundaryFactor = 0.875;
 	
 	
 	float boundaryX = boundaryFactor*uAspect;
