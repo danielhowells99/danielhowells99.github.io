@@ -209,7 +209,7 @@ function render() {
 	
 	let endTime = new Date().getTime();
 	let delayMilliseconds = Math.min(.035,(endTime - startTime)/1000.0);
-	//console.log(delayMilliseconds)
+	console.log(delayMilliseconds)
 	startTime = endTime
 	
 	//console.log(delayMilliseconds)
