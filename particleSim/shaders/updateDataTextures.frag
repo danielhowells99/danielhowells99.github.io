@@ -33,10 +33,10 @@ void main() {
 	//vec2 homeDisplacement = vec2(homeData.x*uAspect,homeData.y) - position;
 	//force += 4.0*uMouseForce*homeData/(mouseDist+1.0);
 
-	float k0 = 72.0; //SETTING1
+	float k0 = 60.0; //SETTING1
 	//float k0 = 12.0; //SETTING2
 	
-	float boundaryFactor = 0.875;
+	float boundaryFactor = 1.0;
 	
 	
 	float boundaryX = boundaryFactor*uAspect;
