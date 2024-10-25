@@ -22,6 +22,7 @@ function resizeCanvas() {
 	gl.viewport(0,0,canvas.width,canvas.height);
 }
 
+const fpsElem = document.querySelector("#fps");
 
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
@@ -96,6 +97,7 @@ const dataProgramInfo = {
 const particleProgramInfo = {
 	program: particleProgram,
 	attribLocations: {
+		vertexData: gl.getAttribLocation(particleProgram, "aVertexData"),
 		indexData: gl.getAttribLocation(particleProgram, "aIndexData"),
 	},
 	uniformLocations: {
@@ -103,13 +105,12 @@ const particleProgramInfo = {
 		particleNumSq: gl.getUniformLocation(particleProgram, "uParticleNumSq"),
 		canvasDimension: gl.getUniformLocation(particleProgram, "uCanvasDimension"),
 		sizeSampler: gl.getUniformLocation(particleProgram, "uSizeSampler"),
-		dataSampler: gl.getUniformLocation(particleProgram, "uDataSampler"),
 	},
 };
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 800*800//524288;
+const particle_num = 524288;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 
 const particle_data = []
@@ -138,8 +139,8 @@ for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
 	size_data.push(sizeval);
 	size_data.push(sizeval);
 	size_data.push(sizeval);
-	*/
 	index_data.push(i)
+	*/
 }
 
 //set verticies for rectangle to render particles to
@@ -149,12 +150,12 @@ const positions = [1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0];
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 setPositionAttribute(gl, positionBuffer, dataProgramInfo)
 
-
+/*
 const indexBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, indexBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(index_data), gl.STATIC_DRAW);
 setParticleIndexAttribute(gl, indexBuffer, particleProgramInfo)
-
+*/
 
 var {textures,framebuffers} = prepare_textures_and_framebuffers(gl,particle_num_sqd,particle_data,size_data)
 
@@ -177,10 +178,9 @@ gl.uniform1i(dataProgramInfo.uniformLocations.homeSampler, 1);
 gl.useProgram(particleProgram);
 gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
 gl.uniform2fv(particleProgramInfo.uniformLocations.canvasDimension,[canvas.width,canvas.height]);
-gl.uniform1f(particleProgramInfo.uniformLocations.particleNumSq,particle_num_sqd);
-gl.uniform1i(particleProgramInfo.uniformLocations.dataSampler, 0);
+//gl.uniform1f(particleProgramInfo.uniformLocations.particleNumSq,particle_num_sqd);
+gl.uniform1i(particleProgramInfo.uniformLocations.sizeSampler, 2);
 
-/*
 let pixels = new Float32Array(4 * particle_num_sqd*particle_num_sqd);
 let particleDataBuffer = gl.createBuffer();
 
@@ -193,7 +193,6 @@ gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffers.framebuffer2);
 //gl.readBuffers(gl.COLOR_ATTACHMENT0);
 gl.readPixels(0, 0, particle_num_sqd, particle_num_sqd, gl.RGBA, gl.FLOAT, pixels);
 console.log("framebuffer2: ",pixels[0],pixels[1],pixels[2],pixels[3])
-*/
 
 let f1 = framebuffers.framebuffer1
 let f2 = framebuffers.framebuffer2
@@ -204,109 +203,100 @@ let pt2 = textures.dataTexture2
 let frameCounter = 0;
 
 let startTime = new Date().getTime();
-let frameAverage = [];
 
-//const fpsElem = document.querySelector("#fps");
+let frameAverage = [];
 
 function render() {
 	
 	let endTime = new Date().getTime();
 	let delayMilliseconds = (endTime - startTime)/1000.0;
 	//console.log(delayMilliseconds)
-	/*
+	
 	frameAverage.push(delayMilliseconds)
 	if (frameAverage.length > 500){
 		frameAverage.shift()
 	}
 	let averageRate = frameAverage.reduce((accumulator, currentValue) => accumulator + currentValue)/frameAverage.length
 	fpsElem.textContent = "MIN: " + Math.min(...frameAverage).toFixed(4) + " | MAX: " + Math.max(...frameAverage).toFixed(4) + " | AVG: " + (1.0/averageRate).toFixed(0);
-	*/
 	
 	if (delayMilliseconds > 1/60){
-			
-		startTime = endTime
-		
-		aspectRatio = canvas.width/canvas.height
-		frameCounter += 1;
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-		
-		//console.log(delayMilliseconds)
-		
-		gl.useProgram(dataProgram);
-		gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
-		gl.uniform1f(dataProgramInfo.uniformLocations.aspect,aspectRatio);
-		//gl.uniform1f(dataProgramInfo.uniformLocations.frameCount,frameCounter);
-		gl.uniform1f(dataProgramInfo.uniformLocations.deltaTime,delayMilliseconds);
-		gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
-		//gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*0.4*aspectRatio*Math.sin(3*frameCounter/540),0.4*Math.cos(5*frameCounter/540)]);
-		
-		gl.activeTexture(gl.TEXTURE0);
-		gl.bindTexture(gl.TEXTURE_2D, pt1);
-		
-		//gl.uniform1i(dataProgramInfo.uniformLocations.dataSampler, 0);
-		
-		gl.bindFramebuffer(gl.FRAMEBUFFER, f2);
-		gl.viewport(0, 0, particle_num_sqd, particle_num_sqd);
-		
-		setPositionAttribute(gl, positionBuffer, dataProgramInfo) 
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+	
+	startTime = endTime
+	
+	aspectRatio = canvas.width/canvas.height
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+	
+	//console.log(delayMilliseconds)
+	
+	gl.useProgram(dataProgram);
+	gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
+	gl.uniform1f(dataProgramInfo.uniformLocations.aspect,aspectRatio);
+	//gl.uniform1f(dataProgramInfo.uniformLocations.frameCount,frameCounter);
+	gl.uniform1f(dataProgramInfo.uniformLocations.deltaTime,Math.min(0.325,delayMilliseconds));
+	gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
+	//gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*0.4*aspectRatio*Math.sin(3*frameCounter/540),0.4*Math.cos(5*frameCounter/540)]);
+	
+	gl.activeTexture(gl.TEXTURE0);
+	gl.bindTexture(gl.TEXTURE_2D, pt1);
+	
+	gl.uniform1i(dataProgramInfo.uniformLocations.dataSampler, 0);
+	
+	gl.bindFramebuffer(gl.FRAMEBUFFER, f2);
+	gl.viewport(0, 0, particle_num_sqd, particle_num_sqd);
+	
+	setPositionAttribute(gl, positionBuffer, dataProgramInfo) 
+	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-		/*
-		//gl.readBuffer(gl.COLOR_ATTACHMENT0);
-		gl.readPixels(0, 0, particle_num_sqd, particle_num_sqd, gl.RGBA, gl.FLOAT, pixels);
-		*/
-		
-		/*
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pixels), gl.STATIC_DRAW);
-		setParticleDataAttribute(gl,particleDataBuffer,particleProgramInfo)
-		*/
+	//gl.readBuffer(gl.COLOR_ATTACHMENT0);
+	gl.readPixels(0, 0, particle_num_sqd, particle_num_sqd, gl.RGBA, gl.FLOAT, pixels);
 
-		gl.useProgram(particleProgram);
-		gl.uniform2fv(particleProgramInfo.uniformLocations.canvasDimension,[canvas.width,canvas.height]);
-		gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-		
-		gl.enable(gl.BLEND);
-		//gl.enable(gl.DEPTH_TEST);
-		//gl.depthFunc(gl.NOTEQUAL)
-		
-		//gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-		//gl.blendFunc(gl.SRC_ALPHA, gl.ZERO);
-		//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-		//gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-		//gl.blendFunc(gl.DST_COLOR, gl.ZERO);
-		
-		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
-		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
-		
-		//gl.bindBuffer(gl.ARRAY_BUFFER, indexBuffer);
-		setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
-		//gl.enableVertexAttribArray(particleProgramInfo.attribLocations.indexData);
-		gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
-		
-		gl.disable(gl.BLEND);
-		//gl.disable(gl.DEPTH_TEST)
-		
-		// swap which texture we are rendering from and to
-		var t = pt1;
-		pt1 = pt2;
-		pt2 = t;
-		
-		var f = f1;
-		f1 = f2;
-		f2 = f;
+	gl.bindBuffer(gl.ARRAY_BUFFER, particleDataBuffer);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(pixels), gl.STATIC_DRAW);
+	setParticleDataAttribute(gl,particleDataBuffer,particleProgramInfo)
 
-		if (capFlag == 1){
-			console.log("saving picture")
-			var dataURL = gl.canvas.toDataURL("image/png");
-			var a = document.createElement('a');
-			a.href = dataURL;
-			a.download = "picture.png";
-			document.body.appendChild(a);
-			a.click();
-			capFlag = 0;
-		}
+	gl.useProgram(particleProgram);
+	gl.uniform2fv(particleProgramInfo.uniformLocations.canvasDimension,[canvas.width,canvas.height]);
+	gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+	
+	gl.enable(gl.BLEND);
+	//gl.enable(gl.DEPTH_TEST);
+	//gl.depthFunc(gl.NOTEQUAL)
+	
+	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+	//gl.blendFunc(gl.SRC_ALPHA, gl.ZERO);
+	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	//gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+	//gl.blendFunc(gl.DST_COLOR, gl.ZERO);
+	
+	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
+	
+	gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
+	
+	gl.disable(gl.BLEND);
+	//gl.disable(gl.DEPTH_TEST)
+	
+	// swap which texture we are rendering from and to
+	var t = pt1;
+	pt1 = pt2;
+	pt2 = t;
+	
+	var f = f1;
+	f1 = f2;
+	f2 = f;
+
+	if (capFlag == 1){
+		console.log("saving picture")
+		var dataURL = gl.canvas.toDataURL("image/png");
+		var a = document.createElement('a');
+		a.href = dataURL;
+		a.download = "picture.png";
+		document.body.appendChild(a);
+		a.click();
+		capFlag = 0;
+	}
 	}
 	requestAnimationFrame(render);
 }
