@@ -34,7 +34,7 @@ void main() {
 	force += 2.0*uMouseForce*homeData/(mouseDist+1.0);
 	*/
 
-	float k0 = 60.0; //SETTING 1
+	float k0 = 80.0; //SETTING 1
 	//float k0 = 12.0; //SETTING 2
 	
 	float boundaryFactor = 0.875;

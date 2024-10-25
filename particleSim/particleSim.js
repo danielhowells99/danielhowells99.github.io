@@ -209,6 +209,8 @@ let frameAverage = [];
 
 //const fpsElem = document.querySelector("#fps");
 
+const frameLimit = 50; //PAL TV?
+
 function render() {
 	
 	let endTime = new Date().getTime();
@@ -223,7 +225,7 @@ function render() {
 	fpsElem.textContent = "MIN: " + Math.min(...frameAverage).toFixed(4) + " | MAX: " + Math.max(...frameAverage).toFixed(4) + " | AVG: " + (1.0/averageRate).toFixed(0);
 	*/
 	
-	if (delayMilliseconds > 1/60){
+	if (delayMilliseconds > 1/frameLimit){
 			
 		startTime = endTime
 		
