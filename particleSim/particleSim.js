@@ -14,7 +14,7 @@ gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
 //gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
 //gl.clearColor(0.005,0.015,0.045,1.0);
 
-gl.clearDepth(1.0);
+gl.clearDepth(10.0);
 
 function resizeCanvas() {
 	canvas.width = window.innerWidth;
@@ -101,6 +101,7 @@ const particleProgramInfo = {
 	uniformLocations: {
 		aspect: gl.getUniformLocation(particleProgram, "uAspect"),
 		particleNumSq: gl.getUniformLocation(particleProgram, "uParticleNumSq"),
+		canvasDimension: gl.getUniformLocation(particleProgram, "uCanvasDimension"),
 		sizeSampler: gl.getUniformLocation(particleProgram, "uSizeSampler"),
 	},
 };
@@ -121,10 +122,13 @@ for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
 	particle_data.push(Math.cos(point_angle)*point_dist/aspectRatio)
 	particle_data.push(Math.sin(point_angle)*point_dist)
 	*/
-	particle_data.push(0.4*(-1+Math.random()*2)/aspectRatio)
-	particle_data.push(0.4*(-1+Math.random()*2))
+	//particle_data.push(0.4*(-1+Math.random()*2)/aspectRatio)
 	particle_data.push(0)
 	particle_data.push(0)
+	particle_data.push((-1+Math.random()*2))
+	particle_data.push((-1+Math.random()*2))
+	//particle_data.push(0)
+	//particle_data.push(0)
 	/*
 	let sizeval = Math.random();
 	sizeval = sizeval < 0.9 ? 0.0 : (sizeval < 0.99 ? 100.0 : (sizeval < 0.999 ? 150.0 : 200.0));
@@ -170,6 +174,7 @@ gl.uniform1i(dataProgramInfo.uniformLocations.homeSampler, 1);
 
 gl.useProgram(particleProgram);
 gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
+gl.uniform2fv(particleProgramInfo.uniformLocations.canvasDimension,[canvas.width,canvas.height]);
 //gl.uniform1f(particleProgramInfo.uniformLocations.particleNumSq,particle_num_sqd);
 gl.uniform1i(particleProgramInfo.uniformLocations.sizeSampler, 2);
 
@@ -199,7 +204,7 @@ let startTime = new Date().getTime();
 function render() {
 	aspectRatio = canvas.width/canvas.height
 	//frameCounter += 1;
-	gl.clear(gl.COLOR_BUFFER_BIT)
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 	
 	let endTime = new Date().getTime();
 	let delayMilliseconds = (endTime - startTime)/1000.0;
@@ -235,12 +240,14 @@ function render() {
 	setParticleDataAttribute(gl,particleDataBuffer,particleProgramInfo)
 
 	gl.useProgram(particleProgram);
+	gl.uniform2fv(particleProgramInfo.uniformLocations.canvasDimension,[canvas.width,canvas.height]);
 	gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
 	gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	
-	//gl.enable(gl.BLEND);
-	gl.enable(gl.DEPTH_TEST)
+	gl.enable(gl.BLEND);
+	gl.enable(gl.DEPTH_TEST);
+	gl.depthFunc(gl.NOTEQUAL)
 	
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 	//gl.blendFunc(gl.SRC_ALPHA, gl.ZERO);
@@ -248,12 +255,13 @@ function render() {
 	//gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 	//gl.blendFunc(gl.DST_COLOR, gl.ZERO);
 	
-	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+	gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
 	//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
 	
 	gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 	
-	//gl.disable(gl.BLEND);
+	gl.disable(gl.BLEND);
+	gl.disable(gl.DEPTH_TEST)
 	
 	// swap which texture we are rendering from and to
 	var t = pt1;
