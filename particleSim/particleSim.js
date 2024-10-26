@@ -167,7 +167,7 @@ function render() {
 		startTime = endTime
 		
 		aspectRatio = canvas.width/canvas.height
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+		//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 		
 		gl.useProgram(dataProgram);
 		gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
@@ -195,9 +195,9 @@ function render() {
 		//gl.depthFunc(gl.NOTEQUAL)
 
 		//gl.blendColor(0.7, 0.2, 0.1, 1);
-		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
 		//gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
-		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
 		
 		setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
 		gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
