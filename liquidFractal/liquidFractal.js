@@ -34,6 +34,8 @@ function main() {
 
 	gl.clearColor(0.0, 0.0, 0.0, 1.0);
 	gl.clear(gl.COLOR_BUFFER_BIT);
+	gl.enable(gl.BLEND)
+	gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA)
 	
 	const vsSource = 'shaders/shader.vert'
 	const fsSource = 'shaders/shader.frag'
@@ -59,13 +61,9 @@ function main() {
 	gl.useProgram(programInfo.program);
 	
 	let then = 0;
-	let timeParam = 0;
+	let timeParam = 0.1;
 	
 	function render(now) {
-		
-		now *= 0.001; // convert to seconds
-		deltaTime = now - then;
-		then = now;
 		
 		const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
@@ -83,7 +81,6 @@ function main() {
 		
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		
-		//timeParam += deltaTime;
 		timeParam += 0.004;
 
 		requestAnimationFrame(render);

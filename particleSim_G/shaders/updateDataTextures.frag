@@ -7,6 +7,7 @@ uniform float uAspect;
 uniform float uDeltaTime;
 uniform vec2 uMousePos;
 uniform float uMouseForce;
+uniform float uParticleNumSq;
 
 varying vec2 vTexturePosition;
 
@@ -22,13 +23,28 @@ void main() {
 	vec2 mouseDisplacement = uMousePos - position;
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
 	
-	vec2 force = 20.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));//SETTING1
-	//vec2 force = 16.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));//SETTING2
+	vec2 force = -8.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));//SETTING1
 	
-	float k0 = 10.0; //SETTING 1
-	//float k0 = 60.0; //SETTING 2
+	float equDist = 1.0;
 	
-	//float boundaryFactor = 0.8; //SETTING 1
+	float brk_con = 0.0;
+	
+	for (float i = 0.0; i < 100.0;i++){
+		for (float j = 0.0; j < 100.0;j++){
+			vec2 testParticlePos = vec2(uAspect,1.0)*texture2D(uDataSampler, vec2(i,j)/uParticleNumSq).xy;
+			vec2 testDisp = testParticlePos - position;
+			float testDist = length(testDisp);
+			if(testDist > 0.0){
+				float springDist = testDist - equDist;
+				float angle = atan(testDisp.y,testDisp.x);
+				force += vec2(0.02*cos(angle)*springDist,0.02*sin(angle)*springDist);
+			}
+			++brk_con;
+		}
+		//if (brk_con > uParticleNumSq*uParticleNumSq){break;}
+	}
+	
+	float k0 = 100.0; //SETTING 1
 	float boundaryFactor = 0.875;//SETTING2
 	
 	float boundaryX = boundaryFactor*uAspect;
@@ -52,20 +68,7 @@ void main() {
 		force.y += -k0*(position.y+boundaryY-transBoxY);
 	}
 	
-	//FOR CIRCULAR BOUNDARY
-	/*
-	float posmag = position.x*position.x + position.y*position.y - 0.8*min(1.0,uAspect*uAspect);
-	if (posmag >= 0.0){
-		float angle = atan(position.y,position.x);
-		posmag = length(posmag);
-		force.x += -k0*cos(angle)*(posmag);
-		force.y += -k0*sin(angle)*(posmag);
-	}
-	*/
-	
-	
-	velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
-	//velocity = pow(0.875,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
+	velocity = pow(0.95,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	
 	position += uDeltaTime*velocity;
 	position.x /= uAspect;
