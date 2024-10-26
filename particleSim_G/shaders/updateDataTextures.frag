@@ -13,7 +13,7 @@ varying vec2 vTexturePosition;
 
 void main() {
 
-	float equDist = 1.0;
+	float equDist = 1.1;
 
 	vec4 data = texture2D(uDataSampler, vTexturePosition);
 	
