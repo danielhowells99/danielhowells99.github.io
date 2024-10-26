@@ -10,9 +10,9 @@ if (!ext) {
 	alert('need OES_texture_float');
 }
 
-gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
+//gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
 //gl.clearColor(0.05, 0.01, 0.02, 1.0);
-//gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
+gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
 gl.clearDepth(10.0);
 
 
@@ -195,9 +195,9 @@ function render() {
 		//gl.depthFunc(gl.NOTEQUAL)
 
 		//gl.blendColor(0.7, 0.2, 0.1, 1);
-		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
 		//gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
-		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
+		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
 		
 		setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
 		gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
