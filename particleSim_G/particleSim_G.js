@@ -46,15 +46,13 @@ let mouseStartTime = 0,mouseEndTime = 0
 
 onmousemove = function(e){
 	mouse = {x: e.clientX/canvas.width, y: 1-e.clientY/canvas.height}; 
-	mouseForce = mouseToggle;
 	}
 onmousedown = function(e){
 	
 	mouseStartTime = new Date().getTime()
 	
 	mouse = {x: e.clientX/canvas.width, y: 1-e.clientY/canvas.height}; 
-	mouseToggle = mouseToggle^1; 
-	mouseForce = 1.0*mouseToggle;
+	mouseForce = 1.0;
 	}
 onmouseup = function(e){
 	
@@ -64,7 +62,7 @@ onmouseup = function(e){
 	}
 	
 	mouse = {x: e.clientX/canvas.width, y: 1-e.clientY/canvas.height}; 
-	mouseForce = 1.0*mouseToggle;
+	mouseForce = 0.0;
 	}
 
 
@@ -108,7 +106,7 @@ const particleProgramInfo = {
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 120*120;
+const particle_num = 86*86;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 const particle_data = []
 const index_data = []
