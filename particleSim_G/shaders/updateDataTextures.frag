@@ -32,21 +32,21 @@ void main() {
 	
 	float brk_con = 0.0;
 	
-	for (float i = 0.0; i < 110.0;i++){
-		for (float j = 0.0; j < 110.0;j++){
+	for (float i = 0.0; i < 86.0;i++){
+		for (float j = 0.0; j < 86.0;j++){
 			vec2 testParticlePos = vec2(uAspect,1.0)*texture2D(uDataSampler, vec2(i,j)/uParticleNumSq).xy;
 			vec2 testDisp = testParticlePos - position;
 			float testDist = length(testDisp);
 			if(testDist > 0.0){
 				float springDist = testDist - equDist;
 				float angle = atan(testDisp.y,testDisp.x);
-				force += vec2(0.01*cos(angle)*springDist,0.01*sin(angle)*springDist);
+				force += vec2(0.02*cos(angle)*springDist,0.02*sin(angle)*springDist);
 			}
 			++brk_con;
 		}
 		//if (brk_con > uParticleNumSq*uParticleNumSq){break;}
 	}
-	
+	/*
 	float k0 = 80.0; //SETTING 1
 	float boundaryFactor = 1.0;//SETTING2
 	
@@ -70,6 +70,7 @@ void main() {
 	if (position.y <= -boundaryY+transBoxY){
 		force.y += -k0*(position.y+boundaryY-transBoxY);
 	}
+	*/
 	
 	velocity = pow(0.94,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	
