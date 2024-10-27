@@ -3,6 +3,10 @@ import {loadShader, initShaderProgram, loadTexture} from "../libraries/my-shader
 let squareRotation = 0.0;
 let deltaTime = 0;
 
+let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
+let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
+
 main();
 function main() {
 
@@ -50,6 +54,7 @@ function main() {
 			timeParam: gl.getUniformLocation(shaderProgram, "uTimeParam"),
 			aspect: gl.getUniformLocation(shaderProgram, "uAspect"),
 			uSampler: gl.getUniformLocation(shaderProgram, "uSampler"),
+			partColor: gl.getUniformLocation(shaderProgram, "uPartColor"),
 		},
 	};
 	
@@ -77,6 +82,10 @@ function main() {
 		gl.uniform1f(
 			programInfo.uniformLocations.aspect,
 			aspect,
+		);
+		gl.uniform3fv(
+			programInfo.uniformLocations.partColor,
+			partCol,
 		);
 		
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);

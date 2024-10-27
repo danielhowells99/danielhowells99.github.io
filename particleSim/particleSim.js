@@ -15,6 +15,9 @@ if (!ext) {
 gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
 gl.clearDepth(10.0);
 
+let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
+let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 
 function resizeCanvas() {
 	canvas.width = window.innerWidth;
@@ -102,6 +105,7 @@ const particleProgramInfo = {
 	uniformLocations: {
 		aspect: gl.getUniformLocation(particleProgram, "uAspect"),
 		dataSampler: gl.getUniformLocation(particleProgram, "uDataSampler"),
+		partColor: gl.getUniformLocation(particleProgram, "uPartColor"),
 	},
 };
 
@@ -146,6 +150,7 @@ gl.uniform1i(dataProgramInfo.uniformLocations.dataSampler, 0); //Data located in
 gl.useProgram(particleProgram);
 gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
 gl.uniform1i(particleProgramInfo.uniformLocations.dataSampler, 0);
+gl.uniform3fv(particleProgramInfo.uniformLocations.partColor, partCol);
 
 
 let f1 = framebuffers.framebuffer1
@@ -195,9 +200,9 @@ function render() {
 		//gl.depthFunc(gl.NOTEQUAL)
 
 		//gl.blendColor(0.7, 0.2, 0.1, 1);
-		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
 		//gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
-		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
+		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
 		
 		setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
 		gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  

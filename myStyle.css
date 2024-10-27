@@ -1,12 +1,12 @@
 body { 
 	background-color: hsl(166,74%,5%);
+	/*background-color: rgb(250,234,217);*/
 	/*
 	
 	hsl(151,74%,10%); chalkboard green (current favourite)
 	hsl(166,74%,5%); nice dark green
 	hsl(166,74%,15%); nice green 
 	hsl(166,47%,20%) nice light green
-
 	hsl(200,60%,10%) original blue
 	hsl(244,56%,12%) dark purply-blue
 	*/
@@ -43,6 +43,7 @@ img {
 .menuIcons {
 	width: 200px;
 	height: 200px;
+	mix-blend-mode: difference;
 }
 
 canvas {

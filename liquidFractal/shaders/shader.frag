@@ -4,6 +4,7 @@ precision highp float;
 
 uniform float uTimeParam;
 uniform float uAspect;
+uniform vec3 uPartColor;
 
 //uniform sampler2D uSampler;
 
@@ -51,7 +52,8 @@ void main() {
 	//vec4 myColor = vec4(1.0*d,1.5*d,3.0*d, 1.0);
 	
 	//vec4 myColor = vec4(hsv2rgb(vec3(d + 0.01,0.33-0.25*sin(6.28*d),0.67+0.25*sin(6.28*d))), 1.0); //GOOD!
-	vec4 myColor = vec4(1.0,1.0,1.0,0.5+0.5*sin(6.28*d));
+	//vec4 myColor = vec4(1.0,1.0,1.0,0.5+0.5*sin(6.28*d));
+	vec4 myColor = vec4(uPartColor,0.5+0.5*sin(6.28*d));
 	
 	//vec4 myColor = vec4(0.5+0.5*sin(6.28*d),0.5+0.5*sin(6.28*d),0.5+0.5*sin(6.28*d), 1.0);
 	gl_FragColor = myColor;
