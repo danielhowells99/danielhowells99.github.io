@@ -41,10 +41,9 @@ img {
 	
 }
 .menuIcons {
-	width: 200px;
-	height: 200px;
+	width: 33%;
+	height: 33%;
 	mix-blend-mode: difference;
-	display: block;
 	margin-left: auto;
 	margin-right: auto;
 }
