@@ -45,7 +45,7 @@ void main() {
 			vec2 testDisp = testParticlePos - position;
 			float testDist = length(testDisp);
 			//float testDist = dot(testDisp,testDisp);
-			if(testDist > 0.0){
+			if(testDist > 0.00001){
 				float springDist = testDist - equDist;
 				float angle = atan(testDisp.y,testDisp.x);
 				force += vec2(0.01*cos(angle)*springDist,0.01*sin(angle)*springDist);
