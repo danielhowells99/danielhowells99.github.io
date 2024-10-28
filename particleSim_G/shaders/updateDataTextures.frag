@@ -32,7 +32,7 @@ void main() {
 
 	vec2 velocity = data.zw; //v.xy 2d
 
-	vec2 mouseDisplacement = uMousePos - position;
+	vec2 mouseDisplacement = transformVector*uMousePos - position;
 	float mouseDistSq = dot(mouseDisplacement,mouseDisplacement);
 	float mouseDist = sqrt(mouseDistSq);
 	//float mouseSpringDist = mouseDist - equDist;
@@ -54,7 +54,7 @@ void main() {
 			float dist = sqrt(sqDist);
 			vec2 normVec = testDisp/dist;
 		
-			if(sqDist > 0.00001){
+			if(sqDist > 0.0000001){
 				force += 0.0008*normVec/max(sqDist,objRad*objRad);
 				if(dist <= objRad){
 					float ddd = (objRad - dist);
