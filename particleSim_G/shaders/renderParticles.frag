@@ -14,9 +14,9 @@ void main() {
 	if (d > 1.0) {
 		discard;
 	}
-	float trans = min(0.015 + 0.25*velScale,0.4);
+	float trans = min(0.015 + 0.25*velScale,0.5);
 	if(d < 0.25){
-		trans = min(0.075 + 0.5*velScale,0.6);
+		trans = min(0.075 + 0.75*velScale,0.8);
 		if(d < 0.025){
 			trans = 0.75 + velScale;
 		}	
