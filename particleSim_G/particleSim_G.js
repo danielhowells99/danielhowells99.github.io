@@ -129,8 +129,8 @@ for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
 	//particle_data.push((0.4*rad*rad*Math.sin(angle)))
 	particle_data.push(0)
 	particle_data.push(0)
-	index_data.push((i%particle_num_sqd)/particle_num_sqd)
-	index_data.push(Math.floor(i/particle_num_sqd)/particle_num_sqd)
+	index_data.push(((i%particle_num_sqd)+0.5)/particle_num_sqd)
+	index_data.push((Math.floor(i/particle_num_sqd)+0.5)/particle_num_sqd)
 }
 
 //set verticies for rectangle to render particles to
