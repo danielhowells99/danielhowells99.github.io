@@ -54,7 +54,7 @@ void main() {
 			float dist = sqrt(sqDist);
 			vec2 normVec = testDisp/dist;
 		
-			if(sqDist > 0.000001){
+			if(sqDist > 0.00001){
 				force += 0.0008*normVec/max(sqDist,objRad*objRad);
 				if(dist <= objRad){
 					float ddd = (objRad - dist);
@@ -100,7 +100,7 @@ void main() {
 	}
 	*/
 	
-	float timeFactor = min(uDeltaTime,0.05);
+	float timeFactor = min(uDeltaTime,0.025);
 	velocity = pow(0.95,30.0*timeFactor)*velocity + timeFactor*force;//SETTING1
 	//velocity = 0.99*velocity + force/400.0;//SETTING1
 	
