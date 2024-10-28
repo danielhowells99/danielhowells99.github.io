@@ -100,7 +100,7 @@ void main() {
 	}
 	*/
 	
-	float timeFactor = min(uDeltaTime,0.025);
+	float timeFactor = min(uDeltaTime,0.05);
 	velocity = pow(0.95,30.0*timeFactor)*velocity + timeFactor*force;//SETTING1
 	//velocity = 0.99*velocity + force/400.0;//SETTING1
 	
