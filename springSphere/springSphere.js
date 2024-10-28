@@ -110,7 +110,7 @@ const particleProgramInfo = {
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 23*23;
+const particle_num = 86*86;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 const particle_data = []
 const index_data = []
@@ -118,10 +118,8 @@ const index_data = []
 for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
 	let angle = 2*Math.PI*Math.random()
 	let rad = Math.random()
-	particle_data.push(0.9*(-1+2*Math.random()))
-	//particle_data.push(0.4*rad*rad*Math.cos(angle)/aspectRatio)
-	particle_data.push(0.9*(-1+2*Math.random()))
-	//particle_data.push((0.4*rad*rad*Math.sin(angle)))
+	particle_data.push(0.8*rad*rad*Math.cos(angle)/aspectRatio)
+	particle_data.push((0.8*rad*rad*Math.sin(angle)))
 	particle_data.push(0)
 	particle_data.push(0)
 	index_data.push((i%particle_num_sqd)/particle_num_sqd)

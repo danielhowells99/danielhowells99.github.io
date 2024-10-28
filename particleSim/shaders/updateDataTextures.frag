@@ -13,9 +13,16 @@ varying vec2 vTexturePosition;
 void main() {
 
 	vec4 data = texture2D(uDataSampler, vTexturePosition);
+
+	vec2 transformVector = vec2(0.0,0.0);
+	if (uAspect > 1.0){
+		transformVector = vec2(uAspect,1.0);
+	} else {
+		transformVector = vec2(1.0,1.0/uAspect);
+	}
 	
 	vec2 position = data.xy; // p.xy 2d
-	position.x *= uAspect;
+	position *= transformVector;
 
 	vec2 velocity = data.zw; //v.xy 2d
 
@@ -31,8 +38,8 @@ void main() {
 	//float boundaryFactor = 0.8; //SETTING 1
 	float boundaryFactor = 0.875;//SETTING2
 	
-	float boundaryX = boundaryFactor*uAspect;
-	float boundaryY = boundaryFactor;
+	float boundaryX = boundaryFactor*transformVector.x;
+	float boundaryY = boundaryFactor*transformVector.y;
 	float transBoxX = 0.0;
 	float transBoxY = 0.0;
 	
@@ -68,6 +75,6 @@ void main() {
 	//velocity = pow(0.875,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	
 	position += uDeltaTime*velocity;
-	position.x /= uAspect;
+	position /= transformVector;
 	gl_FragColor = vec4(position,velocity);
 }

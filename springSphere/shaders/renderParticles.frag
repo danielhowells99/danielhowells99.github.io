@@ -3,28 +3,22 @@
 precision mediump float;
 uniform float uAspect;
 uniform vec3 uPartColor;
-varying vec2 vVelocity;
 
 void main() {
 	
-	float velScale = length(vVelocity);
+	float trans = 0.1;
 	
 	vec2 circCoord = 2.0 * gl_PointCoord - 1.0;
 	float d = dot(circCoord, circCoord);
 	if (d > 1.0) {
 		discard;
 	}
-	float trans = min(0.015 + 0.25*velScale,0.4);
-	if(d < 0.25){
-		trans = min(0.075 + 0.5*velScale,0.6);
-		if(d < 0.025){
-			trans = 0.75 + velScale;
-		}	
+	if (d < 0.1) {
+		trans = 0.7;
 	}
 
 	//gl_FragColor = vec4(0.75,0.9,1.0,0.15); //GALAXY BLUE
 	//gl_FragColor = vec4(0.025,0.05,0.1,0.2);
-	//gl_FragColor = vec4(uPartColor,2.0*trans); //
 	gl_FragColor = vec4(uPartColor,trans); //
 	//gl_FragColor = vec4(0.04,0.005,0.14,0.15);//PURP-CHARCOAL
 

@@ -19,11 +19,16 @@ void main() {
 	//gl_FragColor = vColor;
 	//vec2 uv = vTexCoord;
 	//gl_FragColor = vec4(uv,0.0,1.0);
-
+	vec2 transformVector = vec2(0.0,0.0);
+	if (uAspect > 1.0){
+		transformVector = vec2(uAspect,1.0);
+	} else {
+		transformVector = vec2(1.0,1.0/uAspect);
+	}
 
 	vec2 uv = 2.0*vTexCoord-1.0;
 	vec2 uvScaled = 2.0*uv;
-	uvScaled.x *= uAspect;
+	uvScaled *= transformVector;
 	uvScaled += vec2(6.0,9.5);
 	//uvScaled += vec2(7.0,7.0);
 	vec2 z = vec2(0.0,0.0);

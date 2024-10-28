@@ -11,61 +11,51 @@ uniform float uParticleNumSq;
 
 varying vec2 vTexturePosition;
 
-const float objRad = 0.08;
-
 void main() {
 
-	float equDist = 1.0;
+	float equDist = 1.1;
 
 	vec4 data = texture2D(uDataSampler, vTexturePosition);
 	
 	vec2 position = data.xy; // p.xy 2d
-
+	
 	vec2 transformVector = vec2(0.0,0.0);
 	if (uAspect > 1.0){
 		transformVector = vec2(uAspect,1.0);
 	} else {
 		transformVector = vec2(1.0,1.0/uAspect);
 	}
-
 	position *= transformVector;
 
 	vec2 velocity = data.zw; //v.xy 2d
 
 	vec2 mouseDisplacement = uMousePos - position;
-	float mouseDistSq = dot(mouseDisplacement,mouseDisplacement);
-	float mouseDist = sqrt(mouseDistSq);
-	//float mouseSpringDist = mouseDist - equDist;
-	vec2 mouseNorm = mouseDisplacement/sqrt(mouseDist);
+	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
+	float mouseSpringDist = mouseDist - equDist;
+	float mouseAngle = atan(mouseDisplacement.y,mouseDisplacement.x);
+
 	
-	vec2 force = vec2(0.0,0.0);//*uMouseForce*mouseNorm/max(mouseDistSq,0.01);
-	if(mouseDist <= 0.1){
-		float md = (0.1 - mouseDist);
-		force += -uMouseForce*5000.0*mouseNorm*md;
-	}
+	vec2 force = 10.0*uMouseForce*vec2(cos(mouseAngle)*mouseSpringDist,sin(mouseAngle)*mouseSpringDist);
 	
 	float brk_con = 0.0;
 	
-	for (float i = 0.0; i < 23.0;i++){
-		for (float j = 0.0; j < 23.0;j++){
+	for (float i = 0.0; i < 86.0;i++){
+		for (float j = 0.0; j < 86.0;j++){
 			vec2 testParticlePos = transformVector*texture2D(uDataSampler, vec2(i,j)/uParticleNumSq).xy;
 			vec2 testDisp = testParticlePos - position;
-			float sqDist = dot(testDisp,testDisp);
-			float dist = sqrt(sqDist);
-			vec2 normVec = testDisp/dist;
-		
-			if(sqDist > 0.000001){
-				force += 0.0008*normVec/max(sqDist,objRad*objRad);
-				if(dist <= objRad){
-					float ddd = (objRad - dist);
-					force += -500.0*normVec*ddd;
-				}
+			float testDist = length(testDisp);
+			//float testDist = dot(testDisp,testDisp);
+			if(testDist > 0.0){
+				float springDist = testDist - equDist;
+				float angle = atan(testDisp.y,testDisp.x);
+				force += vec2(0.01*cos(angle)*springDist,0.01*sin(angle)*springDist);
 			}
+			++brk_con;
 		}
 		//if (brk_con > uParticleNumSq*uParticleNumSq){break;}
 	}
 	
-	float k0 = 300.0; //SETTING 1
+	float k0 = 80.0; //SETTING 1
 	float boundaryFactor = 1.0;//SETTING2
 	
 	float boundaryX = boundaryFactor*transformVector.x;
@@ -101,11 +91,9 @@ void main() {
 	*/
 	
 	
-	velocity = pow(0.95,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
-	//velocity = 0.99*velocity + force/400.0;//SETTING1
-	
+	velocity = pow(0.94,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	position += uDeltaTime*velocity;
-	//position += velocity;
+	
 	position /= transformVector;
 	gl_FragColor = vec4(position,velocity);
 }
