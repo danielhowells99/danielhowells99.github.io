@@ -26,7 +26,7 @@ void main() {
 
 	vec2 velocity = data.zw; //v.xy 2d
 
-	vec2 mouseDisplacement = uMousePos - position;
+	vec2 mouseDisplacement = transformVector*uMousePos - position;
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
 	
 	vec2 force = 20.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));//SETTING1
