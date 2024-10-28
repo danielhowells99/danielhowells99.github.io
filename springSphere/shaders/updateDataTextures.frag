@@ -41,11 +41,11 @@ void main() {
 	
 	for (float i = 0.0; i < 86.0;i++){
 		for (float j = 0.0; j < 86.0;j++){
-			vec2 testParticlePos = transformVector*texture2D(uDataSampler, vec2(i,j)/uParticleNumSq).xy;
+			vec2 testParticlePos = transformVector*texture2D(uDataSampler, vec2(i+0.5,j+0.5)/uParticleNumSq).xy;
 			vec2 testDisp = testParticlePos - position;
 			float testDist = length(testDisp);
 			//float testDist = dot(testDisp,testDisp);
-			if(testDist > 0.00001){
+			if(testDist > 0.0){
 				float springDist = testDist - equDist;
 				float angle = atan(testDisp.y,testDisp.x);
 				force += vec2(0.01*cos(angle)*springDist,0.01*sin(angle)*springDist);
