@@ -19,10 +19,12 @@ let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
 let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 
+let minCanvDim = 0.0;
 function resizeCanvas() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	gl.viewport(0,0,canvas.width,canvas.height);
+	minCanvDim = Math.min(canvas.width,canvas.height);
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
@@ -105,6 +107,7 @@ const particleProgramInfo = {
 		aspect: gl.getUniformLocation(particleProgram, "uAspect"),
 		dataSampler: gl.getUniformLocation(particleProgram, "uDataSampler"),
 		partColor: gl.getUniformLocation(particleProgram, "uPartColor"),
+		minCanvDim: gl.getUniformLocation(particleProgram, "uMinCanvDim"),
 	},
 };
 
@@ -196,6 +199,7 @@ function render() {
 		gl.useProgram(particleProgram);
 		gl.uniform2fv(particleProgramInfo.uniformLocations.canvasDimension,[canvas.width,canvas.height]);
 		gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
+		gl.uniform1f(particleProgramInfo.uniformLocations.minCanvDim,minCanvDim);
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 		
