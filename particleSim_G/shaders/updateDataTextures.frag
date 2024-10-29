@@ -55,10 +55,10 @@ void main() {
 			if(sqDist > 0.0000001){
 				float dist = sqrt(sqDist);
 				vec2 normVec = testDisp/dist;
-				force += 0.0012*normVec/max(sqDist,objRad*objRad);
+				force += 0.0008*normVec/max(sqDist,objRad*objRad);
 				if(dist <= objRad){
 					float ddd = (objRad - dist);
-					force += -800.0*normVec*ddd;
+					force += -600.0*normVec*ddd;
 				}
 			}
 		}
