@@ -118,8 +118,8 @@ const index_data = []
 for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
 	let angle = 2*Math.PI*Math.random()
 	let rad = Math.random()
-	particle_data.push(0.8*rad*rad*Math.cos(angle)/aspectRatio)
-	particle_data.push((0.8*rad*rad*Math.sin(angle)))
+	particle_data.push(0.4*rad*rad*Math.cos(angle)/aspectRatio)
+	particle_data.push((0.4*rad*rad*Math.sin(angle)))
 	particle_data.push(0)
 	particle_data.push(0)
 	index_data.push(((i%particle_num_sqd)+0.5)/particle_num_sqd)
