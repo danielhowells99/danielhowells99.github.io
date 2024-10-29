@@ -29,11 +29,11 @@ void main() {
 	vec2 mouseDisplacement = transformVector*uMousePos - position;
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
 	
-	vec2 force = 20.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));//SETTING1
-	//vec2 force = 16.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));//SETTING2
+	//vec2 force = 20.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));//SETTING1
+	vec2 force = 16.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));//SETTING2
 	
-	float k0 = 10.0; //SETTING 1
-	//float k0 = 60.0; //SETTING 2
+	//float k0 = 10.0; //SETTING 1
+	float k0 = 60.0; //SETTING 2
 	
 	//float boundaryFactor = 0.8; //SETTING 1
 	float boundaryFactor = 0.875;//SETTING2
@@ -61,18 +61,16 @@ void main() {
 	
 	//FOR CIRCULAR BOUNDARY
 	/*
-	float posmag = position.x*position.x + position.y*position.y - 0.8*min(1.0,uAspect*uAspect);
+	float posmag = position.x*position.x + position.y*position.y - boundaryFactor;
 	if (posmag >= 0.0){
-		float angle = atan(position.y,position.x);
-		posmag = length(posmag);
-		force.x += -k0*cos(angle)*(posmag);
-		force.y += -k0*sin(angle)*(posmag);
+		vec2 normvec = normalize(position);
+		force += -0.5*k0*normvec*(posmag);
 	}
 	*/
 	
 	
-	velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
-	//velocity = pow(0.875,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
+	//velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	velocity = pow(0.88,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	
 	position += uDeltaTime*velocity;
 	position /= transformVector;
