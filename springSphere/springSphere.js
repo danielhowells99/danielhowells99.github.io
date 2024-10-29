@@ -180,7 +180,7 @@ function render() {
 		gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
 		gl.uniform1f(dataProgramInfo.uniformLocations.aspect,aspectRatio);
 		gl.uniform1f(dataProgramInfo.uniformLocations.deltaTime,delayMilliseconds);
-		gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[aspectRatio*(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
+		gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
 		
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, pt1);
