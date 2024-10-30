@@ -38,10 +38,10 @@ void main() {
 	//float mouseSpringDist = mouseDist - equDist;
 	
 	vec2 force = vec2(0.0,0.0);//*uMouseForce*mouseNorm/max(mouseDistSq,0.01);
-	if(mouseDist <= 2.0*objRad){
-		float md = (2.0*objRad - mouseDist);
+	if(mouseDist <= objRad){
+		float md = (objRad - mouseDist);
 		vec2 mouseNorm = mouseDisplacement/sqrt(mouseDist);
-		force += -uMouseForce*2500.0*mouseNorm*md;
+		force += -uMouseForce*80.0*mouseNorm*md;
 	}
 	
 	float brk_con = 0.0;
@@ -55,17 +55,17 @@ void main() {
 			if(sqDist > 0.0000001){
 				float dist = sqrt(sqDist);
 				vec2 normVec = testDisp/dist;
-				force += 0.0008*normVec/max(sqDist,objRad*objRad);
+				force += 0.00001*normVec/max(sqDist,objRad*objRad);
 				if(dist <= objRad){
 					float ddd = (objRad - dist);
-					force += -600.0*normVec*ddd;
+					force += -20.0*normVec*ddd;
 				}
 			}
 		}
 		//if (brk_con > uParticleNumSq*uParticleNumSq){break;}
 	}
 	
-	float k0 = 300.0; //SETTING 1
+	float k0 = 30.0; //SETTING 1
 	float boundaryFactor = 1.0;//SETTING2
 	
 	float boundaryX = boundaryFactor*transformVector.x;
@@ -100,10 +100,9 @@ void main() {
 	}
 	*/
 	
-	float timeFactor = min(uDeltaTime,0.02);
-	velocity = pow(0.95,30.0*timeFactor)*velocity + timeFactor*force;//SETTING1
-	//velocity = 0.99*velocity + force/400.0;//SETTING1
-	
+	float timeFactor = clamp(uDeltaTime,0.045,0.15);
+	//velocity = pow(0.97,30.0*timeFactor)*velocity + timeFactor*force;//SETTING1
+	velocity = 0.995*velocity + timeFactor*force;//SETTING1
 	position += timeFactor*velocity;
 	//position += velocity;
 	position /= transformVector;

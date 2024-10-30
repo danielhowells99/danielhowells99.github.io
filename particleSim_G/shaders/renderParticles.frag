@@ -7,16 +7,18 @@ varying vec2 vVelocity;
 
 void main() {
 	
-	float velScale = length(vVelocity);
-	
 	vec2 circCoord = 2.0 * gl_PointCoord - 1.0;
 	float d = dot(circCoord, circCoord);
 	if (d > 1.0) {
 		discard;
 	}
-	float trans = min(0.1 + velScale,0.75);
-	if(d < (0.005 + 0.25*velScale)){
-		trans = 1.0;
+	float colourParam = 3.0*log(1.0 + 400.0*dot(vVelocity,vVelocity));
+	float trans = min(0.1 + 0.25*colourParam,0.4);
+	if(d < 0.25){
+		trans = min(0.15 + 0.5*colourParam,0.8);
+		if(d < 0.03325){
+			trans = 0.60 + colourParam;
+		}
 	}
 
 	//gl_FragColor = vec4(0.75,0.9,1.0,0.15); //GALAXY BLUE
