@@ -94,6 +94,7 @@ function useMic(stream){
 	console.log("did we get here?")
 	mic = audioCtx.createMediaStreamSource(stream);
 	mic.connect(analyser);
+	analyser.disconnect()
 	let startTime = new Date().getTime();
 	const frameLimit = 10; // PAL/NTSC TV?
 	const minDelta = 0.0//1.0/frameLimit;
