@@ -29,7 +29,7 @@ void main() {
 
 	vec2 velocity = data.zw; //v.xy 2d
 
-	vec2 mouseDisplacement = uMousePos - position;
+	vec2 mouseDisplacement = transformVector*uMousePos - position;
 	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
 	float mouseSpringDist = mouseDist - equDist;
 	float mouseAngle = atan(mouseDisplacement.y,mouseDisplacement.x);
