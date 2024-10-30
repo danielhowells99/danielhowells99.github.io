@@ -100,7 +100,7 @@ void main() {
 	}
 	*/
 	
-	float timeFactor = 6.0*clamp(uDeltaTime,0.004,0.03);
+	float timeFactor = 6.0*clamp(uDeltaTime,0.004,0.028);
 	velocity = pow(0.95,5.0*timeFactor)*velocity + timeFactor*force;//SETTING1
 	//velocity = 0.98*velocity + timeFactor*force;//SETTING1
 	position += timeFactor*velocity;
