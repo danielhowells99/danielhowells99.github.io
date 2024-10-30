@@ -5,7 +5,10 @@ uniform sampler2D uDataSampler;
 varying vec2 vTexPosition;
 
 void main() {
-	float freqVal = texture2D(uDataSampler,vTexPosition).x;
-	float freqVal2 = texture2D(uDataSampler,vec2(1.0-vTexPosition.x,vTexPosition.y)).x;
-	gl_FragColor = vec4(freqVal,0.5*(freqVal + freqVal2),freqVal2,1.0); //
+	vec2 accessCoords = fract(vTexPosition);
+	//float freqVal = texture2D(uDataSampler,abs(vTexPosition-vec2(0.25,0.0))).x;
+	//float freqVal2 = texture2D(uDataSampler,abs(vec2(0.75,0.0)-vTexPosition)).x;
+	float freqVal = texture2D(uDataSampler,accessCoords).x;
+	float freqVal2 = texture2D(uDataSampler,1.0-accessCoords).x;
+	gl_FragColor = vec4(freqVal,pow(0.5*(freqVal + freqVal2),1.3),freqVal2,1.0); //
 }

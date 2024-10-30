@@ -56,7 +56,7 @@ const audioCtx = new AudioContext();
 console.log("sample_rate: " + audioCtx.sampleRate)
 const analyser = audioCtx.createAnalyser()
 analyser.fftSize = 2048;
-analyser.smoothingTimeConstant = 0.9;
+analyser.smoothingTimeConstant = 0.89;
 
 let mic = null
 
