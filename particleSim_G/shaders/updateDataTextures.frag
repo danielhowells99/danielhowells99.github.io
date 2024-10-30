@@ -38,8 +38,8 @@ void main() {
 	//float mouseSpringDist = mouseDist - equDist;
 	
 	vec2 force = vec2(0.0,0.0);//*uMouseForce*mouseNorm/max(mouseDistSq,0.01);
-	if(mouseDist <= objRad){
-		float md = (objRad - mouseDist);
+	if(mouseDist <= 1.5*objRad){
+		float md = (1.5*objRad - mouseDist);
 		vec2 mouseNorm = mouseDisplacement/sqrt(mouseDist);
 		force += -uMouseForce*69.0*mouseNorm*md;
 	}
