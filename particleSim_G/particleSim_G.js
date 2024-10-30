@@ -169,7 +169,7 @@ let pt1 = textures.dataTexture1
 let pt2 = textures.dataTexture2
 
 let startTime = new Date().getTime();
-const frameLimit = 10000000; // PAL/NTSC TV?
+const frameLimit = 60; // PAL/NTSC TV?
 
 function render() {
 	
