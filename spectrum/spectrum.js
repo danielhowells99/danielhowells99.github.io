@@ -31,6 +31,11 @@ document.addEventListener("keypress", function onEvent(event) {
 	if (event.key == "p" || event.key == "P"){
 		capFlag = 1;
 	}
+	if (event.key == "m" || event.key == "M"){
+		if(mic){
+			mic.connect(audioCtx.destination);
+		}
+	}
 });
 
 //###################################################################
@@ -52,6 +57,8 @@ console.log("sample_rate: " + audioCtx.sampleRate)
 const analyser = audioCtx.createAnalyser()
 analyser.fftSize = 2048;
 analyser.smoothingTimeConstant = 0.9;
+
+let mic = null
 
 const bufferLength = analyser.frequencyBinCount;
 const freqData = new Uint8Array(bufferLength);
@@ -85,9 +92,8 @@ navigator.mediaDevices
 
 function useMic(stream){
 	console.log("did we get here?")
-	var mic = audioCtx.createMediaStreamSource(stream);
-	mic.connect(analyser); 
-	mic.connect(audioCtx.destination);
+	mic = audioCtx.createMediaStreamSource(stream);
+	mic.connect(analyser);
 	let startTime = new Date().getTime();
 	const frameLimit = 10; // PAL/NTSC TV?
 	const minDelta = 0.0//1.0/frameLimit;
