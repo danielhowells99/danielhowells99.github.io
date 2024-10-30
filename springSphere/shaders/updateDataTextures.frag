@@ -30,32 +30,29 @@ void main() {
 	vec2 velocity = data.zw; //v.xy 2d
 
 	vec2 mouseDisplacement = transformVector*uMousePos - position;
-	float mouseDist = mouseDisplacement.x*mouseDisplacement.x + mouseDisplacement.y*mouseDisplacement.y;
+	float mouseDist = length(mouseDisplacement);
+	//float mouseDist2 = dot(mouseDisplacement,mouseDisplacement);
 	float mouseSpringDist = mouseDist - equDist;
-	float mouseAngle = atan(mouseDisplacement.y,mouseDisplacement.x);
-
+	vec2 normMouseVec = mouseDisplacement/mouseDist;
 	
-	vec2 force = 10.0*uMouseForce*vec2(cos(mouseAngle)*mouseSpringDist,sin(mouseAngle)*mouseSpringDist);
-	
-	float brk_con = 0.0;
+	vec2 force = 10.0*uMouseForce*normMouseVec*mouseSpringDist;
 	
 	for (float i = 0.0; i < 86.0;i++){
 		for (float j = 0.0; j < 86.0;j++){
 			vec2 testParticlePos = transformVector*texture2D(uDataSampler, vec2(i+0.5,j+0.5)/uParticleNumSq).xy;
 			vec2 testDisp = testParticlePos - position;
 			float testDist = length(testDisp);
-			//float testDist = dot(testDisp,testDisp);
+			//float testDist2 = dot(testDisp,testDisp);
 			if(testDist > 0.0){
+				vec2 normDisp = testDisp/testDist;
 				float springDist = testDist - equDist;
-				float angle = atan(testDisp.y,testDisp.x);
-				force += vec2(0.01*cos(angle)*springDist,0.01*sin(angle)*springDist);
+				force += 0.01*normDisp*springDist;
 			}
-			++brk_con;
 		}
 		//if (brk_con > uParticleNumSq*uParticleNumSq){break;}
 	}
 	
-	float k0 = 80.0; //SETTING 1
+	float k0 = 160.0; //SETTING 1
 	float boundaryFactor = 1.0;//SETTING2
 	
 	float boundaryX = boundaryFactor*transformVector.x;
@@ -91,7 +88,7 @@ void main() {
 	*/
 	
 	
-	velocity = pow(0.94,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	velocity = pow(0.96,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	position += uDeltaTime*velocity;
 	
 	position /= transformVector;
