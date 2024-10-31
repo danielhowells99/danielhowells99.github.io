@@ -35,7 +35,7 @@ void main() {
 	float mouseSpringDist = mouseDist - equDist;
 	vec2 normMouseVec = mouseDisplacement/max(mouseDist,0.000001);
 	
-	vec2 force = 8.0*uMouseForce*normMouseVec*mouseSpringDist;
+	vec2 force = 6.0*uMouseForce*normMouseVec*mouseSpringDist;
 	
 	for (float i = 0.0; i < 64.0;i++){
 		for (float j = 0.0; j < 64.0;j++){
