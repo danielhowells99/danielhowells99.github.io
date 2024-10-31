@@ -30,12 +30,12 @@ void main() {
 	vec2 velocity = data.zw; //v.xy 2d
 
 	vec2 mouseDisplacement = transformVector*uMousePos - position;
-	//float mouseDist = length(mouseDisplacement);
-	float mouseDist = dot(mouseDisplacement,mouseDisplacement);
+	float mouseDist = length(mouseDisplacement);
+	//float mouseDist = dot(mouseDisplacement,mouseDisplacement);
 	float mouseSpringDist = mouseDist - equDist;
 	vec2 normMouseVec = mouseDisplacement/max(mouseDist,0.000001);
 	
-	vec2 force = 10.0*uMouseForce*normMouseVec*mouseSpringDist;
+	vec2 force = 8.0*uMouseForce*normMouseVec*mouseSpringDist;
 	
 	for (float i = 0.0; i < 64.0;i++){
 		for (float j = 0.0; j < 64.0;j++){
