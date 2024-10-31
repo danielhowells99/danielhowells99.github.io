@@ -33,9 +33,9 @@ void main() {
 	float mouseDist = length(mouseDisplacement);
 	//float mouseDist2 = dot(mouseDisplacement,mouseDisplacement);
 	float mouseSpringDist = mouseDist - equDist;
-	vec2 normMouseVec = mouseDisplacement/max(mouseDist,0.000001);
+	vec2 normMouseVec = mouseDisplacement*mouseDist;
 	
-	vec2 force = 10.0*uMouseForce*normMouseVec*mouseSpringDist;
+	vec2 force = 12.0*uMouseForce*normMouseVec*mouseSpringDist;
 	
 	for (float i = 0.0; i < 64.0;i++){
 		for (float j = 0.0; j < 64.0;j++){
@@ -46,7 +46,7 @@ void main() {
 			if(testDist > 0.00001){
 				vec2 normDisp = testDisp/testDist;
 				float springDist = testDist - equDist;
-				force += 0.01*normDisp*springDist;
+				force += 0.012*normDisp*springDist;
 			}
 		}
 		//if (brk_con > uParticleNumSq*uParticleNumSq){break;}
