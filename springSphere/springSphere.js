@@ -162,15 +162,15 @@ let pt1 = textures.dataTexture1
 let pt2 = textures.dataTexture2
 
 let startTime = new Date().getTime();
-const frameLimit = 120; // PAL/NTSC TV?
-const minDelta = 0.0//1.0/frameLimit; // PAL/NTSC TV?
+const frameLimit = 240; // PAL/NTSC TV?
+const minDelta = 1.0/frameLimit; // PAL/NTSC TV?
 
 function render() {
 	
 	let endTime = new Date().getTime();
 	let delayMilliseconds = (endTime - startTime)/1000.0;
 	
-	if (delayMilliseconds > minDelta && (ext)){ //THROTTLE FRAMERATE
+	if (delayMilliseconds > minDelta){ //THROTTLE FRAMERATE
 			
 		startTime = endTime
 		
