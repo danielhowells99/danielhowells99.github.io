@@ -88,7 +88,7 @@ void main() {
 	*/
 	
 	
-	velocity = pow(0.96,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	velocity = pow(0.98,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	position += uDeltaTime*velocity;
 	
 	position /= transformVector;
