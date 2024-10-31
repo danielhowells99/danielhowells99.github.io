@@ -19,10 +19,13 @@ let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
 let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 
+let aspectRatio = canvas.width/canvas.height;
+
 function resizeCanvas() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	gl.viewport(0,0,canvas.width,canvas.height);
+	aspectRatio = canvas.width/canvas.height;
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
@@ -107,8 +110,6 @@ const particleProgramInfo = {
 		partColor: gl.getUniformLocation(particleProgram, "uPartColor"),
 	},
 };
-
-let aspectRatio = canvas.width/canvas.height;
 
 const particle_num = 86*86;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
