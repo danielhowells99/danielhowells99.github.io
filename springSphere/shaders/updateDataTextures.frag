@@ -87,9 +87,9 @@ void main() {
 	}
 	*/
 	
-	
-	velocity = pow(0.98,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
-	position += uDeltaTime*velocity;
+	float timeFactor = min(uDeltaTime,0.1)
+	velocity = pow(0.98,30.0*timeFactor)*velocity + timeFactor*force;//SETTING1
+	position += timeFactor*velocity;
 	
 	position /= transformVector;
 	gl_FragColor = vec4(position,velocity);
