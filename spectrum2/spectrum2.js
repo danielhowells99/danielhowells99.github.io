@@ -1,5 +1,4 @@
 import {loadShader, initShaderProgram, loadTexture} from "../libraries/my-shader-util.js";
-import {prepare_textures_and_framebuffers} from "./prep-textures-framebuffers.js"
 
 var canvas = document.querySelector("canvas");
 const gl = canvas.getContext("webgl");
@@ -40,15 +39,26 @@ document.addEventListener("keypress", function onEvent(event) {
 
 //###################################################################
 
-const dataProgram = initShaderProgram(gl, 'shaders/frequencyStrip.vert', 'shaders/frequencyStrip.frag');
+const freqProgram = initShaderProgram(gl, 'shaders/frequencyStrip.vert', 'shaders/frequencyStrip.frag');
+const displayFramebufferProgram = initShaderProgram(gl, 'shaders/displayFramebuffer.vert', 'shaders/displayFramebuffer.frag');
 
-const dataProgramInfo = {
-	program: dataProgram,
+const freqProgramInfo = {
+	program: freqProgram,
 	attribLocations: {
-		vertexPosition: gl.getAttribLocation(dataProgram, "aVertexPosition"),
+		vertexPosition: gl.getAttribLocation(freqProgram, "aVertexPosition"),
 	},
 	uniformLocations: {
-		dataSampler: gl.getUniformLocation(dataProgram, "uDataSampler"),
+		dataSampler: gl.getUniformLocation(freqProgram, "uDataSampler"),
+	},
+};
+
+const displayFramebufferProgramInfo = {
+	program: displayFramebufferProgram,
+	attribLocations: {
+		vertexPosition: gl.getAttribLocation(displayFramebufferProgram, "aVertexPosition"),
+	},
+	uniformLocations: {
+		framebufferTexSampler: gl.getUniformLocation(displayFramebufferProgram, "uFbTexture"),
 	},
 };
 
@@ -63,20 +73,22 @@ let mic = null
 const bufferLength = analyser.frequencyBinCount;
 const freqData = new Uint8Array(bufferLength);
 analyser.getByteTimeDomainData(freqData);
-let micStream = null
 
-var {textures,framebuffers} = prepare_textures_and_framebuffers(gl,freqData)
-let freqTex = textures.dataTexture1;
+let freqTex = createDataTexture(gl,freqData);
 gl.activeTexture(gl.TEXTURE0);
 gl.bindTexture(gl.TEXTURE_2D, freqTex);
-gl.uniform1i(dataProgramInfo.uniformLocations.dataSampler, 0);
+gl.useProgram(freqProgram)
+gl.uniform1i(freqProgramInfo.uniformLocations.dataSampler,0);
 
 //set verticies for rectangle to render particles to
 const positionBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 const positions = [1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0];
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-setPositionAttribute(gl, positionBuffer, dataProgramInfo)
+setPositionAttribute(gl, positionBuffer, freqProgramInfo)
+setPositionAttribute(gl, positionBuffer, displayFramebufferProgramInfo)
+
+let screenBuffer1 = null;
 
 navigator.mediaDevices
   .getUserMedia({
@@ -108,21 +120,31 @@ function useMic(stream){
 			startTime = endTime
 			
 			//DRAW CODE HERE
-			//analyser.getByteTimeDomainData(dataArray);
 			analyser.getByteFrequencyData(freqData)
+			
+			gl.useProgram(freqProgram)
+
+			gl.activeTexture(gl.TEXTURE0);
 			gl.bindTexture(gl.TEXTURE_2D, freqTex);
 			gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, freqData.length, 1, 0, gl.LUMINANCE,
-                gl.UNSIGNED_BYTE, new Uint8Array(freqData));
+				gl.UNSIGNED_BYTE, new Uint8Array(freqData));
 			gl.activeTexture(gl.TEXTURE0);
-			//gl.bindTexture(gl.TEXTURE_2D, freqTex);
-			
-			gl.useProgram(dataProgram)
-			gl.viewport(0, 0, canvas.width, canvas.height);
-			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-			//console.log(dataArray)
-			
+			gl.bindTexture(gl.TEXTURE_2D, freqTex);
 
+			gl.uniform1i(freqProgramInfo.uniformLocations.dataSampler,0);
 			
+			screenBuffer1 = createScreenFramebuffer(gl)
+			gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer1.framebuffer);
+			gl.viewport(0, 0, canvas.width, canvas.height);
+			//gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+			//console.log(dataArray)
+
+			gl.useProgram(displayFramebufferProgram)
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+			gl.viewport(0, 0, canvas.width, canvas.height);
+			gl.uniform1i(displayFramebufferProgramInfo.uniformLocations.framebufferTexSampler, 2);
+			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
 			//-----
 			if (capFlag == 1){
 				console.log("saving picture")
@@ -158,4 +180,42 @@ function setPositionAttribute(gl, buffer, programInfo) { //Sets verticies for re
 		offset,
 	);
 	gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+}
+
+function createDataTexture(gl,freqData){
+	let dataTexture1 = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, dataTexture1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, freqData.length, 1, 0, gl.LUMINANCE,
+                gl.UNSIGNED_BYTE, new Uint8Array(freqData));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	return dataTexture1;
+}
+
+function createScreenFramebuffer(gl){
+	let screenTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, screenTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA,
+                gl.UNSIGNED_BYTE, new Uint8Array(canvas.width*canvas.height*4).fill(50));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+	var framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, screenTexture, 0); // attach tex1
+    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) { // check this will actually work
+        alert("this combination of attachments not supported");
+    }
+
+	gl.activeTexture(gl.TEXTURE2);
+	gl.bindTexture(gl.TEXTURE_2D, screenTexture);
+
+	return {
+		texture: screenTexture,
+		framebuffer: framebuffer,
+	}
 }
