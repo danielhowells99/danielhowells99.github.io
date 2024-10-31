@@ -170,7 +170,7 @@ let pt2 = textures.dataTexture2
 
 let startTime = new Date().getTime();
 const frameLimit = 600000000; // PAL/NTSC TV?
-const minDelta = 1.0/frameLimit; // PAL/NTSC TV?
+const minDelta = 0.0//1.0/frameLimit; // PAL/NTSC TV?
 
 function render() {
 	

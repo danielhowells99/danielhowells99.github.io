@@ -7,7 +7,7 @@ var canvas = document.querySelector("canvas");
 const gl = canvas.getContext("webgl");
 const ext = gl.getExtension('OES_texture_float');
 if (!ext) {
-	//alert('need OES_texture_float');
+	alert('need OES_texture_float');
 }
 
 //gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
@@ -19,13 +19,10 @@ let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
 let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 
-let aspectRatio = canvas.width/canvas.height;
-
 function resizeCanvas() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	gl.viewport(0,0,canvas.width,canvas.height);
-	aspectRatio = canvas.width/canvas.height;
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
@@ -111,6 +108,8 @@ const particleProgramInfo = {
 	},
 };
 
+let aspectRatio = canvas.width/canvas.height;
+
 const particle_num = 86*86;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 const particle_data = []
@@ -163,7 +162,7 @@ let pt1 = textures.dataTexture1
 let pt2 = textures.dataTexture2
 
 let startTime = new Date().getTime();
-const frameLimit = 120; // PAL/NTSC TV?
+const frameLimit = 60; // PAL/NTSC TV?
 const minDelta = 1.0/frameLimit; // PAL/NTSC TV?
 
 function render() {
