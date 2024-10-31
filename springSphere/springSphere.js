@@ -6,12 +6,8 @@ var canvas = document.querySelector("canvas");
 
 const gl = canvas.getContext("webgl");
 const ext = gl.getExtension('OES_texture_float');
-const ext2 = gl.getExtension('OES_texture_half_float');
 if (!ext) {
 	alert('need OES_texture_float');
-}
-if (!ext2) {
-	alert('need OES_texture_half_float');
 }
 
 //gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
@@ -174,7 +170,7 @@ function render() {
 	let endTime = new Date().getTime();
 	let delayMilliseconds = (endTime - startTime)/1000.0;
 	
-	if (delayMilliseconds > minDelta){ //THROTTLE FRAMERATE
+	if (delayMilliseconds > minDelta && (ext)){ //THROTTLE FRAMERATE
 			
 		startTime = endTime
 		
