@@ -7,7 +7,7 @@ var canvas = document.querySelector("canvas");
 const gl = canvas.getContext("webgl");
 const ext = gl.getExtension('OES_texture_float');
 if (!ext) {
-	alert('need OES_texture_float');
+	//alert('need OES_texture_float');
 }
 
 //gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
