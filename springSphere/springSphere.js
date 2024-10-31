@@ -8,12 +8,12 @@ const gl = canvas.getContext("webgl");
 const ext = gl.getExtension('OES_texture_float');
 if (!ext) {
 	alert('need OES_texture_float');
-	gl.clearColor(1.0,0.0,0.0, 1.0);
+	//gl.clearColor(1.0,0.0,0.0, 1.0);
 }
 
 //gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
 //gl.clearColor(0.05, 0.01, 0.02, 1.0);
-gl.clearColor(0.98, 0.92, 0.85, 0.0);//parchment
+gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
 gl.clearDepth(10.0);
 
 let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
@@ -176,7 +176,7 @@ function render() {
 		startTime = endTime
 		
 		aspectRatio = canvas.width/canvas.height
-		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+		//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 		
 		gl.useProgram(dataProgram);
 		gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
