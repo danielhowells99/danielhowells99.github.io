@@ -92,5 +92,5 @@ void main() {
 	position += uDeltaTime*velocity;
 	
 	position /= transformVector;
-	gl_FragColor = vec4(position,clamp(velocity,-1.0,1.0));
+	gl_FragColor = vec4(position,velocity);
 }
