@@ -13,7 +13,7 @@ varying vec2 vTexturePosition;
 
 void main() {
 
-	float equDist = 1.05;
+	float equDist = 1.0;
 
 	vec4 data = texture2D(uDataSampler, vTexturePosition);
 	
@@ -33,9 +33,9 @@ void main() {
 	float mouseDist = length(mouseDisplacement);
 	//float mouseDist = dot(mouseDisplacement,mouseDisplacement);
 	float mouseSpringDist = mouseDist - equDist;
-	vec2 normMouseVec = mouseDisplacement/max(mouseDist,0.000001);
+	vec2 normMouseVec = mouseDisplacement/mouseDist;
 	
-	vec2 force = 6.0*uMouseForce*normMouseVec*mouseSpringDist;
+	vec2 force = 3.5*uMouseForce*normMouseVec*mouseSpringDist;
 	
 	for (float i = 0.0; i < 64.0;i++){
 		for (float j = 0.0; j < 64.0;j++){
@@ -46,13 +46,13 @@ void main() {
 			if(testDist > 0.00001){
 				vec2 normDisp = testDisp/testDist;
 				float springDist = testDist - equDist;
-				force += 0.012*normDisp*springDist;
+				force += 0.02*normDisp*springDist;
 			}
 		}
 		//if (brk_con > uParticleNumSq*uParticleNumSq){break;}
 	}
 	
-	float k0 = 320.0; //SETTING 1
+	float k0 = 400.0; //SETTING 1
 	float boundaryFactor = 1.0;//SETTING2
 	
 	float boundaryX = boundaryFactor*transformVector.x;
