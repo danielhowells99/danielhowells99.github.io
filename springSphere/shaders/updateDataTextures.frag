@@ -37,8 +37,8 @@ void main() {
 	
 	vec2 force = 10.0*uMouseForce*normMouseVec*mouseSpringDist;
 	
-	for (float i = 0.0; i < 23.0;i++){
-		for (float j = 0.0; j < 23.0;j++){
+	for (float i = 0.0; i < 64.0;i++){
+		for (float j = 0.0; j < 64.0;j++){
 			vec2 testParticlePos = transformVector*texture2D(uDataSampler, vec2(i+0.5,j+0.5)/uParticleNumSq).xy;
 			vec2 testDisp = testParticlePos - position;
 			float testDist = length(testDisp);
