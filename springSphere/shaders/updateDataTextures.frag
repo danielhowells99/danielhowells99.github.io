@@ -23,7 +23,7 @@ void main() {
 	if (uAspect > 1.0){
 		transformVector = vec2(uAspect,1.0);
 	} else {
-		transformVector = vec2(1.0,1.0/uAspect);
+		transformVector = vec2(1.0,1.0/max(uAspect,0.001));
 	}
 	position *= transformVector;
 
@@ -37,8 +37,8 @@ void main() {
 	
 	vec2 force = 10.0*uMouseForce*normMouseVec*mouseSpringDist;
 	
-	for (float i = 0.0; i < 86.0;i++){
-		for (float j = 0.0; j < 86.0;j++){
+	for (float i = 0.0; i < 23.0;i++){
+		for (float j = 0.0; j < 23.0;j++){
 			vec2 testParticlePos = transformVector*texture2D(uDataSampler, vec2(i+0.5,j+0.5)/uParticleNumSq).xy;
 			vec2 testDisp = testParticlePos - position;
 			float testDist = length(testDisp);

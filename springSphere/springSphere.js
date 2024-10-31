@@ -110,7 +110,7 @@ const particleProgramInfo = {
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 86*86;
+const particle_num =23*23;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 const particle_data = []
 const index_data = []
