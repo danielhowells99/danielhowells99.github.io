@@ -13,7 +13,7 @@ varying vec2 vTexturePosition;
 
 void main() {
 
-	float equDist = 1.1;
+	float equDist = 1.05;
 
 	vec4 data = texture2D(uDataSampler, vTexturePosition);
 	
@@ -52,7 +52,7 @@ void main() {
 		//if (brk_con > uParticleNumSq*uParticleNumSq){break;}
 	}
 	
-	float k0 = 160.0; //SETTING 1
+	float k0 = 320.0; //SETTING 1
 	float boundaryFactor = 1.0;//SETTING2
 	
 	float boundaryX = boundaryFactor*transformVector.x;
