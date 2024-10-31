@@ -87,8 +87,8 @@ void main() {
 	}
 	*/
 	
-	float timeFactor = min(uDeltaTime,0.1)
-	velocity = pow(0.98,30.0*timeFactor)*velocity + timeFactor*force;//SETTING1
+	float timeFactor = min(uDeltaTime,0.06)
+	velocity = pow(0.96,30.0*timeFactor)*velocity + timeFactor*force;//SETTING1
 	position += timeFactor*velocity;
 	
 	position /= transformVector;
