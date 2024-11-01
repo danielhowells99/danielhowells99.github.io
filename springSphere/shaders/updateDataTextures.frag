@@ -35,7 +35,7 @@ void main() {
 	float mouseSpringDist = mouseDist - equDist;
 	vec2 normMouseVec = mouseDisplacement/mouseDist;
 	
-	vec2 force = 3.5*uMouseForce*normMouseVec*mouseSpringDist;
+	vec2 force = 8.0*uMouseForce*normMouseVec*mouseSpringDist;
 	
 	for (float i = 0.0; i < 64.0;i++){
 		for (float j = 0.0; j < 64.0;j++){
@@ -52,7 +52,7 @@ void main() {
 		//if (brk_con > uParticleNumSq*uParticleNumSq){break;}
 	}
 	
-	float k0 = 400.0; //SETTING 1
+	float k0 = 20.0; //SETTING 1
 	float boundaryFactor = 1.0;//SETTING2
 	
 	float boundaryX = boundaryFactor*transformVector.x;
@@ -61,19 +61,19 @@ void main() {
 	float transBoxY = 0.0;
 	
 	if (position.x >= boundaryX+transBoxX){
-		force.x += -k0*(position.x-boundaryX-transBoxX);
+		force.x += -k0;//*sign(position.x-boundaryX-transBoxX);
 	}
 	
 	if (position.x <= -boundaryX+transBoxX){
-		force.x += -k0*(position.x+boundaryX-transBoxX);
+		force.x += k0;//*sign(position.x+boundaryX-transBoxX);
 	}
 	
 	if (position.y >= boundaryY+transBoxY){
-		force.y += -k0*(position.y-boundaryY-transBoxY);
+		force.y += -k0;//*sign(position.y-boundaryY-transBoxY);
 	}
 	
 	if (position.y <= -boundaryY+transBoxY){
-		force.y += -k0*(position.y+boundaryY-transBoxY);
+		force.y += k0;//*sign(position.y+boundaryY-transBoxY);
 	}
 	
 	

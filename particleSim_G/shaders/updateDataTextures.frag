@@ -38,8 +38,8 @@ void main() {
 	//float mouseSpringDist = mouseDist - equDist;
 	
 	vec2 force = vec2(0.0,0.0);//*uMouseForce*mouseNorm/max(mouseDistSq,0.01);
-	if(mouseDist <= 1.5*objRad){
-		float md = (1.5*objRad - mouseDist);
+	if(mouseDist <= 1.3*objRad){
+		float md = (1.3*objRad - mouseDist);
 		vec2 mouseNorm = mouseDisplacement/sqrt(mouseDist);
 		force += -uMouseForce*69.0*mouseNorm*md;
 	}
@@ -100,7 +100,7 @@ void main() {
 	}
 	*/
 	
-	float timeFactor = 6.0*clamp(uDeltaTime,0.004,0.028);
+	float timeFactor = 6.0*clamp(uDeltaTime,0.004,0.021);
 	velocity = pow(0.95,5.0*timeFactor)*velocity + timeFactor*force;//SETTING1
 	//velocity = 0.98*velocity + timeFactor*force;//SETTING1
 	position += timeFactor*velocity;

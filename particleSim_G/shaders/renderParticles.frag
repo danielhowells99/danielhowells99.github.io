@@ -12,7 +12,7 @@ void main() {
 	if (d > 1.0) {
 		discard;
 	}
-	float colourParam = 3.0*log(1.0 + 400.0*dot(vVelocity,vVelocity));
+	float colourParam = 4.0*log(1.0 + 400.0*dot(vVelocity,vVelocity));
 	float trans = min(0.1 + 0.25*colourParam,0.4);
 	if(d < 0.25){
 		trans = min(0.15 + 0.5*colourParam,0.8);
