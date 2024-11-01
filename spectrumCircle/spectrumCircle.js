@@ -8,7 +8,7 @@ let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 
 let aspectRatio = canvas.width/canvas.height;
-let logSelect = 0.0;
+let logSelect = 1.0;
 let invertFreq = 0.0;
 let circle_toggle = 1.0;
 
