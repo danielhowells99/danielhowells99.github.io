@@ -211,7 +211,7 @@ function render() {
 		//--------------------
 		gl.stencilFunc(
 			gl.GREATER,     // the test
-			10,            // reference value
+			1,            // reference value
 			0xFF,         // mask
 		 );
 		 // don't change the stencil buffer on draw
