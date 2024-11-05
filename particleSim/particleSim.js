@@ -202,16 +202,16 @@ function render() {
 		//gl.depthFunc(gl.NOTEQUAL)
 
 		//gl.blendColor(0.7, 0.2, 0.1, 1);
-		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
 		//gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
-		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
 		
 		setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
 
 		//--------------------
 		gl.stencilFunc(
 			gl.GREATER,     // the test
-			1,            // reference value
+			5,            // reference value
 			0xFF,         // mask
 		 );
 		 // don't change the stencil buffer on draw
