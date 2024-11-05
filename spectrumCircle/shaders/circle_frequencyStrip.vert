@@ -4,6 +4,7 @@ attribute vec2 aTexPosition;
 uniform mat2 uRotMatrix;
 uniform float uAspect;
 varying vec2 vTexPosition;
+varying vec2 vVertexPosition;
 
 void main() {
 	vec2 transformVector = vec2(0.0,0.0);
@@ -14,4 +15,5 @@ void main() {
 	}
 	gl_Position = vec4(0.99*(uRotMatrix*aVertexPosition)/transformVector,0.0,1.0);
 	vTexPosition = aTexPosition;
+	vVertexPosition = aVertexPosition;
 }

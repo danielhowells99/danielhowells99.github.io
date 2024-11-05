@@ -8,6 +8,7 @@ uniform int uLogSelect;
 uniform int uInvertFreq;
 
 varying vec2 vTexPosition;
+varying vec2 vVertexPosition;
 
 float f(float x){
 	float c = 100.0;
@@ -23,7 +24,9 @@ vec3 hsv2rgb(vec3 c)
 }
 
 void main() {
-
+	if (length(vVertexPosition) > 0.99){
+		discard;
+	}
 	vec2 accessCoords = vTexPosition.yx;
 	if (uInvertFreq > 0){
 		accessCoords.x = 1.0 - accessCoords.x;

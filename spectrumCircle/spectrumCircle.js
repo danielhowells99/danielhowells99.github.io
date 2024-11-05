@@ -110,7 +110,7 @@ const linear_displayFramebufferProgramInfo = {
 const audioCtx = new AudioContext();
 console.log("sample_rate: " + audioCtx.sampleRate)
 const analyser = audioCtx.createAnalyser()
-analyser.fftSize = 2048;
+analyser.fftSize = 1024;
 analyser.smoothingTimeConstant = 0.7;
 
 let mic = null
@@ -344,8 +344,8 @@ function createScreenFramebuffer(gl){
     gl.bindTexture(gl.TEXTURE_2D, screenTexture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, canvas.width, canvas.height, 0, gl.RGBA,
                 gl.UNSIGNED_BYTE, new Uint8Array(canvas.width*canvas.height*4));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 

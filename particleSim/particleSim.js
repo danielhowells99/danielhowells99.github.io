@@ -4,7 +4,7 @@ import {prepare_textures_and_framebuffers} from "./prep-textures-framebuffers.js
 
 var canvas = document.querySelector("canvas");
 
-const gl = canvas.getContext("webgl");
+const gl = canvas.getContext("webgl", {stencil: true});
 const ext = gl.getExtension('OES_texture_float');
 if (!ext) {
 	alert('need OES_texture_float');
@@ -172,7 +172,8 @@ function render() {
 		startTime = endTime
 		
 		aspectRatio = canvas.width/canvas.height
-		//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+		//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+		gl.clear(gl.STENCIL_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 		
 		gl.useProgram(dataProgram);
 		gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
@@ -197,6 +198,7 @@ function render() {
 		
 		gl.enable(gl.BLEND);
 		//gl.enable(gl.DEPTH_TEST);
+		gl.enable(gl.STENCIL_TEST);
 		//gl.depthFunc(gl.NOTEQUAL)
 
 		//gl.blendColor(0.7, 0.2, 0.1, 1);
@@ -205,10 +207,26 @@ function render() {
 		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
 		
 		setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
+
+		//--------------------
+		gl.stencilFunc(
+			gl.GREATER,     // the test
+			10,            // reference value
+			0xFF,         // mask
+		 );
+		 // don't change the stencil buffer on draw
+		 gl.stencilOp(
+			gl.KEEP,     // what to do if the stencil test fails
+			gl.KEEP,     // what to do if the depth test fails
+			gl.INCR,  // what to do if both tests pass
+		 );
+		//---------------------
+
 		gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 		
 		gl.disable(gl.BLEND);
 		//gl.disable(gl.DEPTH_TEST)
+		gl.disable(gl.STENCIL_TEST);
 		
 		// swap which texture we are rendering from and to
 		var t = pt1;
