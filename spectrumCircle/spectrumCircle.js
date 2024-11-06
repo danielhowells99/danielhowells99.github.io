@@ -16,8 +16,14 @@ let screenBuffer1 = createScreenFramebuffer(gl);
 let screenBuffer2 = createScreenFramebuffer(gl);
 
 function resizeCanvas() {
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
+	let displayWidth = window.innerWidth;
+	let displayHeight = window.innerHeight;
+	let scale = 2;
+	canvas.style.width = displayWidth + 'px';
+	canvas.style.height = displayHeight + 'px';
+	canvas.width = displayWidth * scale;
+	canvas.height = displayHeight * scale;
+
 	gl.viewport(0,0,canvas.width,canvas.height);
 	aspectRatio = canvas.width/canvas.height;
 	
@@ -242,7 +248,7 @@ function useMic(stream){
 	}
 	function linearVisualizer(){
 		//TO FB1
-		let shiftVal = 2.0/canvas.width;
+		let shiftVal = 4.0/canvas.width;
 
 		gl.useProgram(linear_freqProgram)
 		gl.activeTexture(gl.TEXTURE0);

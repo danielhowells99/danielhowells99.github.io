@@ -162,6 +162,20 @@ let pt2 = textures.dataTexture2
 let startTime = new Date().getTime();
 const frameLimit = 60; // PAL/NTSC TV?
 
+//--------------------
+gl.stencilFunc(
+	gl.GREATER,     // the test
+	500,            // reference value
+	0xFF,         // mask
+	);
+	// don't change the stencil buffer on draw
+gl.stencilOp(
+	gl.KEEP,     // what to do if the stencil test fails
+	gl.KEEP,     // what to do if the depth test fails
+	gl.INCR,  // what to do if both tests pass
+	);
+//---------------------
+
 function render() {
 	
 	let endTime = new Date().getTime();
@@ -207,20 +221,6 @@ function render() {
 		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
 		
 		setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
-
-		//--------------------
-		gl.stencilFunc(
-			gl.GREATER,     // the test
-			5,            // reference value
-			0xFF,         // mask
-		 );
-		 // don't change the stencil buffer on draw
-		 gl.stencilOp(
-			gl.KEEP,     // what to do if the stencil test fails
-			gl.KEEP,     // what to do if the depth test fails
-			gl.INCR,  // what to do if both tests pass
-		 );
-		//---------------------
 
 		gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 		

@@ -23,7 +23,7 @@ function main() {
 	function resizeCanvas() {
 		let displayWidth = window.innerWidth;
 		let displayHeight = window.innerHeight;
-		let scale = 1;
+		let scale = 2;
 		canvas.style.width = displayWidth + 'px';
 		canvas.style.height = displayHeight + 'px';
 		canvas.width = displayWidth * scale;

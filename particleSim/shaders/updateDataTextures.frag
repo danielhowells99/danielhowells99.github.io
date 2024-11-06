@@ -30,13 +30,13 @@ void main() {
 	float mouseDist = dot(mouseDisplacement,mouseDisplacement);
 	
 	vec2 force = 18.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));//SETTING1
-	//vec2 force = 16.0*uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0);//SETTING2
+	//vec2 force = 16.0*uMouseForce*(mouseDisplacement)/(mouseDist+1.0/2048.0);//SETTING2
 	
-	float k0 = 10.0; //SETTING 1
+	float k0 = 12.0; //SETTING 1
 	//float k0 = 80.0; //SETTING 2
 	
-	float boundaryFactor = 0.875; //SETTING 1
-	//float boundaryFactor = 1.0;//SETTING2
+	//float boundaryFactor = 0.875; //SETTING 1
+	float boundaryFactor = 1.05;//SETTING2
 	
 	float boundaryX = boundaryFactor*transformVector.x;
 	float boundaryY = boundaryFactor*transformVector.y;
