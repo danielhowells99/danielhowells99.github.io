@@ -52,9 +52,9 @@ return (('ontouchstart' in window) ||
 }
 
 if (isTouchDevice()){
-	ontouchmove = function(e){mouse = {x: scale*e.touches[0].clientX/canvas.width, y: 1-scale*e.touches[0].clientY/canvas.height};mouseForce = 1.0;}
-	ontouchstart = function(e){mouse = {x: scale*e.changedTouches[0].clientX/canvas.width, y: 1-scale*e.changedTouches[0].clientY/canvas.height};mouseForce = 1.0;}
-	ontouchend = function(e){mouse = {x: scale*e.changedTouches[0].clientX/canvas.width, y: 1-scale*e.changedTouches[0].clientY/canvas.height};mouseForce = 0.0;}
+	ontouchmove = function(e){mouse = {x: e.touches[0].clientX/canvas.width, y: 1-e.touches[0].clientY/canvas.height};mouseForce = 1.0;}
+	ontouchstart = function(e){mouse = {x: e.changedTouches[0].clientX/canvas.width, y: 1-e.changedTouches[0].clientY/canvas.height};mouseForce = 1.0;}
+	ontouchend = function(e){mouse = {x: e.changedTouches[0].clientX/canvas.width, y: 1-e.changedTouches[0].clientY/canvas.height};mouseForce = 0.0;}
 }
 
 let mouseStartTime = 0,mouseEndTime = 0
