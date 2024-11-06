@@ -12,16 +12,28 @@ if (!ext) {
 
 //gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
 //gl.clearColor(0.05, 0.01, 0.02, 1.0);
-gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
+//gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
+//gl.clearColor(0.98, 0.92, 0.85, 0.0);//parchment
 gl.clearDepth(10.0);
 
 let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
 let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 
+gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 0.0);
+
+let scale = 2;
+let screenBuffer = createScreenFramebuffer(gl,scale);
+
 function resizeCanvas() {
-	canvas.width = window.innerWidth;
-	canvas.height = window.innerHeight;
+	
+	let displayWidth = window.innerWidth;
+	let displayHeight = window.innerHeight;
+	canvas.width = displayWidth;
+	canvas.height = displayHeight;
+
+	screenBuffer = createScreenFramebuffer(gl,scale);
+	
 	gl.viewport(0,0,canvas.width,canvas.height);
 }
 window.addEventListener("resize", resizeCanvas);
@@ -40,9 +52,9 @@ return (('ontouchstart' in window) ||
 }
 
 if (isTouchDevice()){
-	ontouchmove = function(e){mouse = {x: e.touches[0].clientX/canvas.width, y: 1-e.touches[0].clientY/canvas.height};mouseForce = 1.0;}
-	ontouchstart = function(e){mouse = {x: e.changedTouches[0].clientX/canvas.width, y: 1-e.changedTouches[0].clientY/canvas.height};mouseForce = 1.0;}
-	ontouchend = function(e){mouse = {x: e.changedTouches[0].clientX/canvas.width, y: 1-e.changedTouches[0].clientY/canvas.height};mouseForce = 0.0;}
+	ontouchmove = function(e){mouse = {x: scale*e.touches[0].clientX/canvas.width, y: 1-scale*e.touches[0].clientY/canvas.height};mouseForce = 1.0;}
+	ontouchstart = function(e){mouse = {x: scale*e.changedTouches[0].clientX/canvas.width, y: 1-scale*e.changedTouches[0].clientY/canvas.height};mouseForce = 1.0;}
+	ontouchend = function(e){mouse = {x: scale*e.changedTouches[0].clientX/canvas.width, y: 1-scale*e.changedTouches[0].clientY/canvas.height};mouseForce = 0.0;}
 }
 
 let mouseStartTime = 0,mouseEndTime = 0
@@ -82,6 +94,7 @@ document.addEventListener("keypress", function onEvent(event) {
 
 const dataProgram = initShaderProgram(gl, 'shaders/updateDataTextures.vert', 'shaders/updateDataTextures.frag');
 const particleProgram = initShaderProgram(gl, 'shaders/renderParticles.vert', 'shaders/renderParticles.frag');
+const screenBufferProgram = initShaderProgram(gl, 'shaders/bufferToScreen.vert', 'shaders/bufferToScreen.frag');
 
 const dataProgramInfo = {
 	program: dataProgram,
@@ -106,6 +119,16 @@ const particleProgramInfo = {
 		aspect: gl.getUniformLocation(particleProgram, "uAspect"),
 		dataSampler: gl.getUniformLocation(particleProgram, "uDataSampler"),
 		partColor: gl.getUniformLocation(particleProgram, "uPartColor"),
+	},
+};
+
+const screenBufferProgramInfo = {
+	program: screenBufferProgram,
+	attribLocations: {
+		vertexPosition: gl.getAttribLocation(screenBufferProgram, "aVertexPosition"),
+	},
+	uniformLocations: {
+		framebufferTexture: gl.getUniformLocation(screenBufferProgram, "uFbTexture"),
 	},
 };
 
@@ -161,7 +184,7 @@ let pt2 = textures.dataTexture2
 
 let startTime = new Date().getTime();
 const frameLimit = 60; // PAL/NTSC TV?
-
+/*
 //--------------------
 gl.stencilFunc(
 	gl.GREATER,     // the test
@@ -175,7 +198,7 @@ gl.stencilOp(
 	gl.INCR,  // what to do if both tests pass
 	);
 //---------------------
-
+*/
 function render() {
 	
 	let endTime = new Date().getTime();
@@ -201,32 +224,46 @@ function render() {
 		gl.bindFramebuffer(gl.FRAMEBUFFER, f2);
 		gl.viewport(0, 0, particle_num_sqd, particle_num_sqd);
 		
+		gl.uniform1i(dataProgramInfo.uniformLocations.dataSampler, 0);
 		setPositionAttribute(gl, positionBuffer, dataProgramInfo) 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
 		gl.useProgram(particleProgram);
-		gl.uniform2fv(particleProgramInfo.uniformLocations.canvasDimension,[canvas.width,canvas.height]);
-		gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+		//gl.uniform2fv(particleProgramInfo.uniformLocations.canvasDimension,[canvas.width,canvas.height]);
+		//gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer.framebuffer);
+
+		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 0.0);
+
+		gl.clear(gl.COLOR_BUFFER_BIT)
+		gl.viewport(0, 0, scale*gl.canvas.width, scale*gl.canvas.height);
 		
-		gl.enable(gl.BLEND);
+		//gl.enable(gl.BLEND);
 		//gl.enable(gl.DEPTH_TEST);
-		gl.enable(gl.STENCIL_TEST);
+		//gl.enable(gl.STENCIL_TEST);
 		//gl.depthFunc(gl.NOTEQUAL)
 
 		//gl.blendColor(0.7, 0.2, 0.1, 1);
-		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
 		//gl.blendFuncSeparate(gl.ONE, gl.ONE, gl.ONE, gl.ONE);
 		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //WHITE BACKGROUND
-		
+		gl.uniform1i(particleProgramInfo.uniformLocations.dataSampler, 0);
 		setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
-
 		gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 		
-		gl.disable(gl.BLEND);
+		//gl.disable(gl.BLEND);
 		//gl.disable(gl.DEPTH_TEST)
-		gl.disable(gl.STENCIL_TEST);
+		//gl.disable(gl.STENCIL_TEST);
+		
+		gl.useProgram(screenBufferProgram)
+		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+		gl.viewport(0, 0, canvas.width, canvas.height);
+		gl.activeTexture(gl.TEXTURE2);
+		gl.bindTexture(gl.TEXTURE_2D, screenBuffer.texture);
+		gl.uniform1i(screenBufferProgramInfo.uniformLocations.framebufferTexture, 2);
+		setPositionAttribute(gl, positionBuffer, screenBufferProgramInfo) 
+		gl.clear(gl.COLOR_BUFFER_BIT)
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		
 		// swap which texture we are rendering from and to
 		var t = pt1;
@@ -283,4 +320,27 @@ function setParticleIndexAttribute(gl,buffer,programInfo) { //sets the index att
 		0,
 	);
 	gl.enableVertexAttribArray(programInfo.attribLocations.indexData);
+}
+
+function createScreenFramebuffer(gl,size){
+	let screenTexture = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, screenTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size*canvas.width, size*canvas.height, 0, gl.RGBA,
+                gl.UNSIGNED_BYTE, new Uint8Array(size*size*canvas.width*canvas.height*4));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+	var framebuffer = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, screenTexture, 0); // attach tex1
+    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) { // check this will actually work
+        alert("this combination of attachments not supported");
+    }
+
+	return {
+		texture: screenTexture,
+		framebuffer: framebuffer,
+	}
 }

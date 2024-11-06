@@ -35,8 +35,8 @@ void main() {
 	float k0 = 12.0; //SETTING 1
 	//float k0 = 80.0; //SETTING 2
 	
-	//float boundaryFactor = 0.875; //SETTING 1
-	float boundaryFactor = 1.05;//SETTING2
+	float boundaryFactor = 0.875; //SETTING 1
+	//float boundaryFactor = 1.05;//SETTING2
 	
 	float boundaryX = boundaryFactor*transformVector.x;
 	float boundaryY = boundaryFactor*transformVector.y;
