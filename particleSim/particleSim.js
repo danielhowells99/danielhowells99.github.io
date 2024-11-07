@@ -22,7 +22,7 @@ let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 
 gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 0.0);
 
-let scale = 4;
+let scale = 2;
 let screenBuffer = createScreenFramebuffer(gl,scale);
 
 function resizeCanvas() {
