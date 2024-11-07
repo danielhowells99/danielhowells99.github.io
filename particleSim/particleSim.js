@@ -55,22 +55,22 @@ return (('ontouchstart' in window) ||
 }
 
 if (isTouchDevice()){
-	ontouchmove = function(e){mouse = {x: e.touches[0].clientX/canvas.width, y: 1-e.touches[0].clientY/canvas.height};mouseForce = 1.0;}
-	ontouchstart = function(e){mouse = {x: e.changedTouches[0].clientX/canvas.width, y: 1-e.changedTouches[0].clientY/canvas.height};mouseForce = 1.0;}
-	ontouchend = function(e){mouse = {x: e.changedTouches[0].clientX/canvas.width, y: 1-e.changedTouches[0].clientY/canvas.height};mouseForce = 0.0;}
+	ontouchmove = function(e){mouse = {x: screenScale*e.touches[0].clientX/canvas.width, y: 1-screenScale*e.touches[0].clientY/canvas.height};mouseForce = 1.0;}
+	ontouchstart = function(e){mouse = {x: screenScale*e.changedTouches[0].clientX/canvas.width, y: 1-screenScale*e.changedTouches[0].clientY/canvas.height};mouseForce = 1.0;}
+	ontouchend = function(e){mouse = {x: screenScale*e.changedTouches[0].clientX/canvas.width, y: 1-screenScale*e.changedTouches[0].clientY/canvas.height};mouseForce = 0.0;}
 }
 
 let mouseStartTime = 0,mouseEndTime = 0
 
 onmousemove = function(e){
-	mouse = {x: e.clientX/canvas.width, y: 1-e.clientY/canvas.height}; 
+	mouse = {x: screenScale*e.clientX/canvas.width, y: 1-screenScale*e.clientY/canvas.height}; 
 	mouseForce = mouseToggle;
 	}
 onmousedown = function(e){
 	
 	mouseStartTime = new Date().getTime()
 	
-	mouse = {x: e.clientX/canvas.width, y: 1-e.clientY/canvas.height}; 
+	mouse = {x: screenScale*e.clientX/canvas.width, y: 1-screenScale*e.clientY/canvas.height}; 
 	mouseToggle = mouseToggle^1; 
 	mouseForce = 1.0*mouseToggle;
 	}
@@ -81,7 +81,7 @@ onmouseup = function(e){
 		mouseToggle = mouseToggle^1; 
 	}
 	
-	mouse = {x: e.clientX/canvas.width, y: 1-e.clientY/canvas.height}; 
+	mouse = {x: screenScale*e.clientX/canvas.width, y: 1-screenScale*e.clientY/canvas.height}; 
 	mouseForce = 1.0*mouseToggle;
 	}
 
@@ -219,7 +219,7 @@ function render() {
 		gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
 		gl.uniform1f(dataProgramInfo.uniformLocations.aspect,aspectRatio);
 		gl.uniform1f(dataProgramInfo.uniformLocations.deltaTime,delayMilliseconds);
-		gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[screenScale*(2.0*mouse.x-1.0),screenScale*(2.0*mouse.y-1.0)]);
+		gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
 		
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, pt1);
