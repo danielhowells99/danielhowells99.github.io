@@ -25,7 +25,7 @@ gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
 let scale = 1.5;
 let screenScale = 2.0;
 let screenBuffer = createScreenFramebuffer(gl,scale);
-let screenBuffer2 = createScreenFramebuffer(gl,scale);
+//let screenBuffer2 = createScreenFramebuffer(gl,scale);
 
 
 function resizeCanvas() {
@@ -39,7 +39,7 @@ function resizeCanvas() {
 	//gl.clear(gl.COLOR_BUFFER_BIT)
 
 	screenBuffer = createScreenFramebuffer(gl,scale);
-	screenBuffer2 = createScreenFramebuffer(gl,scale);
+	//screenBuffer2 = createScreenFramebuffer(gl,scale);
 	
 	gl.viewport(0,0,canvas.width,canvas.height);
 }
@@ -243,11 +243,11 @@ function render() {
 		gl.useProgram(particleProgram);
 		//gl.uniform2fv(particleProgramInfo.uniformLocations.canvasDimension,[canvas.width,canvas.height]);
 		//gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
-		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer2.framebuffer);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer.framebuffer);
 
-		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
+		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 0.0);
 
-		//gl.clear(gl.COLOR_BUFFER_BIT)
+		gl.clear(gl.COLOR_BUFFER_BIT)
 		gl.viewport(0, 0, scale*gl.canvas.width, scale*gl.canvas.height);
 		
 		//gl.enable(gl.BLEND);
@@ -267,7 +267,8 @@ function render() {
 		//gl.disable(gl.DEPTH_TEST)
 		//gl.disable(gl.STENCIL_TEST);
 		
-		gl.enable(gl.BLEND);
+		//gl.enable(gl.BLEND);
+		/*
 		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ZERO); //CLEAR/BLACK BACKGROUND
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); //CLEAR/BLACK BACKGROUND
 		
@@ -284,7 +285,7 @@ function render() {
 		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 0.0);
 		gl.clear(gl.COLOR_BUFFER_BIT)
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-		
+		*/
 		gl.useProgram(screenBufferProgram)
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.viewport(0, 0, canvas.width, canvas.height);
@@ -292,12 +293,13 @@ function render() {
 		gl.bindTexture(gl.TEXTURE_2D, screenBuffer.texture);
 		gl.uniform1i(screenBufferProgramInfo.uniformLocations.framebufferTexture, 3);
 		gl.uniform1f(screenBufferProgramInfo.uniformLocations.transparencyTest, 1.0);
-		gl.uniform2fv(screenBufferProgramInfo.uniformLocations.screenDimensions, [canvas.width, scale*canvas.height]);
+		gl.uniform2fv(screenBufferProgramInfo.uniformLocations.screenDimensions, [canvas.width, canvas.height]);
 		setPositionAttribute(gl, positionBuffer, screenBufferProgramInfo) 
 		
 		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT)
-		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ZERO); //CLEAR/BLACK BACKGROUND
 		
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		gl.disable(gl.BLEND);
@@ -311,10 +313,11 @@ function render() {
 		var f = f1;
 		f1 = f2;
 		f2 = f;
-		
+		/*
 		var sb = screenBuffer
 		screenBuffer = screenBuffer2
 		screenBuffer2 = sb
+		*/
 
 		if (capFlag == 1){
 			console.log("saving picture")
@@ -369,8 +372,8 @@ function createScreenFramebuffer(gl,size){
     gl.bindTexture(gl.TEXTURE_2D, screenTexture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size*canvas.width, size*canvas.height, 0, gl.RGBA,
                 gl.UNSIGNED_BYTE, new Uint8Array(size*size*canvas.width*canvas.height*4));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
