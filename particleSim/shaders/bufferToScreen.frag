@@ -27,7 +27,7 @@ const float normConst = paintConst*1.0/(A0 + A1 + A2 + A3 + A4 + A5 + A6 + A7 + 
 
 void main() {
 
-	vec2 accessCoords = vTexPosition;// + 0.5/uScreenDimensions;
+	vec2 accessCoords = vTexPosition + 0.5/uScreenDimensions;
 	float xInc = 1.0/uScreenDimensions.x;
 	float yInc = 1.0/uScreenDimensions.y;
 	
@@ -40,6 +40,7 @@ void main() {
 		discard;
 	}
 	*/
+	//outCol = centerCol.w;
 	
 	outCol += normConst*A0*texture2D(uFbTexture,accessCoords + vec2(-xInc,-yInc)).w; 
 	outCol += normConst*A1*texture2D(uFbTexture,accessCoords + vec2(0.0,-yInc)).w;
