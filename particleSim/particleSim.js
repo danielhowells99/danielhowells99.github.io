@@ -14,17 +14,19 @@ if (!ext) {
 //gl.clearColor(0.05, 0.01, 0.02, 1.0);
 //gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
 //gl.clearColor(0.98, 0.92, 0.85, 0.0);//parchment
-gl.clearDepth(10.0);
+gl.clearDepth(1.0);
 
 let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
 let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 
-gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 0.0);
+gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
 
-let scale = 2;
-let screenScale = 1.0;
+let scale = 1.5;
+let screenScale = 2.0;
 let screenBuffer = createScreenFramebuffer(gl,scale);
+let screenBuffer2 = createScreenFramebuffer(gl,scale);
+
 
 function resizeCanvas() {
 	
@@ -34,8 +36,10 @@ function resizeCanvas() {
 	canvas.style.height = displayHeight + 'px';
 	canvas.width = displayWidth * screenScale;
 	canvas.height = displayHeight * screenScale;
+	//gl.clear(gl.COLOR_BUFFER_BIT)
 
 	screenBuffer = createScreenFramebuffer(gl,scale);
+	screenBuffer2 = createScreenFramebuffer(gl,scale);
 	
 	gl.viewport(0,0,canvas.width,canvas.height);
 }
@@ -132,6 +136,9 @@ const screenBufferProgramInfo = {
 	},
 	uniformLocations: {
 		framebufferTexture: gl.getUniformLocation(screenBufferProgram, "uFbTexture"),
+		screenDimensions: gl.getUniformLocation(screenBufferProgram, "uScreenDimensions"),
+		transparencyTest: gl.getUniformLocation(screenBufferProgram, "uTransparencyTest"),
+		partColor: gl.getUniformLocation(screenBufferProgram, "uPartColor"),
 	},
 };
 
@@ -143,8 +150,8 @@ const particle_data = []
 const index_data = []
 
 for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
-	particle_data.push(0.4*(-1+Math.random()*2)/aspectRatio)
-	particle_data.push(0.4*(-1+Math.random()*2))
+	particle_data.push(0.5*(-1+Math.random()*2))
+	particle_data.push(0.5*(-1+Math.random()*2))
 	particle_data.push(0)
 	particle_data.push(0)
 	index_data.push(((i%particle_num_sqd)+0.5)/particle_num_sqd)
@@ -178,6 +185,8 @@ gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
 gl.uniform1i(particleProgramInfo.uniformLocations.dataSampler, 0);
 gl.uniform3fv(particleProgramInfo.uniformLocations.partColor, partCol);
 
+gl.useProgram(screenBufferProgram);
+gl.uniform3fv(screenBufferProgramInfo.uniformLocations.partColor, partCol);
 
 let f1 = framebuffers.framebuffer1
 let f2 = framebuffers.framebuffer2
@@ -213,7 +222,7 @@ function render() {
 		
 		aspectRatio = canvas.width/canvas.height
 		//gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
-		gl.clear(gl.STENCIL_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
+		//gl.clear(gl.STENCIL_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 		
 		gl.useProgram(dataProgram);
 		gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
@@ -234,11 +243,11 @@ function render() {
 		gl.useProgram(particleProgram);
 		//gl.uniform2fv(particleProgramInfo.uniformLocations.canvasDimension,[canvas.width,canvas.height]);
 		//gl.uniform1f(particleProgramInfo.uniformLocations.aspect,aspectRatio);
-		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer.framebuffer);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer2.framebuffer);
 
-		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 0.0);
+		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
 
-		gl.clear(gl.COLOR_BUFFER_BIT)
+		//gl.clear(gl.COLOR_BUFFER_BIT)
 		gl.viewport(0, 0, scale*gl.canvas.width, scale*gl.canvas.height);
 		
 		//gl.enable(gl.BLEND);
@@ -258,15 +267,41 @@ function render() {
 		//gl.disable(gl.DEPTH_TEST)
 		//gl.disable(gl.STENCIL_TEST);
 		
+		gl.enable(gl.BLEND);
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ZERO); //CLEAR/BLACK BACKGROUND
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); //CLEAR/BLACK BACKGROUND
+		
+		gl.useProgram(screenBufferProgram)
+		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer.framebuffer);
+		gl.viewport(0, 0, scale*canvas.width, scale*canvas.height);
+		gl.activeTexture(gl.TEXTURE2);
+		gl.bindTexture(gl.TEXTURE_2D, screenBuffer2.texture);
+		gl.uniform1i(screenBufferProgramInfo.uniformLocations.framebufferTexture, 2);
+		gl.uniform1f(screenBufferProgramInfo.uniformLocations.transparencyTest, 1.0);
+		gl.uniform2fv(screenBufferProgramInfo.uniformLocations.screenDimensions, [scale*canvas.width, scale*canvas.height]);
+		setPositionAttribute(gl, positionBuffer, screenBufferProgramInfo) 
+		
+		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 0.0);
+		gl.clear(gl.COLOR_BUFFER_BIT)
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+		
 		gl.useProgram(screenBufferProgram)
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.viewport(0, 0, canvas.width, canvas.height);
-		gl.activeTexture(gl.TEXTURE2);
+		gl.activeTexture(gl.TEXTURE3);
 		gl.bindTexture(gl.TEXTURE_2D, screenBuffer.texture);
-		gl.uniform1i(screenBufferProgramInfo.uniformLocations.framebufferTexture, 2);
+		gl.uniform1i(screenBufferProgramInfo.uniformLocations.framebufferTexture, 3);
+		gl.uniform1f(screenBufferProgramInfo.uniformLocations.transparencyTest, 1.0);
+		gl.uniform2fv(screenBufferProgramInfo.uniformLocations.screenDimensions, [canvas.width, scale*canvas.height]);
 		setPositionAttribute(gl, positionBuffer, screenBufferProgramInfo) 
+		
+		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT)
+		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+		
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+		gl.disable(gl.BLEND);
+		
 		
 		// swap which texture we are rendering from and to
 		var t = pt1;
@@ -276,6 +311,10 @@ function render() {
 		var f = f1;
 		f1 = f2;
 		f2 = f;
+		
+		var sb = screenBuffer
+		screenBuffer = screenBuffer2
+		screenBuffer2 = sb
 
 		if (capFlag == 1){
 			console.log("saving picture")
@@ -330,8 +369,8 @@ function createScreenFramebuffer(gl,size){
     gl.bindTexture(gl.TEXTURE_2D, screenTexture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size*canvas.width, size*canvas.height, 0, gl.RGBA,
                 gl.UNSIGNED_BYTE, new Uint8Array(size*size*canvas.width*canvas.height*4));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
