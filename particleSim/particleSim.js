@@ -150,10 +150,10 @@ const particle_data = []
 const index_data = []
 
 for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
-	particle_data.push(0.5*(-1+Math.random()*2))
-	particle_data.push(0.5*(-1+Math.random()*2))
-	particle_data.push(0)
-	particle_data.push(0)
+	particle_data.push(0.4*(-1+Math.random()*2))
+	particle_data.push(0.4*(-1+Math.random()*2))
+	particle_data.push(0.4*(-1+Math.random()*2))
+	particle_data.push(0.4*(-1+Math.random()*2))
 	index_data.push(((i%particle_num_sqd)+0.5)/particle_num_sqd)
 	index_data.push((Math.floor(i/particle_num_sqd)+0.5)/particle_num_sqd)
 }
@@ -293,7 +293,7 @@ function render() {
 		gl.bindTexture(gl.TEXTURE_2D, screenBuffer.texture);
 		gl.uniform1i(screenBufferProgramInfo.uniformLocations.framebufferTexture, 3);
 		gl.uniform1f(screenBufferProgramInfo.uniformLocations.transparencyTest, 1.0);
-		gl.uniform2fv(screenBufferProgramInfo.uniformLocations.screenDimensions, [canvas.width, canvas.height]);
+		gl.uniform2fv(screenBufferProgramInfo.uniformLocations.screenDimensions, [scale*canvas.width, scale*canvas.height]);
 		setPositionAttribute(gl, positionBuffer, screenBufferProgramInfo) 
 		
 		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
@@ -372,8 +372,8 @@ function createScreenFramebuffer(gl,size){
     gl.bindTexture(gl.TEXTURE_2D, screenTexture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size*canvas.width, size*canvas.height, 0, gl.RGBA,
                 gl.UNSIGNED_BYTE, new Uint8Array(size*size*canvas.width*canvas.height*4));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
