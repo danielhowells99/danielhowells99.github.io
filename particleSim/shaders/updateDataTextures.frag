@@ -34,7 +34,7 @@ void main() {
 	//vec2 force = 160.0*uMouseForce*(mouseDisplacement)/sqrt(mouseDist);//SETTING2.1 (poke with audio)
 	
 	//float k0 = 12.0; //SETTING 1
-	float k0 = 60.0; //SETTING 2
+	float k0 = 30.0; //SETTING 2
 	
 	float boundaryFactor = 0.875; //SETTING 1
 	//float boundaryFactor = 1.0;//SETTING2

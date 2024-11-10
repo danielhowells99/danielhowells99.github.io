@@ -14,14 +14,14 @@ const float A1 = 2.0;
 const float A2 = 1.0;
 
 const float A3 = 2.0;
-const float A4 = 4.0;
+const float A4 = 8.0;
 const float A5 = 2.0;
 
 const float A6 = 1.0;
 const float A7 = 2.0;
 const float A8 = 1.0;
 
-const float paintConst = 1.2;
+const float paintConst = 1.0;
 const float normConst = paintConst*1.0/(A0 + A1 + A2 + A3 + A4 + A5 + A6 + A7 + A8);
 
 
@@ -101,7 +101,7 @@ void main() {
 	
 	
 
-	gl_FragColor = vec4(outCol*uPartColor,outCol);
+	gl_FragColor = vec4(uPartColor,outCol);
 	//gl_FragColor = outCol;
 	
 }
