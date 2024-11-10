@@ -29,14 +29,15 @@ void main() {
 	vec2 mouseDisplacement = transformVector*uMousePos - position;
 	float mouseDist = dot(mouseDisplacement,mouseDisplacement);
 	
-	//vec2 force = 18.0*(uMouseForce*mouseDisplacement/(mouseDist+1.0/2048.0));//SETTING1
-	vec2 force = 16.0*uMouseForce*(mouseDisplacement)/(mouseDist+1.0/2048.0);//SETTING2
+	//vec2 force = 18.0*(uMouseForce*mouseDisplacement/mouseDist + 1.0/2048.0);//SETTING1
+	vec2 force = 16.0*uMouseForce*mouseDisplacement/(mouseDist);//SETTING2
+	//vec2 force = 160.0*uMouseForce*(mouseDisplacement)/sqrt(mouseDist);//SETTING2.1 (poke with audio)
 	
 	//float k0 = 12.0; //SETTING 1
 	float k0 = 60.0; //SETTING 2
 	
-	//float boundaryFactor = 0.875; //SETTING 1
-	float boundaryFactor = 1.0;//SETTING2
+	float boundaryFactor = 0.875; //SETTING 1
+	//float boundaryFactor = 1.0;//SETTING2
 	
 	float boundaryX = boundaryFactor*transformVector.x;
 	float boundaryY = boundaryFactor*transformVector.y;
@@ -44,19 +45,27 @@ void main() {
 	float transBoxY = 0.0;
 	
 	if (position.x >= boundaryX+transBoxX){
+		//position.x += -2.0*boundaryX;
 		force.x += -k0*(position.x-boundaryX-transBoxX);
+		//position.x = -boundaryX+transBoxX;
 	}
 	
-	if (position.x <= -boundaryX+transBoxX){
+	else if (position.x <= -boundaryX+transBoxX){
+		//position.x += 2.0*boundaryX;
 		force.x += -k0*(position.x+boundaryX-transBoxX);
+		//position.x = boundaryX+transBoxX;
 	}
 	
 	if (position.y >= boundaryY+transBoxY){
+		//position.y += -2.0*boundaryY;
 		force.y += -k0*(position.y-boundaryY-transBoxY);
+		//position.y = -boundaryY+transBoxY;
 	}
 	
-	if (position.y <= -boundaryY+transBoxY){
+	else if (position.y <= -boundaryY+transBoxY){
+		//position.y += 2.0*boundaryY;
 		force.y += -k0*(position.y+boundaryY-transBoxY);
+		//position.y = boundaryY+transBoxY;
 	}
 	
 	//FOR CIRCULAR BOUNDARY
