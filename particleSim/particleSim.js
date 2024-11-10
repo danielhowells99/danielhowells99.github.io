@@ -23,7 +23,7 @@ let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
 
 let scale = 2.0;
-let screenScale = 2.0;
+let screenScale = 1.5;
 let screenBuffer = createScreenFramebuffer(gl,scale);
 //let screenBuffer2 = createScreenFramebuffer(gl,scale);
 
