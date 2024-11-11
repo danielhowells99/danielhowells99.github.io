@@ -17,8 +17,14 @@ if (!ext) {
 gl.clearDepth(1.0);
 
 let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
-let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+//let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+
+let parts = [0.0,0.0,0.0,255*0.03]
+//let parts = [0.0,255*0.98, 255*0.92, 255*0.85]
+
+
 let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
+
 
 gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
 
@@ -144,7 +150,7 @@ const screenBufferProgramInfo = {
 
 let aspectRatio = canvas.width/canvas.height;
 
-const particle_num = 1000*1000;
+const particle_num = 1200*1200;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 const particle_data = []
 const index_data = []
@@ -286,7 +292,7 @@ function render() {
 		gl.clear(gl.COLOR_BUFFER_BIT)
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		*/
-		gl.enable(gl.BLEND);
+		//gl.enable(gl.BLEND);
 		gl.useProgram(screenBufferProgram)
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.viewport(0, 0, canvas.width, canvas.height);
@@ -299,8 +305,8 @@ function render() {
 		
 		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT)
-		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
-		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ZERO); //CLEAR/BLACK BACKGROUND
+		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
+		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //white
 		
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		gl.disable(gl.BLEND);
