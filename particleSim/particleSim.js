@@ -10,7 +10,7 @@ if (!ext) {
 	alert('need OES_texture_float');
 }
 
-//gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
+gl.clearColor(0.0, 0.0, 0.03, 1.0);//GALAXY BLUE
 //gl.clearColor(0.05, 0.01, 0.02, 1.0);
 //gl.clearColor(0.98, 0.92, 0.85, 1.0);//parchment
 //gl.clearColor(0.98, 0.92, 0.85, 0.0);//parchment
@@ -26,7 +26,7 @@ let parts = [0.0,0.0,0.0,255*0.03]
 let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 
 
-gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
+//gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
 
 let scale = 1.0;
 let screenScale = 1.5;
@@ -292,7 +292,7 @@ function render() {
 		gl.clear(gl.COLOR_BUFFER_BIT)
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		*/
-		//gl.enable(gl.BLEND);
+		gl.enable(gl.BLEND);
 		gl.useProgram(screenBufferProgram)
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.viewport(0, 0, canvas.width, canvas.height);
@@ -303,7 +303,8 @@ function render() {
 		gl.uniform2fv(screenBufferProgramInfo.uniformLocations.screenDimensions, [scale*canvas.width, scale*canvas.height]);
 		setPositionAttribute(gl, positionBuffer, screenBufferProgramInfo) 
 		
-		gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
+		//gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
+		gl.clearColor(0.0, 0.0, 0.05, 1.0);//GALAXY BLUE
 		gl.clear(gl.COLOR_BUFFER_BIT)
 		gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE, gl.ONE, gl.ONE); //CLEAR/BLACK BACKGROUND
 		//gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE); //white

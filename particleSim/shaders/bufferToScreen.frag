@@ -21,8 +21,9 @@ const float A6 = 1.0;
 const float A7 = 2.0;
 const float A8 = 1.0;
 
-const float paintConst = 1.0;
-const float normConst = paintConst*1.0/(A0 + A1 + A2 + A3 + A4 + A5 + A6 + A7 + A8);
+//const float paintConst = 1.0;
+const float paintConst = 0.99*1.0*(1.0/0.75);
+const float normConst = 1.0/(A0 + A1 + A2 + A3 + A4 + A5 + A6 + A7 + A8);
 
 vec3 hsv2rgb(vec3 c)
 {
@@ -112,11 +113,13 @@ void main() {
 	outCol /= adjust;
 	*/
 	
+	float s = paintConst*outCol; //(paint => 1.0/min(rgb))
+	
 	//gl_FragColor = vec4(uPartColor,outCol);
-	//gl_FragColor = vec4(min(vec3(0.75,0.9,1.0)*(0.15 + outCol),vec3(1.0)),outCol);
+	gl_FragColor = vec4(min(vec3(0.75,0.9,1.0)*s,vec3(1.0)),outCol); //GALAXY BLUE (adjust paint const accordingly 1.0/0.75)
+	//gl_FragColor = vec4(min(vec3(0.4,0.1,0.1)*(0.15 + s),vec3(1.0)),outCol); //GALAXY BLUE (adjust paint const accordingly 1.0/0.75)
 	//gl_FragColor = vec4(vec3(0.04,0.005,0.14),outCol);
 	
-	float s = outCol;
-	gl_FragColor = vec4(hsv2rgb(vec3(1.0-s,1.0-s,s)),1.0);
+	//gl_FragColor = vec4(hsv2rgb(vec3(1.0-s,1.0-s,s)),1.0);
 	//gl_FragColor = vec4(hsv2rgb(vec3(0.45 + s,1.0-s,s)),1.0);
 }
