@@ -43,7 +43,7 @@ void main() {
 	float boundaryY = boundaryFactor*transformVector.y;
 	float transBoxX = 0.0;
 	float transBoxY = 0.0;
-	
+	/*
 	if (position.x >= boundaryX+transBoxX){
 		//position.x += -2.0*boundaryX;
 		force.x += -k0*(position.x-boundaryX-transBoxX);
@@ -67,16 +67,16 @@ void main() {
 		force.y += -k0*(position.y+boundaryY-transBoxY);
 		//position.y = boundaryY+transBoxY;
 	}
-	
+	*/
 	//FOR CIRCULAR BOUNDARY
-	/*
+	
 	float posmag = position.x*position.x + position.y*position.y - boundaryFactor;
 	if (posmag >= 0.0){
 		//force *= 0.0;
 		vec2 normvec = normalize(position);
 		force += -0.5*k0*normvec*(posmag);
 	}
-	*/
+	
 	
 	
 	//velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
