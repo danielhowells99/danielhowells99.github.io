@@ -29,12 +29,12 @@ void main() {
 	vec2 mouseDisplacement = transformVector*uMousePos - position;
 	float mouseDist = dot(mouseDisplacement,mouseDisplacement);
 	
-	//vec2 force = 18.0*(uMouseForce*mouseDisplacement/(mouseDist + 1.0/4096.0));//SETTING1
-	vec2 force = 16.0*uMouseForce*mouseDisplacement/(mouseDist+ 1.0/2048.0);//SETTING2
+	vec2 force = 18.0*(uMouseForce*mouseDisplacement/(mouseDist + 1.0/4096.0));//SETTING1
+	//vec2 force = 16.0*uMouseForce*mouseDisplacement/(mouseDist+ 1.0/2048.0);//SETTING2
 	//vec2 force = 160.0*uMouseForce*(mouseDisplacement)/sqrt(mouseDist);//SETTING2.1 (poke with audio)
 	
-	//float k0 = 12.0; //SETTING 1
-	float k0 = 60.0; //SETTING 2
+	float k0 = 12.0; //SETTING 1
+	//float k0 = 60.0; //SETTING 2
 	
 	float boundaryFactor = 0.875; //SETTING 1
 	//float boundaryFactor = 1.0;//SETTING2
@@ -43,7 +43,7 @@ void main() {
 	float boundaryY = boundaryFactor*transformVector.y;
 	float transBoxX = 0.0;
 	float transBoxY = 0.0;
-	/*
+	
 	if (position.x >= boundaryX+transBoxX){
 		//position.x += -2.0*boundaryX;
 		force.x += -k0*(position.x-boundaryX-transBoxX);
@@ -67,20 +67,20 @@ void main() {
 		force.y += -k0*(position.y+boundaryY-transBoxY);
 		//position.y = boundaryY+transBoxY;
 	}
-	*/
-	//FOR CIRCULAR BOUNDARY
 	
+	//FOR CIRCULAR BOUNDARY
+	/*
 	float posmag = position.x*position.x + position.y*position.y - boundaryFactor;
 	if (posmag >= 0.0){
 		//force *= 0.0;
 		vec2 normvec = normalize(position);
-		force += -0.5*k0*normvec*(posmag);
+		force += -k0*normvec*(posmag);
 	}
+	*/
 	
 	
-	
-	//velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
-	velocity = pow(0.88,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
+	velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	//velocity = pow(0.88,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	
 	position += uDeltaTime*velocity;
 	position /= transformVector;
