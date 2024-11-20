@@ -28,7 +28,7 @@ let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 
 //gl.clearColor(parts[1]/255, parts[2]/255, parts[3]/255, 1.0);
 
-let scale = 1.0;
+let scale = 1.5;
 let screenScale = 1.5;
 let screenBuffer = createScreenFramebuffer(gl,scale);
 //let screenBuffer2 = createScreenFramebuffer(gl,scale);
@@ -201,7 +201,7 @@ let pt1 = textures.dataTexture1
 let pt2 = textures.dataTexture2
 
 let startTime = new Date().getTime();
-const frameLimit = 60; // PAL/NTSC TV?
+const frameLimit = 120; // PAL/NTSC TV?
 /*
 //--------------------
 gl.stencilFunc(
