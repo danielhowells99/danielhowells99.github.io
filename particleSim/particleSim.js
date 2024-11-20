@@ -217,12 +217,22 @@ gl.stencilOp(
 	);
 //---------------------
 */
+const average = list => list.reduce((prev, curr) => prev + curr) / list.length;
+let timesList = [];
+
 function render() {
 	
 	let endTime = new Date().getTime();
 	let delayMilliseconds = (endTime - startTime)/1000.0;
 	
 	if (delayMilliseconds > 1.0/frameLimit){ //THROTTLE FRAMERATE
+	
+	
+		timesList.push(delayMilliseconds)
+		if (timesList.length > 120){
+			timesList.shift();
+		}
+		let timeAvg = Math.min(average(timesList),0.03);
 			
 		startTime = endTime
 		
@@ -233,7 +243,7 @@ function render() {
 		gl.useProgram(dataProgram);
 		gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
 		gl.uniform1f(dataProgramInfo.uniformLocations.aspect,aspectRatio);
-		gl.uniform1f(dataProgramInfo.uniformLocations.deltaTime,delayMilliseconds);
+		gl.uniform1f(dataProgramInfo.uniformLocations.deltaTime,timeAvg);
 		gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
 		
 		gl.activeTexture(gl.TEXTURE0);
@@ -292,7 +302,7 @@ function render() {
 		gl.clear(gl.COLOR_BUFFER_BIT)
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		*/
-		gl.enable(gl.BLEND);
+		//gl.enable(gl.BLEND);
 		gl.useProgram(screenBufferProgram)
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		gl.viewport(0, 0, canvas.width, canvas.height);

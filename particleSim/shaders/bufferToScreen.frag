@@ -176,7 +176,7 @@ void main() {
 	outCol /= adjust;
 	*/
 	
-	float s = (1.0/0.8)*paintConst*outCol; //(paint => 1.0/min(rgb))
+	float s = paintConst*outCol; //(paint => 1.0/min(rgb))
 	
 	//gl_FragColor = vec4(uPartColor,outCol);
 	//gl_FragColor = vec4(min(vec3(0.75,0.9,1.0)*s,vec3(1.0)),outCol); //GALAXY BLUE (adjust paint const accordingly 1.0/0.75)
@@ -185,8 +185,8 @@ void main() {
 	
 	//gl_FragColor = vec4(hsv2rgb(vec3(1.0-s,1.0-s,s)),1.0);
 	//gl_FragColor = vec4(hsv2rgb(vec3(0.8-0.3*s,1.0-0.9*s,1.0*s)),1.0);//biolumin
-	//gl_FragColor = vec4(hsv2rgb(vec3(0.3*s,1.0-0.9*s,1.0*s)),1.0);
-	gl_FragColor = vec4(s,s,s,1.0);
+	gl_FragColor = vec4(hsv2rgb(vec3(-0.5+0.85*s,1.0-0.9*s,1.0*s)),1.0);
+	//gl_FragColor = vec4(s,s,s,1.0);
 	//gl_FragColor = vec4(hsv2rgb(vec3(1.0-s,1.0,1.0*s)),1.0);
 	//gl_FragColor = vec4(hsv2rgb(vec3(0.05,1.0-0.9*s,0.1+0.9*s)),1.0);
 }
