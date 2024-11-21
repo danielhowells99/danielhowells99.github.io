@@ -227,12 +227,14 @@ function render() {
 	
 	if (delayMilliseconds > 1.0/frameLimit){ //THROTTLE FRAMERATE
 	
-	
+		
 		timesList.push(delayMilliseconds)
 		if (timesList.length > 120){
 			timesList.shift();
 		}
-		let timeAvg = Math.min(average(timesList),0.03);
+		
+		let timeAvg = Math.min(average(timesList),1.0/30.0);
+		//let timeAvg = (1/frameLimit);
 			
 		startTime = endTime
 		
