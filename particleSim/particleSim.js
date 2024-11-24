@@ -233,7 +233,7 @@ function render() {
 			timesList.shift();
 		}
 		
-		let timeAvg = Math.min(average(timesList),1.0/30.0);
+		let timeAvg = Math.min(average(timesList),1.0/60.0);
 		//let timeAvg = (1/frameLimit);
 			
 		startTime = endTime

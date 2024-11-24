@@ -184,7 +184,17 @@ void main() {
 	//gl_FragColor = vec4(vec3(0.04,0.005,0.14),outCol);
 	
 	//gl_FragColor = vec4(hsv2rgb(vec3(1.0-s,1.0-s,s)),1.0);
-	gl_FragColor = vec4(hsv2rgb(vec3(0.8-0.3*s,1.0-0.9*s,1.0*s)),1.0);//biolumin
+	//gl_FragColor = vec4(hsv2rgb(vec3(0.8-0.3*s,1.0-0.9*s,1.0*s)),1.0);//biolumin
+	//gl_FragColor = vec4(hsv2rgb(vec3(0.6-0.3*s,1.0-0.9*s,1.0*s)),1.0);//occil
+	
+	//gl_FragColor = vec4(hsv2rgb(vec3(0.5-0.2*s,1.0-s,1.0*s)),1.0);//greeeeen
+	//gl_FragColor = vec4(hsv2rgb(vec3(0.2+0.2*s,1.0-s*s,1.0*s)),1.0);//greeeeen
+	
+	vec3 col1 = vec3(0.0,0.06,0.05);
+	vec3 col2 = hsv2rgb(vec3(0.4+0.2*s,1.0-s,1.0));
+	
+	gl_FragColor = vec4((1.0-s)*col1 + s*col2,1.0);
+	
 	//gl_FragColor = vec4(hsv2rgb(vec3(-0.5+0.85*s,1.0-0.9*s,1.0*s)),1.0);
 	//gl_FragColor = vec4(s,s,s,1.0);
 	//gl_FragColor = vec4(hsv2rgb(vec3(1.0-s,1.0,1.0*s)),1.0);
