@@ -201,7 +201,7 @@ let pt1 = textures.dataTexture1
 let pt2 = textures.dataTexture2
 
 let startTime = new Date().getTime();
-const frameLimit = 120; // PAL/NTSC TV?
+const frameLimit = 90; // PAL/NTSC TV?
 /*
 //--------------------
 gl.stencilFunc(
@@ -229,11 +229,11 @@ function render() {
 	
 		
 		timesList.push(delayMilliseconds)
-		if (timesList.length > 120){
+		if (timesList.length > 30){
 			timesList.shift();
 		}
 		
-		let timeAvg = Math.min(average(timesList),1.0/40.0);
+		let timeAvg = Math.min(average(timesList),1.0/30.0);
 		//let timeAvg = (1/frameLimit);
 			
 		startTime = endTime

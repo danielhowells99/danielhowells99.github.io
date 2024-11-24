@@ -83,7 +83,7 @@ void main() {
 	}
 	*/
 	//outCol = centerCol.w;
-	/*
+	
 	outCol += normConst*A0*texture2D(uFbTexture,accessCoords + vec2(-xInc,-yInc)).w; 
 	outCol += normConst*A1*texture2D(uFbTexture,accessCoords + vec2(0.0,-yInc)).w;
 	outCol += normConst*A2*texture2D(uFbTexture,accessCoords + vec2(xInc,-yInc)).w;
@@ -95,7 +95,7 @@ void main() {
 	outCol += normConst*A6*texture2D(uFbTexture,accessCoords + vec2(-xInc,yInc)).w;
 	outCol += normConst*A7*texture2D(uFbTexture,accessCoords + vec2(0.0,yInc)).w;
 	outCol += normConst*A8*texture2D(uFbTexture,accessCoords + vec2(xInc,yInc)).w;
-	*/
+	
 	/*
 	outCol += 0.0625*texture2D(uFbTexture,accessCoords + vec2(-xInc,-yInc)).w; 
 	outCol += 0.125*texture2D(uFbTexture,accessCoords + vec2(0.0,-yInc)).w;
@@ -110,7 +110,7 @@ void main() {
 	
 	outCol *= 1.01;
 	*/
-	
+	/*
 	outCol += norm2*B00*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,-2.0*yInc)).w; 
 	outCol += norm2*B01*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,-2.0*yInc)).w; 
 	outCol += norm2*B02*texture2D(uFbTexture,accessCoords + vec2(0.0,-2.0*yInc)).w; 
@@ -140,7 +140,7 @@ void main() {
 	outCol += norm2*B42*texture2D(uFbTexture,accessCoords + vec2(0.0,2.0*yInc)).w; 
 	outCol += norm2*B43*texture2D(uFbTexture,accessCoords + vec2(1.0*xInc,2.0*yInc)).w; 
 	outCol += norm2*B44*texture2D(uFbTexture,accessCoords + vec2(2.0*xInc,2.0*yInc)).w; 
-
+	*/
 	/*
 	outCol += 0.0625*texture2D(uFbTexture,accessCoords + vec2(-xInc,-yInc)).w; 
 	outCol += 0.125*texture2D(uFbTexture,accessCoords + vec2(0.0,-yInc)).w;
@@ -190,10 +190,16 @@ void main() {
 	//gl_FragColor = vec4(hsv2rgb(vec3(0.5-0.2*s,1.0-s,1.0*s)),1.0);//greeeeen
 	//gl_FragColor = vec4(hsv2rgb(vec3(0.2+0.2*s,1.0-s*s,1.0*s)),1.0);//greeeeen
 	
-	vec3 col1 = vec3(0.0,0.06,0.05);
-	vec3 col2 = hsv2rgb(vec3(0.4+0.2*s,1.0-s,1.0));
+	//vec3 col1 = vec3(0.0,0.06,0.05);
+	//vec3 col2 = hsv2rgb(vec3(0.4+0.2*s,1.0-s,1.0));	
+	//gl_FragColor = vec4((1.0-s)*col1 + s*col2,1.0);
 	
-	gl_FragColor = vec4((1.0-s)*col1 + s*col2,1.0);
+	vec3 col1 = hsv2rgb(vec3(166.0/360.0,.640,.295));
+	vec3 finalOutCol = col1;
+	if (s > 0.0){
+		finalOutCol = hsv2rgb(vec3(166.0/360.0,(1.0-s),.295 + 1.0*s));
+	}
+	gl_FragColor = vec4(finalOutCol,1.0);
 	
 	//gl_FragColor = vec4(hsv2rgb(vec3(-0.5+0.85*s,1.0-0.9*s,1.0*s)),1.0);
 	//gl_FragColor = vec4(s,s,s,1.0);

@@ -29,7 +29,7 @@ void main() {
 	vec2 mouseDisplacement = transformVector*uMousePos - position;
 	float mouseDist = dot(mouseDisplacement,mouseDisplacement);
 	
-	vec2 force = 18.0*(uMouseForce*mouseDisplacement/(mouseDist + 1.0/4096.0));//SETTING1
+	vec2 force = 18.0*(uMouseForce*mouseDisplacement/(mouseDist + 1.0/2048.0));//SETTING1
 	//vec2 force = 16.0*uMouseForce*mouseDisplacement/(mouseDist+ 1.0/2048.0);//SETTING2
 	//vec2 force = 160.0*uMouseForce*(mouseDisplacement)/sqrt(mouseDist);//SETTING2.1 (poke with audio)
 	
@@ -78,7 +78,7 @@ void main() {
 	}
 	*/
 	
-	velocity = pow(0.8,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	velocity = pow(0.81,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	//velocity = pow(0.88,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	
 	position += uDeltaTime*velocity;
