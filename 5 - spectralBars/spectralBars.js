@@ -1,4 +1,4 @@
-import {initShaderProgram} from "../_libraries/my-shader-util.js";
+import {initShaderProgram} from "../libraries/my-shader-util.js";
 import {prepare_textures_and_framebuffers} from "./prep-textures-framebuffers.js"
 
 var canvas = document.querySelector("canvas");
@@ -47,7 +47,7 @@ document.addEventListener("keypress", function onEvent(event) {
 //###################################################################
 
 const dataProgram = initShaderProgram(gl, 'shaders/frequencyStrip.vert', 'shaders/frequencyStrip.frag');
-const screenSpaceProgram = initShaderProgram(gl, '../_resources/general_shaders/screenSpaceShader.vert', '../_resources/general_shaders/screenSpaceShader.frag');
+const screenSpaceProgram = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader.frag');
 
 const dataProgramInfo = {
 	program: dataProgram,

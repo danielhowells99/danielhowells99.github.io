@@ -1,4 +1,4 @@
-import {initShaderProgram} from "../_libraries/my-shader-util.js";
+import {initShaderProgram} from "../libraries/my-shader-util.js";
 
 var canvas = document.querySelector("canvas");
 const gl = canvas.getContext("webgl");
@@ -102,7 +102,7 @@ const linear_displayFramebufferProgramInfo = {
 	},
 };
 
-const screenSpaceProgram = initShaderProgram(gl, '../_resources/general_shaders/screenSpaceShader.vert', '../_resources/general_shaders/screenSpaceShader.frag');
+const screenSpaceProgram = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader.frag');
 
 const screenSpaceProgramInfo = {
 	program: screenSpaceProgram,

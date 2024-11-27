@@ -1,4 +1,4 @@
-import {initShaderProgram} from "../_libraries/my-shader-util.js";
+import {initShaderProgram} from "../libraries/my-shader-util.js";
 
 let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
 let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
@@ -37,7 +37,7 @@ function main() {
 	resizeCanvas();
 	
 	const liquidShaderProgram = initShaderProgram(gl, 'shaders/liquidShader.vert', 'shaders/liquidShader.frag');
-	const screenSpaceProgram = initShaderProgram(gl, '../_resources/general_shaders/screenSpaceShader.vert', '../_resources/general_shaders/screenSpaceShader.frag');
+	const screenSpaceProgram = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader.frag');
 	
 	const liquidShaderProgramInfo = {
 		program: liquidShaderProgram,
