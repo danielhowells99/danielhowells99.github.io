@@ -11,9 +11,9 @@ void main() {
 	if (d > 1.0) {
 		discard;
 	}
-	float trans = 0.01;
+	float trans = 0.03;
 	if(d < 0.2){
-		trans = 0.1;
+		trans = 0.15;
 		if(d < 0.02){
 			trans = 1.0;
 		}

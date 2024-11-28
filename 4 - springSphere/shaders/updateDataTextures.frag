@@ -46,13 +46,13 @@ void main() {
 			if(testDist > 0.00001){
 				vec2 normDisp = testDisp/testDist;
 				float springDist = testDist - equDist;
-				force += 0.02*normDisp*springDist;
+				force += 0.025*normDisp*springDist;
 			}
 		}
 		//if (brk_con > uParticleNumSq*uParticleNumSq){break;}
 	}
 	
-	float k0 = 80.0; //SETTING 1
+	float k0 = 200.0; //SETTING 1
 	float boundaryFactor = 1.0;//SETTING2
 	
 	float boundaryX = boundaryFactor*transformVector.x;
@@ -61,19 +61,19 @@ void main() {
 	float transBoxY = 0.0;
 	
 	if (position.x >= boundaryX+transBoxX){
-		force.x += -k0*(position.x-boundaryX-transBoxX);
+		force.x += -k0*(position.x-boundaryX-transBoxX)*(position.x-boundaryX-transBoxX);
 	}
 	
 	if (position.x <= -boundaryX+transBoxX){
-		force.x += -k0*(position.x+boundaryX-transBoxX);
+		force.x += k0*(position.x+boundaryX-transBoxX)*(position.x+boundaryX-transBoxX);
 	}
 	
 	if (position.y >= boundaryY+transBoxY){
-		force.y += -k0*(position.y-boundaryY-transBoxY);
+		force.y += -k0*(position.y-boundaryY-transBoxY)*(position.y-boundaryY-transBoxY);
 	}
 	
 	if (position.y <= -boundaryY+transBoxY){
-		force.y += -k0*(position.y+boundaryY-transBoxY);
+		force.y += k0*(position.y+boundaryY-transBoxY)*(position.y+boundaryY-transBoxY);
 	}
 	
 	

@@ -30,19 +30,23 @@ void main() {
 	vec2 z = vec2(0.0,0.0);
 	
 	float iterationReached = 0.0;
-	float param = 0.4*uTimeParam;
+	float param = 3.141592*uTimeParam;
 	
-	for(float i = 0.0; i < 13.0 ; i++){
+	for(float i = 0.0; i < 13.0 ; i++){//13
 		z = vec2(cos(0.1*(1.0-z.x*z.x))-sin(0.1*z.y*z.y-param) + uvScaled.x,2.0*cos(z.x+param)*sin(z.y+param) + uvScaled.y);
 		if (length(z) > 20.0){
 			iterationReached = i;
 			break;
 		}
 	}
-	float d = 1.5*atan(z.y,z.x) + uTimeParam*0.1 + 0.6;
-	d = mod(cos(floor(d)*3.1415)*d,1.0);
 
-	//float d = 0.5*(1.0+cos(uTimeParam*0.01 + 0.5 + 4.0*atan(z.y,z.x)));
+	//z = uvScaled;
+	float d = 7.0*(atan(z.y,z.x)/(6.28318530718) + 0.5) + uTimeParam ;
+	d = 2.0*fract(cos(3.141592*floor(2.0*d))*d);
+
+	//z = mat2(cos(2.0*param),sin(2.0*param),-sin(2.0*param),cos(2.0*param))*z;
+	//float d = atan(z.y,z.x)/(6.283)+0.5;
+	//d = mod(cos(floor(d)*3.141592)*d,1.0);
 
 	vec4 myColor = vec4(vec3(1.0),d);
 	//vec4 myColor = vec4(hsv2rgb(vec3(d + 0.01,0.33-0.25*sin(6.28*d),0.67+0.25*sin(6.28*d))), 1.0); //GOOD!

@@ -20,7 +20,8 @@ const float A6 = 1.0;
 const float A7 = 2.0;
 const float A8 = 1.0;
 
-/*//-------------------
+/*
+//-------------------
 const float B00 = 1.0;
 const float B01 = 2.0;
 const float B02 = 4.0;
@@ -50,11 +51,13 @@ const float B41 = 2.0;
 const float B42 = 4.0;
 const float B43 = 2.0;
 const float B44 = 1.0;
+
+const float norm2 = 1.0/((B00+B01+B02+B03+B04)+(B10+B11+B12+B13+B14)+(B20+B21+B22+B23+B24)+(B30+B31+B32+B33+B34)+(B40+B41+B42+B43+B44));
 //-------------------*/
 
 const float paintConst = 1.0;
 const float normConst = 1.0/(A0 + A1 + A2 + A3 + A4 + A5 + A6 + A7 + A8);
-//const float norm2 = 1.0/((B00+B01+B02+B03+B04)+(B10+B11+B12+B13+B14)+(B20+B21+B22+B23+B24)+(B30+B31+B32+B33+B34)+(B40+B41+B42+B43+B44));
+
 
 vec3 hsv2rgb(vec3 c)
 {
@@ -86,7 +89,6 @@ void main() {
 	outCol += normConst*A6*texture2D(uFbTexture,accessCoords + vec2(-xInc,yInc)).w;
 	outCol += normConst*A7*texture2D(uFbTexture,accessCoords + vec2(0.0,yInc)).w;
 	outCol += normConst*A8*texture2D(uFbTexture,accessCoords + vec2(xInc,yInc)).w;
-	
 	
 	/*
 	outCol += norm2*B00*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,-2.0*yInc)).w; 
@@ -122,6 +124,10 @@ void main() {
 	
 	float s = paintConst*outCol; //(paint => 1.0/min(rgb))
 
+	//quantize
+	//float quantFactor = 5.0;
+	//s = (1.0/quantFactor)*floor(quantFactor*s + 0.5);
+
 	//desktop green
 	/*
 	vec3 finalOutCol = hsv2rgb(vec3(166.0/360.0,.640,.295)); //bgCol
@@ -136,7 +142,7 @@ void main() {
 	//vec3 finalOutCol = hsv2rgb(vec3(1.1-0.4*s,0.1 + 0.5*s,1.0-s)); 
 
 	//blk & wht
-	//vec3 finalOutCol  = texture2D(uFbTexture,accessCoords).www;
+	//vec3 finalOutCol  = vec3(s);
 
 	//rainbow
 	//s += 0.3;
@@ -147,16 +153,26 @@ void main() {
 	//vec3 finalOutCol = 0.5 + 0.5*vec3(sin(-s + 0.2),sin(-s + 0.4),sin(-s + 0.6));
 
 	//RED
-	//vec3 finalOutCol = hsv2rgb(vec3(0.0,1.0-0.9*s*s,0.05+s));
+	//vec3 finalOutCol = hsv2rgb(vec3(0.0,1.0-0.9*s*s,0.07+s));
 
 	//Blue
 	//vec3 finalOutCol = hsv2rgb(vec3(0.7-0.3*s,1.0-0.9*s,0.07+1.0*s));
 
 	//green
-	vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.1*s));
+	vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.0*s));
 
 	//temp temp
-	//vec3 finalOutCol = hsv2rgb(vec3(1.0-s,1.0,s));
+	//vec3 finalOutCol = hsv2rgb(vec3(1.0-s,1.0,s));	
+
+	//saturated rainbow
+	//vec3 finalOutCol = hsv2rgb(vec3(s,1.0,1.0));
+
+	//convex
+	/*
+	vec3 col1 = vec3(0.04,0.005,0.14);
+	vec3 col2 = vec3(0.98, 0.90, 0.82);
+	vec3 finalOutCol = s*col1 + (1.0-s)*col2;
+	*/
 
 	
 	gl_FragColor = vec4(finalOutCol,1.0);

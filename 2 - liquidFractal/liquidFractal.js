@@ -35,6 +35,13 @@ function main() {
 
 	window.addEventListener("resize", resizeCanvas);
 	resizeCanvas();
+
+	let capFlag = 0;
+	document.addEventListener("keypress", function onEvent(event) {
+		if (event.key == "p" || event.key == "P"){
+			capFlag = 1;
+		}
+	});
 	
 	const liquidShaderProgram = initShaderProgram(gl, 'shaders/liquidShader.vert', 'shaders/liquidShader.frag');
 	const screenSpaceProgram = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader.frag');
@@ -105,7 +112,21 @@ function main() {
 		setPositionAttribute(gl, positionBuffer, screenSpaceProgramInfo) 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		
-		timeParam += 0.004;
+		timeParam += 0.0004;
+		if (timeParam > 2.0){
+			timeParam = 0.0;
+		}
+
+		if (capFlag == 1){
+			console.log("saving picture")
+			var dataURL = gl.canvas.toDataURL("image/png");
+			var a = document.createElement('a');
+			a.href = dataURL;
+			a.download = "picture.png";
+			document.body.appendChild(a);
+			a.click();
+			capFlag = 0;
+		}
 
 		requestAnimationFrame(render);
 	}
