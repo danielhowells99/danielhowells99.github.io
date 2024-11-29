@@ -129,12 +129,12 @@ void main() {
 	//s = (1.0/quantFactor)*floor(quantFactor*s + 0.5);
 
 	//desktop green
-	/*
+	
 	vec3 finalOutCol = hsv2rgb(vec3(166.0/360.0,.640,.295)); //bgCol
 	if (s > 0.0){
 		finalOutCol = hsv2rgb(vec3(166.0/360.0,(1.0-s),.295 + 0.705*s));
 	}
-	*/
+	
 	//ALT 1.0
 	//vec3 finalOutCol = hsv2rgb(vec3(166.0/360.0,(1.0-s),0.07+s));
 
@@ -153,7 +153,7 @@ void main() {
 	//vec3 finalOutCol = 0.5 + 0.5*vec3(sin(-s + 0.2),sin(-s + 0.4),sin(-s + 0.6));
 
 	//RED
-	vec3 finalOutCol = hsv2rgb(vec3(0.0,1.0-0.9*s*s,0.07+s));
+	//vec3 finalOutCol = hsv2rgb(vec3(0.0,1.0-0.9*s*s,0.07+s));
 
 	//Blue
 	//vec3 finalOutCol = hsv2rgb(vec3(0.7-0.3*s,1.0-0.9*s,0.07+1.0*s));
