@@ -31,6 +31,7 @@ void main() {
 	
 	//vec2 force = 18.0*(uMouseForce*mouseDisplacement/(mouseDist + 1.0/2048.0));//SETTING1
 	vec2 force = 16.0*uMouseForce*mouseDisplacement/(mouseDist+ 1.0/2048.0);//SETTING2
+	//vec2 force = -1.0*uMouseForce*mouseDisplacement/(mouseDist);//SETTING2
 	
 	//float k0 = 12.0; //SETTING 1
 	float k0 = 60.0; //SETTING 2
@@ -62,12 +63,14 @@ void main() {
 	
 	float posmag = position.x*position.x + position.y*position.y - boundaryFactor;
 	if (posmag >= 0.0){
-		force += -k0*position*sqrt(posmag);
+		vec2 norm1 = position/length(position);
+		force += -1.0*k0*norm1*posmag*posmag;
 	}
 	
 	
 	//velocity = pow(0.81,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
 	velocity = pow(0.88,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
+	//velocity = pow(0.99,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	
 	position += uDeltaTime*velocity;
 	position /= transformVector;
