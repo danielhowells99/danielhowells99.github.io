@@ -129,14 +129,14 @@ void main() {
 	//s = (1.0/quantFactor)*floor(quantFactor*s + 0.5);
 
 	//desktop green
-	
+	/*
 	vec3 finalOutCol = hsv2rgb(vec3(166.0/360.0,.640,.295)); //bgCol
 	if (s > 0.0){
 		finalOutCol = hsv2rgb(vec3(166.0/360.0,(1.0-s),.295 + 0.705*s));
 	}
-	
+	*/
 	//ALT 1.0
-	//vec3 finalOutCol = hsv2rgb(vec3(166.0/360.0,(1.0-s),0.07+s));
+	vec3 finalOutCol = hsv2rgb(vec3(166.0/360.0,(1.0-s),0.1+0.9*s));
 
 	//negative contrast
 	//vec3 finalOutCol = hsv2rgb(vec3(1.1-0.4*s,0.1 + 0.5*s,1.0-s)); 
