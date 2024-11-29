@@ -156,10 +156,10 @@ void main() {
 	//vec3 finalOutCol = hsv2rgb(vec3(0.0,1.0-0.9*s*s,0.07+s));
 
 	//Blue
-	vec3 finalOutCol = hsv2rgb(vec3(0.7-0.3*s,1.0-0.9*s,0.07+1.0*s));
+	//vec3 finalOutCol = hsv2rgb(vec3(0.7-0.3*s,1.0-0.9*s,0.07+1.0*s));
 
 	//green
-	//vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.0*s));
+	vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.0*s));
 
 	//temp temp
 	//vec3 finalOutCol = hsv2rgb(vec3(1.0-s,1.0,s));	
