@@ -1,6 +1,8 @@
 body { 
 	
-	background-color: hsl(198, 100%, 3.5%)/*
+	background-color: hsl(166,47%,20%);/*
+	hsl(0.0, 100%, 3.5%) //red
+	hsl(198, 100%, 3.5%) //green
 	hsl(244,56%,0%);
 	hsl(166,74%,3%);
 	hsl(170,75%,100%);
@@ -54,7 +56,7 @@ img {
 .menuIcons {
 	width: 33%;
 	height: 33%;
-	mix-blend-mode: difference;
+	/*mix-blend-mode: dodge;//difference*/
 	margin-left: auto;
 	margin-right: auto;
 }
