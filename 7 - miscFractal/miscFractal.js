@@ -71,15 +71,13 @@ function main() {
 	onmousedown = function(e){
 		
 		mouseStartTime = new Date().getTime()
-		
-		mouseToggle = mouseToggle^1; 
 		mouseForce = 1.0*mouseToggle;
 		
 		}
 	onmouseup = function(e){
 		
 		mouseEndTime = new Date().getTime()
-		if (mouseEndTime-mouseStartTime > 250){
+		if (mouseEndTime-mouseStartTime < 500){
 			mouseToggle = mouseToggle^1; 
 		}
 		

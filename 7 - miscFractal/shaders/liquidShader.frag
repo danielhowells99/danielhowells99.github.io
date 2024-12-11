@@ -1,6 +1,7 @@
+precision highp float;
+
 varying highp vec4 vColor;
 varying highp vec2 vTexCoord;
-precision highp float;
 
 uniform float uTimeParam;
 uniform float uAspect;

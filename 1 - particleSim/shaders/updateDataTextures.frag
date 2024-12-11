@@ -33,11 +33,11 @@ void main() {
 	//vec2 force = 16.0*uMouseForce*mouseDisplacement/(mouseDist+ 1.0/2048.0);//SETTING2
 	//vec2 force = -1.0*uMouseForce*mouseDisplacement/(mouseDist);//SETTING2
 	
-	float k0 = 12.0; //SETTING 1
-	//float k0 = 60.0; //SETTING 2
+	//float k0 = 12.0; //SETTING 1
+	float k0 = 80.0; //SETTING 2
 	
-	float boundaryFactor = 0.875; //SETTING 1
-	//float boundaryFactor = 1.0;//SETTING2
+	//float boundaryFactor = 0.875; //SETTING 1
+	float boundaryFactor = 1.0;//SETTING2
 	
 	
 	float boundaryX = boundaryFactor*transformVector.x;
@@ -77,8 +77,8 @@ void main() {
 	}
 	*/
 	
-	velocity = pow(0.81,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
-	//velocity = pow(0.88,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
+	//velocity = pow(0.81,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	velocity = pow(0.88,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	//velocity = pow(0.99,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	
 	position += uDeltaTime*velocity;
