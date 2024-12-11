@@ -68,7 +68,7 @@ vec3 hsv2rgb(vec3 c)
 
 
 void main() {
-	vec2 accessCoords = vTexPosition;// + 0.5/uScreenDimensions;
+	vec2 accessCoords = vTexPosition + 0.5/uScreenDimensions;
 	float xInc = 1.0/uScreenDimensions.x;
 	float yInc = 1.0/uScreenDimensions.y;
 	
