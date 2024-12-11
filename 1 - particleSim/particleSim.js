@@ -13,8 +13,8 @@ if (!ext) {
 //let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
 //let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 
-let scale = 1.5;
-let screenScale = 1.5;
+let scale = 2.0;
+let screenScale = 1.0;
 let screenBuffer = createScreenFramebuffer(gl,scale);
 
 function resizeCanvas() {
