@@ -74,9 +74,9 @@ void main() {
 	
 	
 	float outCol = 0.0;
-	//outCol += texture2D(uFbTexture,accessCoords).w;
+	outCol += texture2D(uFbTexture,accessCoords).w;
 
-	
+	/*
 	outCol += normConst*A0*texture2D(uFbTexture,accessCoords + vec2(-xInc,-yInc)).w; 
 	outCol += normConst*A1*texture2D(uFbTexture,accessCoords + vec2(0.0,-yInc)).w;
 	outCol += normConst*A2*texture2D(uFbTexture,accessCoords + vec2(xInc,-yInc)).w;
@@ -88,6 +88,7 @@ void main() {
 	outCol += normConst*A6*texture2D(uFbTexture,accessCoords + vec2(-xInc,yInc)).w;
 	outCol += normConst*A7*texture2D(uFbTexture,accessCoords + vec2(0.0,yInc)).w;
 	outCol += normConst*A8*texture2D(uFbTexture,accessCoords + vec2(xInc,yInc)).w;
+	*/
 	
 	
 	/*
@@ -140,7 +141,7 @@ void main() {
 	//vec3 finalOutCol = hsv2rgb(vec3(166.0/360.0,(1.0-s),0.1+0.9*s));
 
 	//negative contrast
-	//vec3 finalOutCol = hsv2rgb(vec3(1.1-0.4*s,0.1 + 0.5*s,1.0-s)); 
+	vec3 finalOutCol = hsv2rgb(vec3(1.1-0.4*s,0.1 + 0.5*s,1.0-s)); 
 
 	//blk & wht
 	//vec3 finalOutCol  = (1.0-s)*vec3(0.0,0.02,0.07) + s*vec3(1.0,0.95,0.90);
@@ -161,7 +162,7 @@ void main() {
 	//vec3 finalOutCol = hsv2rgb(vec3(0.7-0.2*s,1.0-0.9*s,0.07+1.0*s));
 
 	//green
-	vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.0*s));
+	//vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.0*s));
 
 	//temp temp
 	//vec3 finalOutCol = hsv2rgb(vec3(1.0-s,1.0,s));	

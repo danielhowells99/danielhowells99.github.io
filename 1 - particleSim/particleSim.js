@@ -13,7 +13,7 @@ if (!ext) {
 //let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
 //let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 
-let scale = 2.0;
+let scale = 1.0;
 let screenScale = 1.0;
 let screenBuffer = createScreenFramebuffer(gl,scale);
 
@@ -223,7 +223,10 @@ function render() {
 		
 		gl.uniform1i(particleProgramInfo.uniformLocations.dataSampler, 0);
 		setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
+		gl.enable(gl.BLEND)
+		gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE)
 		gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
+		gl.disable(gl.BLEND)
 		
 		gl.useProgram(screenSpaceProgram)
 		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
