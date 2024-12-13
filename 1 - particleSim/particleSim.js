@@ -181,6 +181,8 @@ const frameLimit = 90; // PAL/NTSC TV?
 const average = list => list.reduce((prev, curr) => prev + curr) / list.length;
 let timesList = [];
 
+let anim = 0.0;
+
 function render() {
 	
 	let endTime = new Date().getTime();
@@ -195,13 +197,18 @@ function render() {
 		
 		let timeAvg = Math.min(average(timesList),1.0/30.0);
 		startTime = endTime
+		
+		anim += timeAvg;
+		let mouseShift_x = 0.0//0.02*(Math.random()*2 - 1);
+		let mouseShift_y = 0.0//0.02*(Math.random()*2 - 1);
+		
 		aspectRatio = canvas.width/canvas.height
 		
 		gl.useProgram(dataProgram);
 		gl.uniform1f(dataProgramInfo.uniformLocations.mouseForce,mouseForce);
 		gl.uniform1f(dataProgramInfo.uniformLocations.aspect,aspectRatio);
 		gl.uniform1f(dataProgramInfo.uniformLocations.deltaTime,timeAvg);
-		gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
+		gl.uniform2fv(dataProgramInfo.uniformLocations.mousePos,[(2.0*mouse.x-1.0) + mouseShift_x/aspectRatio,(2.0*mouse.y-1.0)+mouseShift_y]);
 		
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, pt1);
