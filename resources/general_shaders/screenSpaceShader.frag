@@ -141,10 +141,10 @@ void main() {
 	//vec3 finalOutCol = hsv2rgb(vec3(166.0/360.0,(1.0-s),0.1+0.9*s));
 
 	//negative contrast
-	vec3 finalOutCol = hsv2rgb(vec3(1.1-0.4*s,0.1 + 0.5*s,1.0-s)); 
+	//vec3 finalOutCol = hsv2rgb(vec3(1.1-0.4*s,0.1 + 0.5*s,1.0-s)); 
 
 	//blk & wht
-	//vec3 finalOutCol  = (1.0-s)*vec3(0.0,0.02,0.07) + s*vec3(1.0,0.95,0.90);
+	vec3 finalOutCol  = (1.0-s)*vec3(0.0,0.02,0.07) + s*vec3(1.0,0.95,0.90);
 
 	//rainbow
 	//s += 0.3;
