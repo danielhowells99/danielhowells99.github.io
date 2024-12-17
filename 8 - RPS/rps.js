@@ -140,7 +140,7 @@ let pt1 = textures.dataTexture1
 let pt2 = textures.dataTexture2
 
 let startTime = new Date().getTime();
-const frameLimit = 240; // PAL/NTSC TV?
+const frameLimit = 90; // PAL/NTSC TV?
 
 const average = list => list.reduce((prev, curr) => prev + curr) / list.length;
 let timesList = [];
