@@ -141,7 +141,7 @@ void main() {
 	//vec3 finalOutCol = hsv2rgb(vec3(166.0/360.0,.640*(1.0-s),.295 + 0.705*s));
 
 	//negative contrast
-	//vec3 finalOutCol = hsv2rgb(vec3(1.1-0.4*s,0.1 + 0.5*s,1.0-s)); 
+	vec3 finalOutCol = hsv2rgb(vec3(1.1-0.4*s,0.1 + 0.5*s,1.0-s)); 
 
 	//blk & wht
 	//vec3 finalOutCol  = (s)*vec3(0.06,0.03,0.12) + (1.0-s)*vec3(1.0,0.92,0.85);
@@ -164,7 +164,7 @@ void main() {
 	//vec3 finalOutCol = hsv2rgb(vec3(0.7-0.2*s,1.0-0.9*s,0.07+1.0*s));
 
 	//green
-	vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.0*s));
+	//vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.0*s));
 
 	//temp temp
 	//vec3 finalOutCol = hsv2rgb(vec3(1.0-s,1.0,s));	
