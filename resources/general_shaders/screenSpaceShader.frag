@@ -90,7 +90,6 @@ void main() {
 	outCol += normConst*A8*texture2D(uFbTexture,accessCoords + vec2(xInc,yInc)).w;
 	*/
 	
-	
 	/*
 	outCol += norm2*B00*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,-2.0*yInc)).w; 
 	outCol += norm2*B01*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,-2.0*yInc)).w; 
@@ -147,6 +146,8 @@ void main() {
 	//vec3 finalOutCol  = (s)*vec3(0.06,0.03,0.12) + (1.0-s)*vec3(1.0,0.92,0.85);
 	//vec3 finalOutCol  = (1.0-s)*vec3(0.0,0.02,0.07) + s*vec3(1.0,0.95,0.90);
 
+	//vec3 finalOutCol  = s*vec3(0.98,0.99,1.0);
+
 	//rainbow
 	//s += 0.3;
 	//vec3 finalOutCol  = hsv2rgb(vec3(clamp(s,0.0,1.2),0.38 - 0.23*sin(6.283*s),0.65 + 0.25*sin(6.283*s)));
@@ -161,17 +162,18 @@ void main() {
 	//vec3 finalOutCol = vec3(s,s*s*s*s,s*s*s*s*s);
 
 	//Blue
-	vec3 finalOutCol = hsv2rgb(vec3(0.7-0.3*s,1.0-0.9*s,0.07+1.0*s));
+	//vec3 finalOutCol = hsv2rgb(vec3(0.7-0.3*s,1.0-0.9*s,0.07+1.0*s));
 	//vec3 finalOutCol = hsv2rgb(vec3(0.7-0.2*s,1.0-0.9*s,0.07+1.0*s));
 
 	//green
-	//vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.0*s));
+	vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.0*s));
 
 	//temp temp
 	//vec3 finalOutCol = hsv2rgb(vec3(1.0-s,1.0,s));	
 
 	//saturated rainbow
 	//vec3 finalOutCol = hsv2rgb(vec3(0.7 + 0.5*s,1.0 - s,0.05 + 0.95*s));
+	//vec3 finalOutCol = hsv2rgb(vec3(s,1.0,1.0));
 
 	//convex
 	/*

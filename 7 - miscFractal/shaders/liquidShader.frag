@@ -32,7 +32,7 @@ void main() {
 	}
 	
 	vec2 uvScaled = 1.0*uv;
-	uvScaled *= 1.3*transformVector;
+	uvScaled *= 1.35*transformVector;
 	//uvScaled += vec2(0.0,-2.0);
 	vec2 z = uvScaled;
 	
