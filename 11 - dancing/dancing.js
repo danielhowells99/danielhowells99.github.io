@@ -203,7 +203,7 @@ function useMic(stream){
 			gl.enable(gl.BLEND)
 			gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA)
 			//gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
-			gl.drawArrays(gl.LINES, 0, lacedIndicies.length/2);  
+			gl.drawArrays(gl.LINES, 0, lacedIndicies.length/3);  
 			gl.disable(gl.BLEND)
 			
 			//console.log(lacedList);
@@ -316,11 +316,7 @@ function setupUserInput(){
 	}
 
 	if (isTouchDevice()){
-		ontouchmove = function(e){mouse = {x: screenScale*e.touches[0].clientX/canvas.width, y: 1-screenScale*e.touches[0].clientY/canvas.height};mouseForce = 1.0;
-			audioCtx.resume()
-			if(mic){
-				mic.connect(audioCtx.destination);
-			}
+		ontouchmove = function(e){mouse = {x: screenScale*e.touches[0].clientX/canvas.width, y: 1-screenScale*e.touches[0].clientY/canvas.height};mouseForce = 1.0;audioCtx.resume();
 		}
 		ontouchstart = function(e){mouse = {x: screenScale*e.changedTouches[0].clientX/canvas.width, y: 1-screenScale*e.changedTouches[0].clientY/canvas.height};mouseForce = 1.0;}
 		ontouchend = function(e){mouse = {x: screenScale*e.changedTouches[0].clientX/canvas.width, y: 1-screenScale*e.changedTouches[0].clientY/canvas.height};mouseForce = 0.0;}
