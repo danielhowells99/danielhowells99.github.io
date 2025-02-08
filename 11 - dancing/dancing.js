@@ -77,7 +77,7 @@ const frameLimit = 90; // PAL/NTSC TV?
 const average = list => list.reduce((prev, curr) => prev + curr) / list.length;
 let timesList = [];
 
-const particle_num_sqd = 11;
+const particle_num_sqd = 4;
 const particle_num = particle_num_sqd*particle_num_sqd;
 const particle_data = []
 const index_data = []
@@ -192,11 +192,11 @@ function useMic(stream){
 			gl.uniform1i(particleProgramInfo.uniformLocations.dataSampler, 0);
 			gl.uniform1i(particleProgramInfo.uniformLocations.freqSampler, 1);
 			setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
-			//gl.enable(gl.BLEND)
-			//gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA)
+			gl.enable(gl.BLEND)
+			gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA)
 			//gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 			gl.drawArrays(gl.LINES, 0, lacedIndicies.length/2);  
-			//gl.disable(gl.BLEND)
+			gl.disable(gl.BLEND)
 			
 			//console.log(lacedList);
 			
