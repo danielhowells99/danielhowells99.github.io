@@ -33,7 +33,7 @@ void main() {
 	}
 	uv *= transformVector;
 
-	float scf = 60.0;	
+	float scf = 40.0;	
 	float s = 0.0;//sin(scf*length(uv));
 	
 	const float num = 6.0;
