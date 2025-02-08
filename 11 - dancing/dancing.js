@@ -186,7 +186,7 @@ function useMic(stream){
 
 			gl.useProgram(particleProgram);
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-			gl.clearColor(0.0,0.0,freqData[12]/256,1.0);
+			gl.clearColor(0.0,0.0,0.0,1.0);
 			gl.clear(gl.COLOR_BUFFER_BIT)
 			gl.viewport(0, 0, scale*gl.canvas.width, scale*gl.canvas.height);
 			gl.uniform1i(particleProgramInfo.uniformLocations.dataSampler, 0);
