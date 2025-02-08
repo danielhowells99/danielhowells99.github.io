@@ -136,6 +136,9 @@ let freqTex = createDataTexture(gl,freqData);
 gl.activeTexture(gl.TEXTURE1);
 gl.bindTexture(gl.TEXTURE_2D, freqTex);
 
+gl.clearColor(0.0,0.0,1.0,1.0);
+gl.clear(gl.COLOR_BUFFER_BIT)
+
 navigator.mediaDevices
   .getUserMedia({
 	  audio:{
@@ -159,6 +162,9 @@ function useMic(stream){
 	const frameLimit = 60; // PAL/NTSC TV?
 	const minDelta = 1.0/frameLimit;
 	let frames = 0.0;
+	
+	gl.clearColor(0.0,1.0,0.0,1.0);
+	gl.clear(gl.COLOR_BUFFER_BIT)
 
 	function render() {
 		
