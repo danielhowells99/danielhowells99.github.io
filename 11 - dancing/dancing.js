@@ -77,7 +77,7 @@ const frameLimit = 90; // PAL/NTSC TV?
 const average = list => list.reduce((prev, curr) => prev + curr) / list.length;
 let timesList = [];
 
-const particle_num_sqd = 4;
+const particle_num_sqd = 11;
 const particle_num = particle_num_sqd*particle_num_sqd;
 const particle_data = []
 const index_data = []
@@ -146,6 +146,8 @@ navigator.mediaDevices
   .then((stream) => useMic(stream))
   .catch((err) => {
     console.log(err)
+	gl.clearColor(1.0,0.0,0.0,1.0);
+	gl.clear(gl.COLOR_BUFFER_BIT)
   });
   
 function useMic(stream){
