@@ -136,9 +136,6 @@ let freqTex = createDataTexture(gl,freqData);
 gl.activeTexture(gl.TEXTURE1);
 gl.bindTexture(gl.TEXTURE_2D, freqTex);
 
-gl.clearColor(0.0,0.0,1.0,1.0);
-gl.clear(gl.COLOR_BUFFER_BIT)
-
 navigator.mediaDevices
   .getUserMedia({
 	  audio:{
@@ -149,8 +146,6 @@ navigator.mediaDevices
   .then((stream) => useMic(stream))
   .catch((err) => {
     console.log(err)
-	gl.clearColor(1.0,0.0,0.0,1.0);
-	gl.clear(gl.COLOR_BUFFER_BIT)
   });
   
 function useMic(stream){
@@ -162,9 +157,6 @@ function useMic(stream){
 	const frameLimit = 60; // PAL/NTSC TV?
 	const minDelta = 1.0/frameLimit;
 	let frames = 0.0;
-	
-	gl.clearColor(0.0,1.0,0.0,1.0);
-	gl.clear(gl.COLOR_BUFFER_BIT)
 
 	function render() {
 		
@@ -204,7 +196,7 @@ function useMic(stream){
 			gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA)
 			//gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 			gl.drawArrays(gl.LINES, 0, lacedIndicies.length/3);  
-			//gl.disable(gl.BLEND)
+			gl.disable(gl.BLEND)
 			
 			//console.log(lacedList);
 			
