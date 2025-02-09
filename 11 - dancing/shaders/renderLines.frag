@@ -14,6 +14,6 @@ vec3 hsv2rgb(vec3 c)
 void main() {
 	float val = 0.8*vVal;
 	vec3 outCol = hsv2rgb(vec3((0.75+val*val),0.7+0.3*cos(6.28*val*val),0.6-0.4*cos(6.28*val*val)));
-	gl_FragColor = vec4(outCol,0.4*val*val);
+	gl_FragColor = vec4(outCol,0.5*val*val);
 	//gl_FragColor = vec4(outCol,0.1);
 }
