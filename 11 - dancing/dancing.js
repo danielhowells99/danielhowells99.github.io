@@ -83,18 +83,20 @@ const particle_data = []
 const index_data = []
 
 for (let i = 0; i < particle_num; i++){
-	/*
+	
 	particle_data.push(0.77*(-1+Math.random()*2))
 	particle_data.push(0.77*(-1+Math.random()*2))
 	let randAngle = Math.random()*6.2831853;
 	particle_data.push(0.005*((i+1)/particle_num)*Math.cos(randAngle))
 	particle_data.push(0.005*((i+1)/particle_num)*Math.sin(randAngle))
-	*/
+	
+	/*
 	let angle = (i/particle_num)*6.2831853;
 	particle_data.push(0.77*Math.cos(angle))
 	particle_data.push(0.77*Math.sin(angle))
 	particle_data.push(0)
 	particle_data.push(0)
+	*/
 	
 	
 	let firstIndex = ((i%particle_num_sqd)+0.5)/particle_num_sqd;
@@ -132,7 +134,7 @@ let pt2 = textures.dataTexture2
 const audioCtx = new AudioContext();
 console.log("sample_rate: " + audioCtx.sampleRate)
 const analyser = audioCtx.createAnalyser()
-analyser.fftSize = 1024;
+analyser.fftSize = 2048;
 analyser.smoothingTimeConstant = 0.7;
 
 let mic = null
