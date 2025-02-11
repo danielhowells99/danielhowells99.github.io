@@ -158,18 +158,22 @@ void main() {
 
 	//RED
 	//vec3 finalOutCol = hsv2rgb(vec3(0.0+0.15*s,1.0-0.75*s*s,0.07+0.93*s));
-	//vec3 finalOutCol = hsv2rgb(vec3(0.95,1.0-0.75*s*s,0.07+0.93*s));
+	vec3 finalOutCol = hsv2rgb(vec3(0.9+0.1*s,1.0-0.8*s*s,0.07+0.93*s));
 	//vec3 finalOutCol = vec3(s,s*s*s*s,s*s*s*s*s);
 
 	//Blue
 	//vec3 finalOutCol = hsv2rgb(vec3(0.7-0.3*s,1.0-0.9*s,0.07+1.0*s));
 	//vec3 finalOutCol = hsv2rgb(vec3(0.7-0.2*s,1.0-0.9*s,0.07+1.0*s));
+	
+	//vec3 finalOutCol = hsv2rgb(vec3(0.95-0.3*s,1.0-1.0*s*s,0.02+1.0*s));
 
 	//green
-	vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.0*s));
+	//vec3 finalOutCol = hsv2rgb(vec3(0.55-0.3*s,1.0-0.95*s,0.07+1.0*s));
 
 	//temp temp
-	//vec3 finalOutCol = hsv2rgb(vec3(1.0-s,1.0,s));	
+	//vec3 finalOutCol = hsv2rgb(vec3(0.55+s,1.0-s,s));	
+	//s *= 0.7;
+	//vec3 finalOutCol = hsv2rgb(vec3((0.75+s*s),0.7+0.3*cos(6.28*s*s),0.6-0.4*cos(6.28*s*s)));
 
 	//saturated rainbow
 	//vec3 finalOutCol = hsv2rgb(vec3(0.7 + 0.5*s,1.0 - s,0.05 + 0.95*s));

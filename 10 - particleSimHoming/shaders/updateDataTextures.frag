@@ -39,7 +39,7 @@ void main() {
 	
 	//vec2 force = 10.0*(uMouseForce*mouseDisplacement/(mouseDist + 1.0/2048.0));//SETTING1
 	//vec2 force = 16.0*uMouseForce*mouseDisplacement/(mouseDist+ 1.0/2048.0);//SETTING2
-	vec2 force = -10.0*uMouseForce*mouseDisplacement/(mouseDist);//SETTING2
+	vec2 force = -7.0*uMouseForce*mouseDisplacement/(mouseDist);//SETTING2
 	
 	//homing force
 	force += 100.0*homeDisplacement*(homeDist); //-Q*(xdistToinfluence)/(distToinfluence*distToinfluence) + xdistToHome*K
