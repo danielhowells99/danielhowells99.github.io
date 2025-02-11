@@ -36,6 +36,7 @@ let mouseToggle = 0.0;
 let mouseStartTime = 0,mouseEndTime = 0;
 let capFlag = 0;
 let playFlag = 1.0;
+let logFlag = 0.0;
 setupUserInput()
 
 //###################################################################
@@ -61,6 +62,7 @@ const particleProgramInfo = {
 	uniformLocations: {
 		dataSampler: gl.getUniformLocation(particleProgram, "uDataSampler"),
 		freqSampler: gl.getUniformLocation(particleProgram, "uFreqSampler"),
+		logFlag: gl.getUniformLocation(particleProgram, "uLogFlag"),
 	},
 };
 
@@ -83,6 +85,7 @@ const particle_data = []
 const index_data = []
 
 for (let i = 0; i < particle_num; i++){
+	
 	
 	particle_data.push(0.77*(-1+Math.random()*2))
 	particle_data.push(0.77*(-1+Math.random()*2))
@@ -202,6 +205,7 @@ function useMic(stream){
 			gl.viewport(0, 0, scale*gl.canvas.width, scale*gl.canvas.height);
 			gl.uniform1i(particleProgramInfo.uniformLocations.dataSampler, 0);
 			gl.uniform1i(particleProgramInfo.uniformLocations.freqSampler, 1);
+			gl.uniform1f(particleProgramInfo.uniformLocations.logFlag, logFlag);
 			setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
 			gl.enable(gl.BLEND)
 			gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA)
@@ -348,6 +352,9 @@ function setupUserInput(){
 		}
 		if (event.key == "d" || event.key == "D"){
 			playFlag = 1;
+		}
+		if (event.key == "l" || event.key == "L"){
+			logFlag = logFlag^1;
 		}
 		if (event.key == "m" || event.key == "M"){
 			if(mic){
