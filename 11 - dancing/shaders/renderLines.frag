@@ -13,7 +13,7 @@ vec3 hsv2rgb(vec3 c)
 }
 
 void main() {
-	float s = (0.80)*vVal;
+	float s = vVal;
 	float ss = s*s;
 	
 	vec3 outCol = hsv2rgb(vec3((0.75+ss),0.7+0.3*cos(6.28*ss),0.6-0.4*cos(6.28*ss)));

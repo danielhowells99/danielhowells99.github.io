@@ -11,7 +11,7 @@ if (!ext) {
 	alert('need OES_texture_float');
 }
 
-const SKIPS = 3.0;
+const SKIPS = 4.0;
 let scale = 1.0;
 let screenScale = 1.0;
 //let screenBuffer = createScreenFramebuffer(gl,scale);
@@ -93,6 +93,7 @@ for (let i = 0; i < particle_num; i++){
 	particle_data.push(0.005*((i+1)/particle_num)*Math.cos(randAngle))
 	particle_data.push(0.005*((i+1)/particle_num)*Math.sin(randAngle))
 	
+	
 	/*
 	let angle = (i/particle_num)*6.2831853;
 	particle_data.push(0.77*Math.cos(angle))
@@ -101,6 +102,13 @@ for (let i = 0; i < particle_num; i++){
 	particle_data.push(0)
 	*/
 	
+	/*
+	let angle = (i/particle_num)
+	particle_data.push(0.8*(1-angle)*Math.cos(3.14*i))
+	particle_data.push(0.0)
+	particle_data.push(0)
+	particle_data.push(-0.025*(0.2+0.8*angle))
+	*/
 	
 	let firstIndex = ((i%particle_num_sqd)+0.5)/particle_num_sqd;
 	let secondIndex = (Math.floor(i/particle_num_sqd)+0.5)/particle_num_sqd;

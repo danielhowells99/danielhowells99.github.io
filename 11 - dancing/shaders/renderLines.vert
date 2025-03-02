@@ -20,10 +20,10 @@ void main() {
 	float freqIndex = aIndexData.z;
 	if (uLogFlag > 0.0){
 		vVal = texture2D(uFreqSampler, vec2(f(freqIndex),0.5)).x;
-		vVal = (freqIndex*0.4+0.8)*vVal*vVal;
+		vVal = 0.8*(0.2*exp(freqIndex)+0.7)*vVal*vVal;
 		gl_Position = vec4(pointData.xy,0.0,1.0);
 		return;
 	}
-	vVal = texture2D(uFreqSampler, vec2(0.7*freqIndex,0.5)).x;
+	vVal = 0.8*texture2D(uFreqSampler, vec2(0.7*freqIndex,0.5)).x;
 	gl_Position = vec4(pointData.xy,0.0,1.0);
 }

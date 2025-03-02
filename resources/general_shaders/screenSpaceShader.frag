@@ -190,5 +190,6 @@ void main() {
 
 	//pass through
 	//gl_FragColor = vec4(texture2D(uFbTexture,accessCoords).xyz,1.0);
+	//gl_FragColor = vec4(texture2D(uFbTexture,accessCoords));
 	
 }
