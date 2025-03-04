@@ -11,7 +11,8 @@ vec3 hsv2rgb(vec3 c)
 
 void main() {
 	//float intensity = length(gl_FragCoord.xy);
-	vec3 outcol = hsv2rgb(vec3(12.0*vt,0.5-0.25*sin(12.0*2.0*3.1415*vt),0.75+0.25*sin(12.0*2.0*3.1415*vt)));
+	float colFreq = 8.0;
+	vec3 outcol = hsv2rgb(vec3(colFreq*vt,0.5-0.25*sin(colFreq*2.0*3.1415*vt),0.75+0.25*sin(colFreq*2.0*3.1415*vt)));
 	//vec3 outcol = hsv2rgb(vec3(244.0/360.0,0.5-0.25*sin(12.0*2.0*3.1415*vt),0.75+0.25*sin(12.0*2.0*3.1415*vt)));
-	gl_FragColor = vec4(outcol,0.02);
+	gl_FragColor = vec4(outcol,0.04);
 }

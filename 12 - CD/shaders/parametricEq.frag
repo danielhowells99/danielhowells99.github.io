@@ -39,11 +39,13 @@ vec4 f2(float t){
 	float dxCoord = 0.0;
 	float dyCoord = 0.0;
 	float norm = 0.0;
-	t *= 2.0*6.283185307;
-	for(float i=1.0;i<=4.0;i++) {
-		float A = (1.0-2.0*mod(i,2.0))*pow(2.0,i)+1.0;
+	t *= 3.1415;
+	for(float i=1.0;i<=2.0;i++) {
+		//float A = (1.0-2.0*mod(i,2.0))*pow(2.0,i)+1.0;
+		float A = (1.0-2.0*mod(i,2.0))*pow(2.0,i)-3.0;
 		//float A = pow(2.0,i)+1.0;
 		//float A = (1.0-2.0*mod(i,2.0))*pow(4.0,i)-3.0;;
+		//float A = 1.0;
 		float B = i;
 
 		float sab = sin(A*t)/B;

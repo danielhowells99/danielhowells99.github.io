@@ -28,12 +28,12 @@ void main() {
 
 	vec2 position = xy;
 
-	vt = 2.0*abs(aIndexData.z);
+	vt = abs(aIndexData.z);
 
-	//dxdy *= rotate2d(-6.28*(uAnim + vt));
-	dxdy *= rotate2d(6.28*(uAnim));
+	dxdy = rotate2d(6.28*(uAnim - vt))*dxdy;
+	//dxdy *= rotate2d(6.28*(uAnim));
 
-	float tangentLength = 2.8;
+	float tangentLength = 4.0;
 	
 	if (uPointMode == 0){
 		if (aIndexData.z <= 0.0){

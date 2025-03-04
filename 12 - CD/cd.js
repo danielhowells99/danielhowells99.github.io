@@ -80,14 +80,14 @@ const screenSpaceProgramInfo = {
 	},
 };
 
-const lineResSq = Math.round(Math.sqrt(7500)); //MAX 2890
+const lineResSq = Math.round(Math.sqrt(6000)); //MAX 2890
 const lineRes = lineResSq*lineResSq;
 const time_data = []
 const point_data = []
 const index_data = []
 
 for (let i = 0; i < lineRes; i++){
-	let t = i/(lineRes-1.0);
+	let t = 2.0*i/(lineRes-1);
 	time_data.push(t)
 
 	let firstIndex = ((i%lineResSq)+0.5)/lineResSq;
@@ -158,7 +158,7 @@ function render() {
 		startTime = endTime;
 
 		
-		((anim += 0.05*delayMilliseconds) > 1.0) ? anim = 0.0 : null;
+		((anim += 0.0007) > 1.0) ? anim = 0.0 : null;
 		let s = anim;
 		//recomputeFlag = 1.0;
 
@@ -202,7 +202,7 @@ function render() {
 		
 		gl.uniform1i(particleProgramInfo.uniformLocations.pointMode, 0);
 		setParticleIndexAttribute(gl, indexBuffer, particleProgramInfo,3)
-		gl.drawArrays(gl.LINES, 0, lineResSq*lineResSq);  
+		gl.drawArrays(gl.LINES, 0, 2.0*lineResSq*lineResSq);  
 		
 		gl.disable(gl.BLEND)
 		
