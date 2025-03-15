@@ -163,7 +163,7 @@ setPositionAttribute(gl, canvasPositionBuffer, linear_displayFramebufferProgramI
 navigator.mediaDevices
   .getUserMedia({
 	  audio:{
-		  sampleRate: 44100,
+		  sampleRate: audioCtx.sampleRate,
 	  },
 	  video:false
   })

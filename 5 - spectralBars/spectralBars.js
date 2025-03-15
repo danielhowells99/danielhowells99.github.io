@@ -100,7 +100,7 @@ setPositionAttribute(gl, positionBuffer, dataProgramInfo)
 navigator.mediaDevices
   .getUserMedia({
 	  audio:{
-		  sampleRate: 44100,
+		  sampleRate: audioCtx.sampleRate,
 	  },
 	  video:false
   })

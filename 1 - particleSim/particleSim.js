@@ -83,12 +83,21 @@ document.addEventListener("keypress", function onEvent(event) {
 		capFlag = 1;
 	}
 });
+let screenSpaceToggle = 1
+document.addEventListener("keypress", function onEvent(event) {
+	if (event.key == "s" || event.key == "S"){
+		selectSSS(screenSpaceToggle^=1);
+	}
+});
 
 //###################################################################
 
 const dataProgram = initShaderProgram(gl, 'shaders/updateDataTextures.vert', 'shaders/updateDataTextures.frag');
 const particleProgram = initShaderProgram(gl, 'shaders/renderParticles.vert', 'shaders/renderParticles.frag');
-const screenSpaceProgram = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader.frag');
+const screenSpaceProgram1 = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader.frag');
+const screenSpaceProgram2 = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader2.frag');
+
+let screenSpaceProgram = screenSpaceProgram1
 
 const dataProgramInfo = {
 	program: dataProgram,
@@ -114,7 +123,7 @@ const particleProgramInfo = {
 	},
 };
 
-const screenSpaceProgramInfo = {
+let screenSpaceProgramInfo = {
 	program: screenSpaceProgram,
 	attribLocations: {
 		vertexPosition: gl.getAttribLocation(screenSpaceProgram, "aVertexPosition"),
@@ -324,4 +333,24 @@ function createScreenFramebuffer(gl,size){
 		texture: screenTexture,
 		framebuffer: framebuffer,
 	}
+}
+
+function selectSSS(x){
+	if (x == 1){
+		screenSpaceProgram = screenSpaceProgram1
+	} else {
+		screenSpaceProgram = screenSpaceProgram2
+	}
+	screenSpaceProgramInfo = {
+		program: screenSpaceProgram,
+		attribLocations: {
+			vertexPosition: gl.getAttribLocation(screenSpaceProgram, "aVertexPosition"),
+		},
+		uniformLocations: {
+			framebufferTexture: gl.getUniformLocation(screenSpaceProgram, "uFbTexture"),
+			screenDimensions: gl.getUniformLocation(screenSpaceProgram, "uScreenDimensions"),
+			partColor: gl.getUniformLocation(screenSpaceProgram, "uPartColor"),
+		},
+	};
+	return 0;
 }

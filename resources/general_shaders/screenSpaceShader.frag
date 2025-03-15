@@ -159,6 +159,7 @@ void main() {
 	//RED
 	//vec3 finalOutCol = hsv2rgb(vec3(0.0+0.15*s,1.0-0.75*s*s,0.07+0.93*s));
 	vec3 finalOutCol = hsv2rgb(vec3(0.9+0.1*s,1.0-0.8*s*s,0.07+0.93*s));
+	//vec3 finalOutCol = hsv2rgb(vec3(0.95+0.18*s,1.0-0.8*s*s,0.09+0.90*s));
 	//vec3 finalOutCol = vec3(s,s*s*s*s,s*s*s*s*s);
 
 	//Blue

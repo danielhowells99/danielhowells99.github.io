@@ -161,7 +161,7 @@ gl.bindTexture(gl.TEXTURE_2D, freqTex);
 navigator.mediaDevices
   .getUserMedia({
 	  audio:{
-		  sampleRate: 44100,
+		  sampleRate: audioCtx.sampleRate,
 	  },
 	  video:false
   })
