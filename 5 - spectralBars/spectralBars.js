@@ -71,7 +71,7 @@ const screenSpaceProgramInfo = {
 	},
 };
 
-const audioCtx = new AudioContext();
+const audioCtx = new AudioContext({sampleRate: 44100});
 console.log("sample_rate: " + audioCtx.sampleRate)
 const analyser = audioCtx.createAnalyser()
 analyser.fftSize = 2048;

@@ -116,11 +116,11 @@ const screenSpaceProgramInfo = {
 	},
 };
 
-const audioCtx = new AudioContext();
+const audioCtx = new AudioContext({sampleRate: 44100});
 console.log("sample_rate: " + audioCtx.sampleRate)
 const analyser = audioCtx.createAnalyser()
 analyser.fftSize = 1024;
-analyser.smoothingTimeConstant = 0.7;
+analyser.smoothingTimeConstant = 0.65;
 
 let mic = null
 

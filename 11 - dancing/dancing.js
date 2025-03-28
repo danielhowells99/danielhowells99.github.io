@@ -142,7 +142,7 @@ let pt1 = textures.dataTexture1
 let pt2 = textures.dataTexture2
 
 //AUDIO CODE
-const audioCtx = new AudioContext();
+const audioCtx = new AudioContext({sampleRate: 44100});
 console.log("sample_rate: " + audioCtx.sampleRate)
 const analyser = audioCtx.createAnalyser()
 analyser.fftSize = 2048;
