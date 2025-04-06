@@ -5,13 +5,13 @@ import {prepare_textures_and_framebuffers} from "./prep-textures-framebuffers.js
 
 var canvas = document.querySelector("canvas");
 
-const gl = canvas.getContext("webgl");
+const gl = canvas.getContext("webgl",{preserveDrawingBuffer: true});
 const ext = gl.getExtension('OES_texture_float');
 if (!ext) {
 	alert('need OES_texture_float');
 }
 
-const SKIPS = 4.0;
+const SKIPS = 2.0;
 let scale = 1.0;
 let screenScale = 1.0;
 //let screenBuffer = createScreenFramebuffer(gl,scale);
@@ -208,7 +208,8 @@ function useMic(stream){
 
 			gl.useProgram(particleProgram);
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-			gl.clearColor(0.0,0.0,0.0,1.0);
+			gl.clearColor(0.0,0.0,0.01,1.0);
+			//render black rectangle over to sim fade out
 			gl.clear(gl.COLOR_BUFFER_BIT)
 			gl.viewport(0, 0, scale*gl.canvas.width, scale*gl.canvas.height);
 			gl.uniform1i(particleProgramInfo.uniformLocations.dataSampler, 0);

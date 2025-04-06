@@ -95,7 +95,7 @@ document.addEventListener("keypress", function onEvent(event) {
 const dataProgram = initShaderProgram(gl, 'shaders/updateDataTextures.vert', 'shaders/updateDataTextures.frag');
 const particleProgram = initShaderProgram(gl, 'shaders/renderParticles.vert', 'shaders/renderParticles.frag');
 const screenSpaceProgram1 = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader.frag');
-const screenSpaceProgram2 = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader2.frag');
+const screenSpaceProgram2 = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader5.frag');
 
 let screenSpaceProgram = screenSpaceProgram1
 

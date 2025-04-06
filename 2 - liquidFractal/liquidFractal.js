@@ -44,7 +44,7 @@ function main() {
 	});
 	
 	const liquidShaderProgram = initShaderProgram(gl, 'shaders/liquidShader.vert', 'shaders/liquidShader.frag');
-	const screenSpaceProgram = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader.frag');
+	const screenSpaceProgram = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader4.frag');
 	
 	const liquidShaderProgramInfo = {
 		program: liquidShaderProgram,
