@@ -48,7 +48,7 @@ void main() {
 	//float d = atan(z.y,z.x)/(6.283)+0.5;
 	//d = mod(cos(floor(d)*3.141592)*d,1.0);
 
-	vec4 myColor = vec4(vec3(1.0),d);
-	//vec4 myColor = vec4(hsv2rgb(vec3(d + 0.01,0.33-0.25*sin(6.28*d),0.67+0.25*sin(6.28*d))), 1.0); //GOOD!
+	//vec4 myColor = vec4(d,d,d,1.0);
+	vec4 myColor = vec4(hsv2rgb(vec3(d + 0.01,0.33-0.25*sin(6.28*d),0.67+0.25*sin(6.28*d))), 1.0); //GOOD!
 	gl_FragColor = myColor;
 }

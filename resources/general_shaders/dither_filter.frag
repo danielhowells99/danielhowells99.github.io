@@ -7,7 +7,7 @@ uniform vec2 uScreenDimensions;
 
 varying vec2 vTexPosition;
 
-const float DITHER_SIZE = 8.0;
+const float DITHER_SIZE = 4.0;
 const float NORMALIZE = DITHER_SIZE*DITHER_SIZE + 1.0;
 
 vec3 hsv2rgb(vec3 c)
@@ -65,13 +65,13 @@ void main() {
 	for (float i = 0.0;i<DITHER_SIZE;i++){
 		for (float j = 0.0;j<DITHER_SIZE;j++){
 			n += 1.0;
-			avgVal += texture2D(uFbTexture,cornerCoords + vec2(i*xInc,j*yInc)).w;
+			avgVal += texture2D(uFbTexture,cornerCoords + vec2(i*xInc,j*yInc)).x;
 		}
 	}
 	avgVal /= n;
 
 	pixelPos = mod(pixelPos,DITHER_SIZE);
-	if (avgVal > getThreshold(pixelPos)){
+	if (avgVal > getThreshold1(pixelPos)){
 		s = 1.0;
 	}
 	/*

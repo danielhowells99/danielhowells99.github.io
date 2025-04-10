@@ -74,7 +74,7 @@ void main() {
 	
 	
 	float outCol = 0.0;
-	outCol += texture2D(uFbTexture,accessCoords).w;
+	outCol += texture2D(uFbTexture,accessCoords).x;
 
 	/*
 	outCol += normConst*A0*texture2D(uFbTexture,accessCoords + vec2(-xInc,-yInc)).w; 
