@@ -180,18 +180,16 @@ function render() {
 		
 
 		gaussian5Filter.applyFilter(gl,screenBuffer2.texture,screenBuffer3.framebuffer)
-		affineFilter.setAffineTransform(gl,[0.95,0.95,0.95,1],[0.01,0.01,0.01,0.0])
+		affineFilter.setAffineTransform(gl,[0.99,0.99,0.99,1],[0.01,0.01,0.01,0.0])
 		affineFilter.applyFilter(gl,screenBuffer3.texture,screenBuffer2.framebuffer)
 
-		
-
-		maximumFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.texture,screenBuffer4.framebuffer)
+		maximumFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.texture,screenBuffer3.framebuffer)
 
 		affineFilter.setAffineTransform(gl,[1,1,1,1],[0.0,0.0,0.0,0.0])
-		affineFilter.applyFilter(gl,screenBuffer4.texture,screenBuffer2.framebuffer)
+		affineFilter.applyFilter(gl,screenBuffer3.texture,screenBuffer2.framebuffer)
 
 		//paintFilter.applyFilter(gl,screenBuffer2.texture,screenBuffer3.framebuffer)
-		gaussian5Filter.applyFilter(gl,screenBuffer4.texture,screenBuffer2.framebuffer)
+		//gaussian5Filter.applyFilter(gl,screenBuffer4.texture,screenBuffer2.framebuffer)
 		colourFilter.applyFilter(gl,screenBuffer2.texture,null)
 
 		gl.disable(gl.BLEND)	
