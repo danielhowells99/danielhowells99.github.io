@@ -1,5 +1,7 @@
-import {initShaderProgram} from "../libraries/my-shader-util.js";
+import {loadShader, initShaderProgram, loadTexture} from "../libraries/my-shader-util.js";
 import {prepare_textures_and_framebuffers} from "./prep-textures-framebuffers.js"
+import {getPostProcessingFilter,createScreenFramebuffer} from "../libraries/post-processing.js"
+import {initializeUserInput} from "../libraries/user-input.js"
 
 var canvas = document.querySelector("canvas");
 const gl = canvas.getContext("webgl");
@@ -17,13 +19,35 @@ let minCanvDim = 0.0;
 let aspectRatio = canvas.width/canvas.height;
 
 let sb_scale = 1.0;
-let screenBuffer = createScreenFramebuffer(gl,sb_scale);
+let screenBuffer1 = createScreenFramebuffer(gl,sb_scale);
+let screenBuffer2 = createScreenFramebuffer(gl,sb_scale);
+
+let userInput = initializeUserInput(canvas,false)
+
+document.addEventListener("keypress", function onEvent(event) {
+	if (event.key == "m" || event.key == "M"){
+		if(mic){
+			mic.connect(audioCtx.destination);
+		}
+	}
+});
+
+const affineFilter = getPostProcessingFilter(gl,"AFFINE")
+const gaussian3Filter = getPostProcessingFilter(gl,"GAUSSIAN3")
+const gaussian5Filter = getPostProcessingFilter(gl,"GAUSSIAN5")
+const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+const TransformFilter = getPostProcessingFilter(gl,"TRANSFORM")
+const maximumFilter = getPostProcessingFilter(gl,"MAXIMUM")
+const paintFilter = getPostProcessingFilter(gl,"PAINT8")
+const ditherFilter = getPostProcessingFilter(gl,"DITHER")
 
 function resizeCanvas() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	gl.viewport(0,0,canvas.width,canvas.height);
-	screenBuffer = createScreenFramebuffer(gl,sb_scale)
+	screenBuffer1 = createScreenFramebuffer(gl,sb_scale);
+	screenBuffer2 = createScreenFramebuffer(gl,sb_scale);
+	userInput = initializeUserInput(canvas,false)
 
 	minCanvDim = Math.min(canvas.width,canvas.height);
 	aspectRatio = canvas.width/canvas.height;
@@ -32,22 +56,9 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-let capFlag = 0;
-document.addEventListener("keypress", function onEvent(event) {
-	if (event.key == "p" || event.key == "P"){
-		capFlag = 1;
-	}
-	if (event.key == "m" || event.key == "M"){
-		if(mic){
-			mic.connect(audioCtx.destination);
-		}
-	}
-});
-
 //###################################################################
 
 const dataProgram = initShaderProgram(gl, 'shaders/frequencyStrip.vert', 'shaders/frequencyStrip.frag');
-const screenSpaceProgram = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader.frag');
 
 const dataProgramInfo = {
 	program: dataProgram,
@@ -56,18 +67,6 @@ const dataProgramInfo = {
 	},
 	uniformLocations: {
 		dataSampler: gl.getUniformLocation(dataProgram, "uDataSampler"),
-	},
-};
-
-const screenSpaceProgramInfo = {
-	program: screenSpaceProgram,
-	attribLocations: {
-		vertexPosition: gl.getAttribLocation(screenSpaceProgram, "aVertexPosition"),
-	},
-	uniformLocations: {
-		framebufferTexture: gl.getUniformLocation(screenSpaceProgram, "uFbTexture"),
-		screenDimensions: gl.getUniformLocation(screenSpaceProgram, "uScreenDimensions"),
-		partColor: gl.getUniformLocation(screenSpaceProgram, "uPartColor"),
 	},
 };
 
@@ -86,6 +85,7 @@ let micStream = null
 
 var {textures,framebuffers} = prepare_textures_and_framebuffers(gl,freqData)
 let freqTex = textures.dataTexture1;
+gl.useProgram(dataProgram)
 gl.activeTexture(gl.TEXTURE0);
 gl.bindTexture(gl.TEXTURE_2D, freqTex);
 gl.uniform1i(dataProgramInfo.uniformLocations.dataSampler, 0);
@@ -136,23 +136,17 @@ function useMic(stream){
 			//gl.bindTexture(gl.TEXTURE_2D, freqTex);
 			
 			gl.useProgram(dataProgram)
-			gl.bindFramebuffer(gl.FRAMEBUFFER,screenBuffer.framebuffer);
+			gl.bindFramebuffer(gl.FRAMEBUFFER,screenBuffer1.framebuffer);
 			gl.viewport(0, 0, canvas.width, canvas.height);
 			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 			//console.log(dataArray)
 
-			gl.useProgram(screenSpaceProgram)
-			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-			gl.viewport(0, 0, canvas.width, canvas.height);
-			gl.activeTexture(gl.TEXTURE3);
-			gl.bindTexture(gl.TEXTURE_2D, screenBuffer.texture);
-			gl.uniform1i(screenSpaceProgramInfo.uniformLocations.framebufferTexture, 3);
-			gl.uniform2fv(screenSpaceProgramInfo.uniformLocations.screenDimensions, [canvas.width, canvas.height]);
-			setPositionAttribute(gl, positionBuffer, screenSpaceProgramInfo) 
-			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+			//ditherFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
+			paintFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
+			colourFilter.applyFilter(gl,screenBuffer2.texture,null)
 
 			//-----
-			if (capFlag == 1){
+			if (userInput.cap_flag == 1){
 				console.log("saving picture")
 				var dataURL = gl.canvas.toDataURL("image/png");
 				var a = document.createElement('a');
@@ -160,7 +154,7 @@ function useMic(stream){
 				a.download = "picture.png";
 				document.body.appendChild(a);
 				a.click();
-				capFlag = 0;
+				userInput.cap_flag = 0;
 			}
 		}
 		requestAnimationFrame(render);
@@ -186,27 +180,4 @@ function setPositionAttribute(gl, buffer, programInfo) { //Sets verticies for re
 		offset,
 	);
 	gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
-}
-
-function createScreenFramebuffer(gl,size){
-	let screenTexture = gl.createTexture();
-	gl.bindTexture(gl.TEXTURE_2D, screenTexture);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size*canvas.width, size*canvas.height, 0, gl.RGBA,
-				gl.UNSIGNED_BYTE, new Uint8Array(size*size*canvas.width*canvas.height*4));
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-	var framebuffer = gl.createFramebuffer();
-	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, screenTexture, 0); // attach tex1
-	if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) { // check this will actually work
-		alert("this combination of attachments not supported");
-	}
-
-	return {
-		texture: screenTexture,
-		framebuffer: framebuffer,
-	}
 }

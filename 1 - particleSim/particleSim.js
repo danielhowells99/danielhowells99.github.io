@@ -16,10 +16,10 @@ if (!ext) {
 
 let scale = 1.0;
 let screenScale = 1.0;
-let screenBuffer1 = createScreenFramebuffer(gl,scale,name = "one");
-let screenBuffer2 = createScreenFramebuffer(gl,scale,name = "two");
-let screenBuffer3 = createScreenFramebuffer(gl,scale,name = "three");
-let screenBuffer4 = createScreenFramebuffer(gl,scale,name = "four");
+let screenBuffer1 = createScreenFramebuffer(gl,scale);
+let screenBuffer2 = createScreenFramebuffer(gl,scale);
+let screenBuffer3 = createScreenFramebuffer(gl,scale);
+let screenBuffer4 = createScreenFramebuffer(gl,scale);
 
 
 let userInput = initializeUserInput(canvas)
@@ -33,10 +33,10 @@ function resizeCanvas() {
 	canvas.width = displayWidth * screenScale;
 	canvas.height = displayHeight * screenScale;
 
-	screenBuffer1 = createScreenFramebuffer(gl,scale,name = "one");
-	screenBuffer2 = createScreenFramebuffer(gl,scale,name = "two");
-	screenBuffer3 = createScreenFramebuffer(gl,scale,name = "three");
-	screenBuffer4 = createScreenFramebuffer(gl,scale,name = "four");
+	screenBuffer1 = createScreenFramebuffer(gl,scale);
+	screenBuffer2 = createScreenFramebuffer(gl,scale);
+	screenBuffer3 = createScreenFramebuffer(gl,scale);
+	screenBuffer4 = createScreenFramebuffer(gl,scale);
 	userInput = initializeUserInput(canvas)
 	gl.viewport(0,0,canvas.width,canvas.height);
 }
@@ -89,8 +89,8 @@ const index_data = []
 for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
 	particle_data.push(0.4*(-1+Math.random()*2))
 	particle_data.push(0.4*(-1+Math.random()*2))
-	particle_data.push(0)
-	particle_data.push(0)
+	particle_data.push(0.8*(-1+Math.random()*2))
+	particle_data.push(0.8*(-1+Math.random()*2))
 	index_data.push(((i%particle_num_sqd)+0.5)/particle_num_sqd)
 	index_data.push((Math.floor(i/particle_num_sqd)+0.5)/particle_num_sqd)
 }
@@ -179,20 +179,23 @@ function render() {
 		gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 		
 
+		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer3.framebuffer);
+		gl.clearColor(0.0,0.0,0.0,1.0);
+		gl.clear(gl.COLOR_BUFFER_BIT)
 		gaussian5Filter.applyFilter(gl,screenBuffer2.texture,screenBuffer3.framebuffer)
-		affineFilter.setAffineTransform(gl,[0.99,0.99,0.99,1],[0.01,0.01,0.01,0.0])
+		gl.disable(gl.BLEND)	
+		affineFilter.setAffineTransform(gl,[0.97,0.97,0.97,1],[0.02,0.02,0.02,0.0])
 		affineFilter.applyFilter(gl,screenBuffer3.texture,screenBuffer2.framebuffer)
+		
 
 		maximumFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.texture,screenBuffer3.framebuffer)
-
-		affineFilter.setAffineTransform(gl,[1,1,1,1],[0.0,0.0,0.0,0.0])
+		gl.disable(gl.BLEND)
+		//affineFilter.setAffineTransform(gl,[1,1,1,1],[0.0,0.0,0.0,0.0])
 		affineFilter.applyFilter(gl,screenBuffer3.texture,screenBuffer2.framebuffer)
 
 		//paintFilter.applyFilter(gl,screenBuffer2.texture,screenBuffer3.framebuffer)
 		//gaussian5Filter.applyFilter(gl,screenBuffer4.texture,screenBuffer2.framebuffer)
-		colourFilter.applyFilter(gl,screenBuffer2.texture,null)
-
-		gl.disable(gl.BLEND)	
+		colourFilter.applyFilter(gl,screenBuffer3.texture,null)
 		
 		// swap which texture we are rendering from and to
 		var t = pt1;

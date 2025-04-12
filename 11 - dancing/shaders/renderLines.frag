@@ -3,7 +3,7 @@
 precision mediump float;
 
 varying float vVal;
-uniform float uLogFlag;
+uniform float uLogFlag; 
 
 vec3 hsv2rgb(vec3 c)
 {

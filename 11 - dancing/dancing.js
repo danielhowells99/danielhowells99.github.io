@@ -1,21 +1,41 @@
 import {loadShader, initShaderProgram, loadTexture} from "../libraries/my-shader-util.js";
 import {prepare_textures_and_framebuffers} from "./prep-textures-framebuffers.js"
+import {getPostProcessingFilter,createScreenFramebuffer} from "../libraries/post-processing.js"
+import {initializeUserInput} from "../libraries/user-input.js"
 
 //###---COMMON CODE---###
 
 var canvas = document.querySelector("canvas");
 
-const gl = canvas.getContext("webgl",{preserveDrawingBuffer: true});
+const gl = canvas.getContext("webgl");
 const ext = gl.getExtension('OES_texture_float');
 if (!ext) {
 	alert('need OES_texture_float');
 }
 
+const affineFilter = getPostProcessingFilter(gl,"AFFINE")
+const copyFilter = getPostProcessingFilter(gl,"COPY")
+const dilateFilter = getPostProcessingFilter(gl,"DILATE")
+const gaussian3Filter = getPostProcessingFilter(gl,"GAUSSIAN3")
+const gaussian5Filter = getPostProcessingFilter(gl,"GAUSSIAN5")
+const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+const transformFilter = getPostProcessingFilter(gl,"TRANSFORM")
+const maximumFilter = getPostProcessingFilter(gl,"MAXIMUM")
+const multiplyFilter = getPostProcessingFilter(gl,"MULTIPLY")
+const paintFilter = getPostProcessingFilter(gl,"PAINT8")
+const ditherFilter = getPostProcessingFilter(gl,"DITHER")
+const luminanceFilter = getPostProcessingFilter(gl,"LUMINANCE")
+
 const SKIPS = 2.0;
-let scale = 1.0;
+let scale = 2.0;
 let screenScale = 1.0;
-//let screenBuffer = createScreenFramebuffer(gl,scale);
+let screenBuffer1 = createScreenFramebuffer(gl,scale,gl.LINEAR);
+let screenBuffer2 = createScreenFramebuffer(gl,scale,gl.LINEAR);
+let screenBuffer3 = createScreenFramebuffer(gl,1.0,gl.LINEAR);
+let screenBuffer4 = createScreenFramebuffer(gl,1.0,gl.LINEAR);
 let aspectRatio = canvas.width/canvas.height;
+
+let userInput = initializeUserInput(canvas,false)
 
 function resizeCanvas() {
 	
@@ -25,19 +45,32 @@ function resizeCanvas() {
 	canvas.style.height = displayHeight + 'px';
 	canvas.width = displayWidth * screenScale;
 	canvas.height = displayHeight * screenScale;
+
+	screenBuffer1 = createScreenFramebuffer(gl,scale,gl.LINEAR);
+	screenBuffer2 = createScreenFramebuffer(gl,scale,gl.LINEAR);
+	screenBuffer3 = createScreenFramebuffer(gl,1.0,gl.LINEAR);
+	screenBuffer4 = createScreenFramebuffer(gl,1.0,gl.LINEAR);
+	aspectRatio = canvas.width/canvas.height;
+
+	userInput = initializeUserInput(canvas,false)
 	
 }
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-let mouse = {x: 0,y: 0}
-let mouseForce = 0.0;
-let mouseToggle = 0.0;
-let mouseStartTime = 0,mouseEndTime = 0;
-let capFlag = 0;
-let playFlag = 1.0;
 let logFlag = 0.0;
-setupUserInput()
+
+document.addEventListener("keypress", function onEvent(event) {
+	if (event.key == "l" || event.key == "L"){
+		logFlag = logFlag^1;
+	}
+	if (event.key == "m" || event.key == "M"){
+		if(mic){
+			audioCtx.resume()
+			mic.connect(audioCtx.destination);
+		}
+	}
+});
 
 //###################################################################
 
@@ -206,21 +239,38 @@ function useMic(stream){
 			setPositionAttribute(gl, positionBuffer, dataProgramInfo) 
 			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
+			let fadeCoeff = 0.999
+			affineFilter.setAffineTransform(gl,[fadeCoeff,fadeCoeff,fadeCoeff,1],[0.02,0.02,0.02,0.0])
+			//affineFilter.setAffineTransform(gl,[0.88,0.88,0.88,1])
+			affineFilter.applyFilter(gl,screenBuffer2.texture,screenBuffer1.framebuffer,scale)
+
 			gl.useProgram(particleProgram);
-			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-			gl.clearColor(0.0,0.0,0.01,1.0);
-			//render black rectangle over to sim fade out
-			gl.clear(gl.COLOR_BUFFER_BIT)
+			gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer1.framebuffer);
 			gl.viewport(0, 0, scale*gl.canvas.width, scale*gl.canvas.height);
 			gl.uniform1i(particleProgramInfo.uniformLocations.dataSampler, 0);
 			gl.uniform1i(particleProgramInfo.uniformLocations.freqSampler, 1);
 			gl.uniform1f(particleProgramInfo.uniformLocations.logFlag, logFlag);
 			setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
 			gl.enable(gl.BLEND)
+
 			gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA)
+			//gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE)
+
+
 			//gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 			gl.drawArrays(gl.LINES, 0, lacedIndicies.length/3);  
 			gl.disable(gl.BLEND)
+
+			copyFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer,scale)
+
+			gaussian3Filter.applyFilter(gl,screenBuffer2.texture,screenBuffer3.framebuffer)
+
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+			gl.clearColor(0.02,0.0,0.07,1.0);
+			gl.clear(gl.COLOR_BUFFER_BIT)
+
+			dilateFilter.applyFilter(gl,screenBuffer3.texture,null)
+			
 			
 			//console.log(lacedList);
 			
@@ -234,7 +284,7 @@ function useMic(stream){
 			
 			//END DRAW CODE
 
-			if (capFlag == 1){
+			if (userInput.cap_flag == 1){
 				console.log("saving picture")
 				var dataURL = gl.canvas.toDataURL("image/png");
 				var a = document.createElement('a');
@@ -242,7 +292,7 @@ function useMic(stream){
 				a.download = "picture.png";
 				document.body.appendChild(a);
 				a.click();
-				capFlag = 0;
+				userInput.cap_flag = 0;
 			}
 		}
 		requestAnimationFrame(render);
@@ -288,28 +338,6 @@ function setParticleIndexAttribute(gl, buffer, programInfo) { //Sets verticies f
 	gl.enableVertexAttribArray(programInfo.attribLocations.indexData);
 }
 
-function createScreenFramebuffer(gl,size){
-	let screenTexture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, screenTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size*canvas.width, size*canvas.height, 0, gl.RGBA,
-                gl.UNSIGNED_BYTE, new Uint8Array(size*size*canvas.width*canvas.height*4));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-	var framebuffer = gl.createFramebuffer();
-    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, screenTexture, 0); // attach tex1
-    if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) { // check this will actually work
-        alert("this combination of attachments not supported");
-    }
-
-	return {
-		texture: screenTexture,
-		framebuffer: framebuffer,
-	}
-}
 
 function createDataTexture(gl,freqData){
 	let dataTexture1 = gl.createTexture();
@@ -321,58 +349,6 @@ function createDataTexture(gl,freqData){
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	return dataTexture1;
-}
-
-function setupUserInput(){
-	
-	function isTouchDevice() {
-		return (('ontouchstart' in window) ||
-			(navigator.maxTouchPoints > 0) ||
-			(navigator.msMaxTouchPoints > 0));
-	}
-
-	if (isTouchDevice()){
-		ontouchmove = function(e){mouse = {x: screenScale*e.touches[0].clientX/canvas.width, y: 1-screenScale*e.touches[0].clientY/canvas.height};mouseForce = 1.0;audioCtx.resume();
-		}
-		ontouchstart = function(e){mouse = {x: screenScale*e.changedTouches[0].clientX/canvas.width, y: 1-screenScale*e.changedTouches[0].clientY/canvas.height};mouseForce = 1.0;}
-		ontouchend = function(e){mouse = {x: screenScale*e.changedTouches[0].clientX/canvas.width, y: 1-screenScale*e.changedTouches[0].clientY/canvas.height};mouseForce = 0.0;}
-	}
-
-	onmousemove = function(e){
-		mouse = {x: screenScale*e.clientX/canvas.width, y: 1-screenScale*e.clientY/canvas.height}; 
-	}
-	onmousedown = function(e){
-		mouseStartTime = new Date().getTime()
-		mouse = {x: screenScale*e.clientX/canvas.width, y: 1-screenScale*e.clientY/canvas.height}; 
-		mouseForce = 1.0;
-	}
-	onmouseup = function(e){
-		mouseEndTime = new Date().getTime()
-		mouse = {x: screenScale*e.clientX/canvas.width, y: 1-screenScale*e.clientY/canvas.height}; 
-		mouseForce = 0.0;
-	}
-
-	document.addEventListener("keypress", function onEvent(event) {
-		if (event.key == "p" || event.key == "P"){
-			capFlag = 1;
-		}
-		if (event.key == "a" || event.key == "A"){
-			playFlag = 0.0;
-		}
-		if (event.key == "d" || event.key == "D"){
-			playFlag = 1;
-		}
-		if (event.key == "l" || event.key == "L"){
-			logFlag = logFlag^1;
-		}
-		if (event.key == "m" || event.key == "M"){
-			if(mic){
-				audioCtx.resume()
-				mic.connect(audioCtx.destination);
-			}
-		}
-	});
-
 }
 
 function laceArrays2D(list){

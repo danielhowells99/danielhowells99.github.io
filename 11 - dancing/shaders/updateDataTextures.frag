@@ -29,27 +29,27 @@ void main() {
 	float boundaryY = boundaryFactor*transformVector.y;
 	
 	if (position.x >= boundaryX){
-		//position.x -= 2.0*(position.x-boundaryX);
-		//velocity.x *= -1.0;
-		position.x = -boundaryX;
+		position.x -= 2.0*(position.x-boundaryX);
+		velocity.x *= -1.0;
+		//position.x = -boundaryX;
 	}
 	
 	else if (position.x <= -boundaryX){
-		//position.x -= 2.0*(position.x+boundaryX);
-		//velocity.x *= -1.0;
-		position.x = boundaryX;
+		position.x -= 2.0*(position.x+boundaryX);
+		velocity.x *= -1.0;
+		//position.x = boundaryX;
 	}
 	
 	if (position.y >= boundaryY){
-		//position.y -= 2.0*(position.y-boundaryY);
-		//velocity.y *= -1.0;
-		position.y = -boundaryY;
+		position.y -= 2.0*(position.y-boundaryY);
+		velocity.y *= -1.0;
+		//position.y = -boundaryY;
 	}
 	
 	else if (position.y <= -boundaryY){
-		//position.y -= 2.0*(position.y+boundaryY);
-		//velocity.y *= -1.0;
-		position.y = boundaryY;
+		position.y -= 2.0*(position.y+boundaryY);
+		velocity.y *= -1.0;
+		//position.y = boundaryY;
 	}
 	
 	position /= transformVector;

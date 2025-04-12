@@ -25,18 +25,18 @@ void main() {
 	float xInc = 1.0/uScreenDimensions.x;
 	float yInc = 1.0/uScreenDimensions.y;
 
-	float val = 0.0;
-	val += A0*texture2D(uFbTexture,accessCoords + vec2(-xInc,-yInc)).x; 
-	val += A1*texture2D(uFbTexture,accessCoords + vec2(0.0,-yInc)).x;
-	val += A2*texture2D(uFbTexture,accessCoords + vec2(xInc,-yInc)).x;
+	vec3 val = vec3(0.0);
+	val += A0*texture2D(uFbTexture,accessCoords + vec2(-xInc,-yInc)).xyz; 
+	val += A1*texture2D(uFbTexture,accessCoords + vec2(0.0,-yInc)).xyz;
+	val += A2*texture2D(uFbTexture,accessCoords + vec2(xInc,-yInc)).xyz;
 	
-	val += A3*texture2D(uFbTexture,accessCoords + vec2(-xInc,0.0)).x;
-	val += A4*texture2D(uFbTexture,accessCoords).x;
-	val += A5*texture2D(uFbTexture,accessCoords + vec2(xInc,0.0)).x;
+	val += A3*texture2D(uFbTexture,accessCoords + vec2(-xInc,0.0)).xyz;
+	val += A4*texture2D(uFbTexture,accessCoords).xyz;
+	val += A5*texture2D(uFbTexture,accessCoords + vec2(xInc,0.0)).xyz;
 	
-	val += A6*texture2D(uFbTexture,accessCoords + vec2(-xInc,yInc)).x;
-	val += A7*texture2D(uFbTexture,accessCoords + vec2(0.0,yInc)).x;
-	val += A8*texture2D(uFbTexture,accessCoords + vec2(xInc,yInc)).x;
+	val += A6*texture2D(uFbTexture,accessCoords + vec2(-xInc,yInc)).xyz;
+	val += A7*texture2D(uFbTexture,accessCoords + vec2(0.0,yInc)).xyz;
+	val += A8*texture2D(uFbTexture,accessCoords + vec2(xInc,yInc)).xyz;
 	
 	gl_FragColor = vec4(normConst*vec3(val),1.0);
 }

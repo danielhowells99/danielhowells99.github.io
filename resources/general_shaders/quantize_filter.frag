@@ -4,15 +4,15 @@ precision mediump float;
 
 uniform sampler2D uFbTexture;
 uniform vec2 uScreenDimensions;
-
-uniform vec4 uSelectionVector;
-uniform vec4 uOutVector;
-uniform vec4 uOutConstant;
+uniform float uQuantizeLevel;
 
 varying vec2 vTexPosition;
 
 void main() {
 	vec2 accessCoords = vTexPosition;// + 0.5/uScreenDimensions;	
-	float val = dot(texture2D(uFbTexture,accessCoords),uSelectionVector);
-	gl_FragColor = val*uOutVector+uOutConstant;
+	float s = texture2D(uFbTexture,accessCoords).x;
+	
+	s = (1.0/uQuantizeLevel)*floor(uQuantizeLevel*s + 0.5);
+
+	gl_FragColor = vec4(vec3(s),1.0);
 }

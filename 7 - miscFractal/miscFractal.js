@@ -1,10 +1,12 @@
-import {initShaderProgram} from "../libraries/my-shader-util.js";
+import {loadShader, initShaderProgram, loadTexture} from "../libraries/my-shader-util.js";
+import {getPostProcessingFilter,createScreenFramebuffer} from "../libraries/post-processing.js"
+import {initializeUserInput} from "../libraries/user-input.js"
 
 let bgdCol = getComputedStyle(document.querySelector('body')).backgroundColor
 let parts = bgdCol.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 let partCol = [1-parts[1]/255,1-parts[2]/255,1-parts[3]/255]
 
-main();
+main();  
 function main() {
 
 	const canvas = document.querySelector("#glcanvas");
@@ -17,10 +19,22 @@ function main() {
 		return;
 	}
 
+	const affineFilter = getPostProcessingFilter(gl,"AFFINE")
+	const gaussian3Filter = getPostProcessingFilter(gl,"GAUSSIAN3")
+	const gaussian5Filter = getPostProcessingFilter(gl,"GAUSSIAN5")
+	const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+	const TransformFilter = getPostProcessingFilter(gl,"TRANSFORM")
+	const maximumFilter = getPostProcessingFilter(gl,"MAXIMUM")
+	const paintFilter = getPostProcessingFilter(gl,"PAINT8")
+	const ditherFilter = getPostProcessingFilter(gl,"DITHER")
+
+
 
 	let scale = 1.0;
 	let screenScale = 1.0;
-	let screenBuffer = createScreenFramebuffer(gl,scale);
+	let screenBuffer1 = createScreenFramebuffer(gl,scale,gl.LINEAR,"one");
+	//let screenBuffer2 = createScreenFramebuffer(gl,scale);
+	let userInput = initializeUserInput(canvas,true)
 
 	function resizeCanvas() {
 		let displayWidth = window.innerWidth;
@@ -30,64 +44,16 @@ function main() {
 		canvas.width = displayWidth;
 		canvas.height = displayHeight;
 		
-		screenBuffer = createScreenFramebuffer(gl,scale);
+		screenBuffer1 = createScreenFramebuffer(gl,scale,gl.LINEAR,"one");
+		//screenBuffer2 = createScreenFramebuffer(gl,scale);
+		userInput = initializeUserInput(canvas,true)
 		window.scrollTo(0,1)
 	}
 
 	window.addEventListener("resize", resizeCanvas);
 	resizeCanvas();
-
-	let capFlag = 0;
-	document.addEventListener("keypress", function onEvent(event) {
-		if (event.key == "p" || event.key == "P"){
-			capFlag = 1;
-		}
-	});
-	
-	let mouse = {x: 0,y: 0}
-	let mouseForce = 0.0;
-	let mouseToggle = 0.0
-
-	function isTouchDevice() {
-	return (('ontouchstart' in window) ||
-		(navigator.maxTouchPoints > 0) ||
-		(navigator.msMaxTouchPoints > 0));
-	}
-
-	if (isTouchDevice()){
-		ontouchmove = function(e){mouse = {x: screenScale*e.touches[0].clientX/canvas.width, y: 1-screenScale*e.touches[0].clientY/canvas.height};mouseForce = 1.0;}
-		ontouchstart = function(e){mouse = {x: screenScale*e.changedTouches[0].clientX/canvas.width, y: 1-screenScale*e.changedTouches[0].clientY/canvas.height};mouseForce = 1.0;}
-		ontouchend = function(e){mouse = {x: screenScale*e.changedTouches[0].clientX/canvas.width, y: 1-screenScale*e.changedTouches[0].clientY/canvas.height};mouseForce = 0.0;}
-	}
-
-	let mouseStartTime = 0,mouseEndTime = 0
-
-	onmousemove = function(e){
-		mouseForce = mouseToggle;
-		if (!mouseToggle){ 
-			mouse = {x: screenScale*e.clientX/canvas.width, y: 1-screenScale*e.clientY/canvas.height}; 
-		}
-	}
-	onmousedown = function(e){
-		
-		mouseStartTime = new Date().getTime()
-		mouseForce = 1.0*mouseToggle;
-		
-		}
-	onmouseup = function(e){
-		
-		mouseEndTime = new Date().getTime()
-		if (mouseEndTime-mouseStartTime < 500){
-			mouseToggle = mouseToggle^1; 
-		}
-		
-		mouse = {x: screenScale*e.clientX/canvas.width, y: 1-screenScale*e.clientY/canvas.height}; 
-		mouseForce = 1.0*mouseToggle;
-		}
-
 	
 	const liquidShaderProgram = initShaderProgram(gl, 'shaders/liquidShader.vert', 'shaders/liquidShader.frag');
-	const screenSpaceProgram = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/screenSpaceShader.frag');
 	
 	const liquidShaderProgramInfo = {
 		program: liquidShaderProgram,
@@ -100,18 +66,6 @@ function main() {
 			uSampler: gl.getUniformLocation(liquidShaderProgram, "uSampler"),
 			partColor: gl.getUniformLocation(liquidShaderProgram, "uPartColor"),
 			mouseLoc: gl.getUniformLocation(liquidShaderProgram, "uMouseLoc"),
-		},
-	};
-
-	const screenSpaceProgramInfo = {
-		program: screenSpaceProgram,
-		attribLocations: {
-			vertexPosition: gl.getAttribLocation(screenSpaceProgram, "aVertexPosition"),
-		},
-		uniformLocations: {
-			framebufferTexture: gl.getUniformLocation(screenSpaceProgram, "uFbTexture"),
-			screenDimensions: gl.getUniformLocation(screenSpaceProgram, "uScreenDimensions"),
-			partColor: gl.getUniformLocation(screenSpaceProgram, "uPartColor"),
 		},
 	};
 	
@@ -141,30 +95,22 @@ function main() {
 			liquidShaderProgramInfo.uniformLocations.partColor,
 			partCol,
 		);
-		gl.uniform2fv(liquidShaderProgramInfo.uniformLocations.mouseLoc,[(2.0*mouse.x-1.0),(2.0*mouse.y-1.0)]);
+		gl.uniform2fv(liquidShaderProgramInfo.uniformLocations.mouseLoc,[(2.0*userInput.mouse_location.x-1.0),(2.0*userInput.mouse_location.y-1.0)]);
 		
-		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer.framebuffer);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer1.framebuffer);
 		gl.viewport(0, 0, scale*canvas.width, scale*canvas.height);
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-		gl.useProgram(screenSpaceProgram)
-		gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-		gl.viewport(0, 0, canvas.width, canvas.height);
-		gl.activeTexture(gl.TEXTURE3);
-		gl.bindTexture(gl.TEXTURE_2D, screenBuffer.texture);
-		gl.uniform1i(screenSpaceProgramInfo.uniformLocations.framebufferTexture, 3);
-		gl.uniform2fv(screenSpaceProgramInfo.uniformLocations.screenDimensions, [canvas.width, canvas.height]);
-		setPositionAttribute(gl, positionBuffer, screenSpaceProgramInfo) 
-		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+		colourFilter.applyFilter(gl,screenBuffer1.texture,null)
 		
-		if (mouseForce){
+		if (userInput.mouse_force){
 			timeParam += 0.0002;
 		}
 		if (timeParam > 1.0){
 			timeParam = 0.0;
 		}
 
-		if (capFlag == 1){
+		if (userInput.cap_flag == 1){
 			console.log("saving picture")
 			var dataURL = gl.canvas.toDataURL("image/png");
 			var a = document.createElement('a');
@@ -172,36 +118,13 @@ function main() {
 			a.download = "picture.png";
 			document.body.appendChild(a);
 			a.click();
-			capFlag = 0;
+			userInput.cap_flag = 0;
 		}
 
 		requestAnimationFrame(render);
 	}
 
 	requestAnimationFrame(render);
-
-	function createScreenFramebuffer(gl,size){
-		let screenTexture = gl.createTexture();
-		gl.bindTexture(gl.TEXTURE_2D, screenTexture);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size*canvas.width, size*canvas.height, 0, gl.RGBA,
-					gl.UNSIGNED_BYTE, new Uint8Array(size*size*canvas.width*canvas.height*4));
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-	
-		var framebuffer = gl.createFramebuffer();
-		gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-		gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, screenTexture, 0); // attach tex1
-		if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) { // check this will actually work
-			alert("this combination of attachments not supported");
-		}
-	
-		return {
-			texture: screenTexture,
-			framebuffer: framebuffer,
-		}
-	}
 }
 
 function setPositionAttribute(gl, buffer, programInfo) {

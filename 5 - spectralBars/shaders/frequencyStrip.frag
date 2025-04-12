@@ -19,7 +19,9 @@ vec3 hsv2rgb(vec3 c)
 
 void main() {
 	//vec2 accessCoords = vec2(f(vTexPosition.x),vTexPosition.y);
-	vec2 accessCoords = vec2(vTexPosition.x,vTexPosition.y);
+	//vec2 modifier = vec2(sign(vTexPosition.x-0.5)*0.25*(vTexPosition.y-0.5)*(vTexPosition.y-0.5),0.0);
+	vec2 modifier = 0.01*vec2(sin(20.0*vTexPosition.y*(1.0-4.0*(vTexPosition.x-0.5)*(vTexPosition.x-0.5))),0.0);
+	vec2 accessCoords = vec2(vTexPosition.x,vTexPosition.y) + modifier;
 	float freqVal = texture2D(uDataSampler,accessCoords).x;
 	float freqVal2 = texture2D(uDataSampler,1.0-accessCoords).x;
 	float s = clamp(pow((freqVal + freqVal2),1.5),0.0,1.0);
@@ -27,5 +29,5 @@ void main() {
 	//gl_FragColor = vec4(freqVal,pow(0.5*(freqVal + freqVal2),1.3),freqVal2,1.0); //
 	//gl_FragColor = vec4(hsv2rgb(vec3(1.0-1.0*s,1.0-0.75*s,1.0*s)),1.0); //
 	//gl_FragColor = vec4(vec3(pow(freqVal,2.0)),1.0); //
-	gl_FragColor = vec4(vec3(1.0),s); //
+	gl_FragColor = vec4(vec3(s),1.0); //
 }

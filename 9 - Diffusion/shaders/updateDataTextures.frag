@@ -53,6 +53,6 @@ void main() {
 	
 	//float quantFactor = 5.0;
 	//s = (1.0/quantFactor)*floor(quantFactor*s + 0.5);
-	
-	gl_FragColor = vec4(1.0,1.0,1.0,pow(s,5.0));
+	float val = 1.4*pow(s,5.0);
+	gl_FragColor = vec4(vec3(val),1.0);
 }

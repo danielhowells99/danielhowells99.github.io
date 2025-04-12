@@ -16,7 +16,8 @@ if (!ext) {
 
 let scale = 1.0;
 let screenScale = 1.0;
-let screenBuffer = createScreenFramebuffer(gl,scale);
+let screenBuffer1 = createScreenFramebuffer(gl,scale);
+let screenBuffer2 = createScreenFramebuffer(gl,scale);
 let userInput = initializeUserInput(canvas)
 
 function resizeCanvas() {
@@ -28,7 +29,8 @@ function resizeCanvas() {
 	canvas.width = displayWidth * screenScale;
 	canvas.height = displayHeight * screenScale;
 
-	screenBuffer = createScreenFramebuffer(gl,scale);
+	screenBuffer1 = createScreenFramebuffer(gl,scale);
+	screenBuffer2 = createScreenFramebuffer(gl,scale);
 	userInput = initializeUserInput(canvas)
 	gl.viewport(0,0,canvas.width,canvas.height);
 }
@@ -65,7 +67,17 @@ const particleProgramInfo = {
 	},
 };
 
-const postFilter = getPostProcessingFilter(gl,"PASS_THROUGH")
+//####################################################################
+const affineFilter = getPostProcessingFilter(gl,"AFFINE")
+const quantizeFilter = getPostProcessingFilter(gl,"QUANTIZE")
+const gaussian3Filter = getPostProcessingFilter(gl,"GAUSSIAN3")
+const gaussian5Filter = getPostProcessingFilter(gl,"GAUSSIAN5")
+const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+const transformFilter = getPostProcessingFilter(gl,"TRANSFORM")
+const maximumFilter = getPostProcessingFilter(gl,"MAXIMUM")
+const paintFilter = getPostProcessingFilter(gl,"PAINT8")
+const ditherFilter = getPostProcessingFilter(gl,"DITHER")
+//###################################################################
 
 let aspectRatio = canvas.width/canvas.height;
 
@@ -172,7 +184,7 @@ function render() {
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
 		gl.useProgram(particleProgram);
-		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer.framebuffer);
+		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer1.framebuffer);
 
 		gl.clearColor(0.0,0.0,0.0,1.0);
 		gl.clear(gl.COLOR_BUFFER_BIT)
@@ -186,7 +198,11 @@ function render() {
 		gl.drawArrays(gl.LINES, 0, particle_num_sqd*particle_num_sqd);  
 		gl.disable(gl.BLEND)
 
-		postFilter.applyFilter(screenBuffer.texture,null)
+		//quantizeFilter.setQuantizationLevel(gl,4.0)
+		//quantizeFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
+		//paintFilter.applyFilter(gl,screenBuffer2.texture,screenBuffer1.framebuffer)
+		//gaussian5Filter.applyFilter(gl,screenBuffer2.texture,screenBuffer1.framebuffer)
+		colourFilter.applyFilter(gl,screenBuffer1.texture,null)
 		
 		// swap which texture we are rendering from and to
 		var t = pt1;

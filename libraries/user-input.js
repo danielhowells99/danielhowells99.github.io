@@ -10,7 +10,7 @@ function initializeUserInput(canvas,toggle_behavior = true){
         mouse_location: {x: 0,y:0},
         mouse_force: 0.0,
         cap_flag: 0.0,
-        play_flag: 0.0,
+        play_flag: 1.0,
         mouse_toggle_flag: 0.0,
         mouse_start_time: 0.0,
         mouse_end_time: 0.0
@@ -58,7 +58,7 @@ function initializeUserInput(canvas,toggle_behavior = true){
                 userInput.mouse_toggle_flag = userInput.mouse_toggle_flag^1; 
             }
             userInput.mouse_location = {x: screenScale*e.clientX/width, y: 1-screenScale*e.clientY/height}; 
-            userInput.mouse_force = 0.0;
+            userInput.mouse_force = userInput.mouse_toggle_flag;
         }
     }
 

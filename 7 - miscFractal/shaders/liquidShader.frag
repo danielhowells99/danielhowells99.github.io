@@ -56,6 +56,6 @@ void main() {
 	d = 2.0*fract(cos(3.141592*floor(2.0*d))*d);
 	*/
 
-	vec4 myColor = vec4(vec3(1.0),d);
+	vec4 myColor = vec4(vec3(d),1.0);
 	gl_FragColor = myColor;
 }

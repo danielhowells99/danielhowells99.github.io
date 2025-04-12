@@ -10,6 +10,6 @@ varying vec2 vTexPosition;
 
 void main() {
 	vec2 accessCoords = vTexPosition;// + 0.5/uScreenDimensions;
-	vec3 val = max(texture2D(uFbTexture1,accessCoords).xyz,texture2D(uFbTexture2,accessCoords).xyz);
-	gl_FragColor = vec4(val,1.0);
+	vec4 val = texture2D(uFbTexture1,accessCoords)*texture2D(uFbTexture2,accessCoords);
+	gl_FragColor = val;
 }

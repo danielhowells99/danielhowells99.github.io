@@ -11,5 +11,6 @@ varying vec2 vTexPosition;
 
 void main() {
 	vec2 accessCoords = vTexPosition;// + 0.5/uScreenDimensions;	
-	gl_FragColor = texture2D(uFbTexture,accessCoords)*uScaleVector - uShiftVector;
+	vec4 texVal = texture2D(uFbTexture,accessCoords);
+	gl_FragColor = texVal*uScaleVector - uShiftVector*vec4(normalize(texVal.xyz),1.0);
 }

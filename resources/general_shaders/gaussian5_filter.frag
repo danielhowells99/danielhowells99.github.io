@@ -7,7 +7,6 @@ uniform vec2 uScreenDimensions;
 
 varying vec2 vTexPosition;
 
-
 //-------------------
 const float B00 = 1.0;
 const float B01 = 2.0;
@@ -46,39 +45,39 @@ void main() {
 	float xInc = 1.0/uScreenDimensions.x;
 	float yInc = 1.0/uScreenDimensions.y;
 	
-	float outCol = 0.0;
+	vec3 outCol = vec3(0.0);
 	
-	outCol += B00*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,-2.0*yInc)).x; 
-	outCol += B01*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,-2.0*yInc)).x; 
-	outCol += B02*texture2D(uFbTexture,accessCoords + vec2(0.0,-2.0*yInc)).x; 
-	outCol += B03*texture2D(uFbTexture,accessCoords + vec2(1.0*xInc,-2.0*yInc)).x; 
-	outCol += B04*texture2D(uFbTexture,accessCoords + vec2(2.0*xInc,-2.0*yInc)).x; 
+	outCol += B00*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,-2.0*yInc)).xyz; 
+	outCol += B01*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,-2.0*yInc)).xyz; 
+	outCol += B02*texture2D(uFbTexture,accessCoords + vec2(0.0,-2.0*yInc)).xyz; 
+	outCol += B03*texture2D(uFbTexture,accessCoords + vec2(1.0*xInc,-2.0*yInc)).xyz; 
+	outCol += B04*texture2D(uFbTexture,accessCoords + vec2(2.0*xInc,-2.0*yInc)).xyz; 
 	
-	outCol += B10*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,-1.0*yInc)).x; 
-	outCol += B11*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,-1.0*yInc)).x; 
-	outCol += B12*texture2D(uFbTexture,accessCoords + vec2(0.0,-1.0*yInc)).x; 
-	outCol += B13*texture2D(uFbTexture,accessCoords + vec2(1.0*xInc,-1.0*yInc)).x; 
-	outCol += B14*texture2D(uFbTexture,accessCoords + vec2(2.0*xInc,-1.0*yInc)).x; 
+	outCol += B10*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,-1.0*yInc)).xyz; 
+	outCol += B11*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,-1.0*yInc)).xyz; 
+	outCol += B12*texture2D(uFbTexture,accessCoords + vec2(0.0,-1.0*yInc)).xyz; 
+	outCol += B13*texture2D(uFbTexture,accessCoords + vec2(1.0*xInc,-1.0*yInc)).xyz; 
+	outCol += B14*texture2D(uFbTexture,accessCoords + vec2(2.0*xInc,-1.0*yInc)).xyz; 
 	
-	outCol += B20*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,0.0)).x; 
-	outCol += B21*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,0.0)).x; 
-	outCol += B22*texture2D(uFbTexture,accessCoords).x;
-	outCol += B23*texture2D(uFbTexture,accessCoords + vec2(1.0*xInc,0.0)).x; 
-	outCol += B24*texture2D(uFbTexture,accessCoords + vec2(2.0*xInc,0.0)).x; 
+	outCol += B20*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,0.0)).xyz; 
+	outCol += B21*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,0.0)).xyz; 
+	outCol += B22*texture2D(uFbTexture,accessCoords).xyz;
+	outCol += B23*texture2D(uFbTexture,accessCoords + vec2(1.0*xInc,0.0)).xyz; 
+	outCol += B24*texture2D(uFbTexture,accessCoords + vec2(2.0*xInc,0.0)).xyz; 
 	
-	outCol += B30*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,1.0*yInc)).x; 
-	outCol += B31*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,1.0*yInc)).x; 
-	outCol += B32*texture2D(uFbTexture,accessCoords + vec2(0.0,1.0*yInc)).x; 
-	outCol += B33*texture2D(uFbTexture,accessCoords + vec2(1.0*xInc,1.0*yInc)).x; 
-	outCol += B34*texture2D(uFbTexture,accessCoords + vec2(2.0*xInc,1.0*yInc)).x; 
+	outCol += B30*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,1.0*yInc)).xyz; 
+	outCol += B31*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,1.0*yInc)).xyz; 
+	outCol += B32*texture2D(uFbTexture,accessCoords + vec2(0.0,1.0*yInc)).xyz; 
+	outCol += B33*texture2D(uFbTexture,accessCoords + vec2(1.0*xInc,1.0*yInc)).xyz; 
+	outCol += B34*texture2D(uFbTexture,accessCoords + vec2(2.0*xInc,1.0*yInc)).xyz; 
 	
-	outCol += B40*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,2.0*yInc)).x; 
-	outCol += B41*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,2.0*yInc)).x; 
-	outCol += B42*texture2D(uFbTexture,accessCoords + vec2(0.0,2.0*yInc)).x; 
-	outCol += B43*texture2D(uFbTexture,accessCoords + vec2(1.0*xInc,2.0*yInc)).x; 
-	outCol += B44*texture2D(uFbTexture,accessCoords + vec2(2.0*xInc,2.0*yInc)).x; 
+	outCol += B40*texture2D(uFbTexture,accessCoords + vec2(-2.0*xInc,2.0*yInc)).xyz; 
+	outCol += B41*texture2D(uFbTexture,accessCoords + vec2(-1.0*xInc,2.0*yInc)).xyz; 
+	outCol += B42*texture2D(uFbTexture,accessCoords + vec2(0.0,2.0*yInc)).xyz; 
+	outCol += B43*texture2D(uFbTexture,accessCoords + vec2(1.0*xInc,2.0*yInc)).xyz; 
+	outCol += B44*texture2D(uFbTexture,accessCoords + vec2(2.0*xInc,2.0*yInc)).xyz; 
 	
 	
-	float s = norm2*outCol;
-	gl_FragColor = vec4(vec3(s),1.0);
+	vec3 s = norm2*outCol;
+	gl_FragColor = vec4(s,1.0);
 }

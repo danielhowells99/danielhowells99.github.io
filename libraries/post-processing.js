@@ -6,11 +6,17 @@ function getPostProcessingFilter(gl,name){
         case "COLOUR":
             filter = new ColourFilter(gl,"COLOUR")
             return filter
+        case "COPY":
+            filter = new CopyFilter(gl,"COPY")
+            return filter
         case "AFFINE":
             filter = new AffineFilter(gl,"AFFINE")
             return filter
         case "TRANSFORM":
             filter = new TransformFilter(gl,"TRANSFORM")
+            return filter
+        case "QUANTIZE":
+            filter = new QuantizeFilter(gl,"QUANTIZE")
             return filter
         case "GAUSSIAN3":
             filter = new Gaussian3(gl,"GAUSSIAN3")
@@ -27,22 +33,31 @@ function getPostProcessingFilter(gl,name){
         case "DITHER":
             filter = new Dither(gl,"DITHER")
             return filter
+        case "DILATE":
+            filter = new Dilate(gl,"DILATE")
+            return filter
+        case "LUMINANCE":
+            filter = new Luminance(gl,"DILATE")
+            return filter
         case "MAXIMUM":
             filter = new MaximumFilter(gl,"MAXIMUM")
             return filter
+        case "MULTIPLY":
+            filter = new MultiplyFilter(gl,"MULTIPLY")
+            return filter
         default: 
-            console.log("getPostProcessingFilter() - invalid filter name")
+            console.log(`getPostProcessingFilter("${name}") - invalid filter name`)
             return filter;
     }
 }
 
-function createScreenFramebuffer(gl,size,name = "default"){
+function createScreenFramebuffer(gl,size,sampling = gl.LINEAR,name = "default"){
 	let screenTexture = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, screenTexture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size*gl.canvas.width, size*gl.canvas.height, 0, gl.RGBA,
                 gl.UNSIGNED_BYTE, new Uint8Array(size*size*gl.canvas.width*gl.canvas.height*4));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, sampling);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, sampling);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
@@ -57,6 +72,8 @@ function createScreenFramebuffer(gl,size,name = "default"){
 		texture: screenTexture,
 		framebuffer: framebuffer,
         name: name,
+        width: size*gl.canvas.width,
+        height: size*gl.canvas.height,
 	}
 }
 
@@ -95,10 +112,10 @@ class UnitaryFilter extends PostProcessingFilter{
         super(gl,name)
     }
 
-    applyFilter(gl,source_texture,dest_framebuffer){
+    applyFilter(gl,source_texture,dest_framebuffer,scale = 1.0){
         gl.useProgram(this.program)
         gl.bindFramebuffer(gl.FRAMEBUFFER, dest_framebuffer);
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        gl.viewport(0, 0, scale*gl.canvas.width, scale*gl.canvas.height);
         gl.activeTexture(gl.TEXTURE7);
         gl.bindTexture(gl.TEXTURE_2D, source_texture);
         gl.uniform1i(this.program_info.uniformLocations.framebuffer_texture, 7);
@@ -197,6 +214,68 @@ class AffineFilter extends UnitaryFilter{
         gl.uniform4fv(this.program_info.uniformLocations.scale_vector,scale_vector);
         gl.uniform4fv(this.program_info.uniformLocations.shift_vector,shift_vector);
     }
+
+    setPassThrough(gl){
+        this.setAffineTransform(gl)
+    }
+}
+
+class CopyFilter extends UnitaryFilter{
+
+    constructor(gl,name){
+        super(gl,name)
+        const shader = this.getAffineFilter(gl)
+        this.program = shader.program
+        this.program_info = shader.program_info
+        this.scale_vector = [1,1,1,1];
+        this.shift_vector = [0,0,0,0];
+    }
+
+    getAffineFilter(gl){
+        const program = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/copy_filter.frag');
+        const program_info = {
+            program: program,
+            attribLocations: {
+                vertex_position: gl.getAttribLocation(program, "aVertexPosition"),
+            },
+            uniformLocations: {
+                framebuffer_texture: gl.getUniformLocation(program, "uFbTexture"),
+            },
+        };
+        return {program: program, program_info: program_info};
+    }
+}
+
+class QuantizeFilter extends UnitaryFilter{
+
+    constructor(gl,name){
+        super(gl,name)
+        const shader = this.getQuantizeFilter(gl)
+        this.program = shader.program
+        this.program_info = shader.program_info
+        this.quantization_level = 16;
+    }
+
+    getQuantizeFilter(gl){
+        const program = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/quantize_filter.frag');
+        const program_info = {
+            program: program,
+            attribLocations: {
+                vertex_position: gl.getAttribLocation(program, "aVertexPosition"),
+            },
+            uniformLocations: {
+                framebuffer_texture: gl.getUniformLocation(program, "uFbTexture"),
+                screen_dimensions: gl.getUniformLocation(program, "uScreenDimensions"),
+                quantization_level: gl.getUniformLocation(program, "uQuantizeLevel"),
+            },
+        };
+        return {program: program, program_info: program_info};
+    }
+    setQuantizationLevel(gl,quantization_level = 16.0){
+        this.quantization_level = quantization_level
+        gl.useProgram(this.program)
+        gl.uniform1f(this.program_info.uniformLocations.quantization_level,quantization_level);
+    }
 }
 
 class TransformFilter extends UnitaryFilter{
@@ -208,6 +287,7 @@ class TransformFilter extends UnitaryFilter{
         this.program_info = shader.program_info
         this.selection_vector = [1.0,0.0,0.0,0.0]
         this.out_vector = [0.0,0.0,0.0,1.0]
+        this.out_constant = [0.0,0.0,0.0,0.0]
     }
 
     getTransformFilter(gl){
@@ -222,17 +302,20 @@ class TransformFilter extends UnitaryFilter{
                 screen_dimensions: gl.getUniformLocation(program, "uScreenDimensions"),
                 selection_vector: gl.getUniformLocation(program, "uSelectionVector"),
                 out_vector: gl.getUniformLocation(program, "uOutVector"),
+                out_constant: gl.getUniformLocation(program, "uOutConstant"),
             },
         };
         return {program: program, program_info: program_info};
     }
 
-    setTransform(gl,selection_vector,out_vector){
+    setTransform(gl,selection_vector,out_vector,out_constant = [0,0,0,0]){
         this.selection_vector = selection_vector
         this.out_vector = out_vector
+        this.out_constant = out_constant
         gl.useProgram(this.program)
         gl.uniform4fv(this.program_info.uniformLocations.selection_vector,selection_vector)
         gl.uniform4fv(this.program_info.uniformLocations.out_vector,out_vector)
+        gl.uniform4fv(this.program_info.uniformLocations.out_constant,out_constant)
     }
 }
 
@@ -361,6 +444,56 @@ class Dither extends UnitaryFilter{
     }
 }
 
+class Dilate extends UnitaryFilter{
+
+    constructor(gl,name){
+        super(gl,name)
+        const shader = this.getDilateFilter(gl)
+        this.program = shader.program
+        this.program_info = shader.program_info
+    }
+
+    getDilateFilter(gl){
+        const program = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/dilate_filter.frag');
+        const program_info = {
+            program: program,
+            attribLocations: {
+                vertex_position: gl.getAttribLocation(program, "aVertexPosition"),
+            },
+            uniformLocations: {
+                framebuffer_texture: gl.getUniformLocation(program, "uFbTexture"),
+                screen_dimensions: gl.getUniformLocation(program, "uScreenDimensions"),
+            },
+        };
+        return {program: program, program_info: program_info};
+    }
+}
+
+class Luminance extends UnitaryFilter{
+
+    constructor(gl,name){
+        super(gl,name)
+        const shader = this.getLuminanceFilter(gl)
+        this.program = shader.program
+        this.program_info = shader.program_info
+    }
+
+    getLuminanceFilter(gl){
+        const program = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/luminance_filter.frag');
+        const program_info = {
+            program: program,
+            attribLocations: {
+                vertex_position: gl.getAttribLocation(program, "aVertexPosition"),
+            },
+            uniformLocations: {
+                framebuffer_texture: gl.getUniformLocation(program, "uFbTexture"),
+                screen_dimensions: gl.getUniformLocation(program, "uScreenDimensions"),
+            },
+        };
+        return {program: program, program_info: program_info};
+    }
+}
+
 class MaximumFilter extends BinaryFilter{
 
     constructor(gl,name){
@@ -372,6 +505,32 @@ class MaximumFilter extends BinaryFilter{
 
     getMaximumFilter(gl){
         const program = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/maximum_filter.frag');
+        const program_info = {
+            program: program,
+            attribLocations: {
+                vertex_position: gl.getAttribLocation(program, "aVertexPosition"),
+            },
+            uniformLocations: {
+                framebuffer_texture1: gl.getUniformLocation(program, "uFbTexture1"),
+                framebuffer_texture2: gl.getUniformLocation(program, "uFbTexture2"),
+                screen_dimensions: gl.getUniformLocation(program, "uScreenDimensions"),
+            },
+        };
+        return {program: program, program_info: program_info};
+    }
+}
+
+class MultiplyFilter extends BinaryFilter{
+
+    constructor(gl,name){
+        super(gl,name)
+        const shader = this.getMultiplyFilter(gl)
+        this.program = shader.program
+        this.program_info = shader.program_info
+    }
+
+    getMultiplyFilter(gl){
+        const program = initShaderProgram(gl, '../resources/general_shaders/screenSpaceShader.vert', '../resources/general_shaders/multiply_filter.frag');
         const program_info = {
             program: program,
             attribLocations: {

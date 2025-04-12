@@ -40,10 +40,10 @@ void main() {
 	vec4 outColour = vec4(0.0);
 	if (uLogSelect > 0){
 		//outColour = vec4(hsv2rgb(vec3(1.0-1.0*s*s,1.0-1.0*s*s,1.4*s*s)),1.0); //
-		outColour = vec4(vec3(1.0),s*s);
+		outColour = vec4(vec3(s*s),1.0);
 	} else {
 		//outColour = vec4(hsv2rgb(vec3(1.0-1.0*s,1.0-1.0*s,1.5*s)).xyz,1.0); //
-		outColour = vec4(vec3(1.0),s);
+		outColour = vec4(s,s,s,1.0);
 	}
 
 	gl_FragColor = outColour;

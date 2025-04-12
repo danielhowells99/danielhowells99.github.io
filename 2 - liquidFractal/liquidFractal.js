@@ -13,7 +13,8 @@ if (gl === null) {
 
 
 let scale = 1.0;
-let screenBuffer = createScreenFramebuffer(gl,scale);
+let screenBuffer1 = createScreenFramebuffer(gl,scale);
+let screenBuffer2 = createScreenFramebuffer(gl,scale);
 let userInput = initializeUserInput(canvas)
 
 function resizeCanvas() {
@@ -24,7 +25,8 @@ function resizeCanvas() {
 	canvas.width = displayWidth;
 	canvas.height = displayHeight;
 	
-	screenBuffer = createScreenFramebuffer(gl,scale);
+	screenBuffer1 = createScreenFramebuffer(gl,scale);
+	screenBuffer2 = createScreenFramebuffer(gl,scale);
 	userInput = initializeUserInput(canvas)
 	window.scrollTo(0,1)
 }
@@ -32,7 +34,12 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-const postFilter = getPostProcessingFilter(gl,"PASS_THROUGH")
+//const affineFilter = getPostProcessingFilter(gl,"AFFINE")
+const paintFilter = getPostProcessingFilter(gl,"PAINT4")
+const gaussianFilter = getPostProcessingFilter(gl,"GAUSSIAN5")
+const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+const ditherFilter = getPostProcessingFilter(gl,"DITHER")
+//affineFilter.setPassThrough(gl)
 
 const liquidShaderProgram = initShaderProgram(gl, 'shaders/liquidShader.vert', 'shaders/liquidShader.frag');
 
@@ -71,11 +78,16 @@ function render() {
 		aspect,
 	);
 	
-	gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer.framebuffer);
+	gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer1.framebuffer);
 	gl.viewport(0, 0, scale*canvas.width, scale*canvas.height);
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-	postFilter.applyFilter(screenBuffer.texture,null)
+
+	ditherFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
+	gaussianFilter.applyFilter(gl,screenBuffer2.texture,screenBuffer1.framebuffer)
+	//paintFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
+	colourFilter.applyFilter(gl,screenBuffer1.texture,null)
+	
 	
 	timeParam += 0.0004;
 	if (timeParam > 2.0){
