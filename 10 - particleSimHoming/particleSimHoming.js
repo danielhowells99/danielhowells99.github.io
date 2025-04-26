@@ -17,7 +17,7 @@ if (!ext) {
 let scale = 1.0;
 let screenScale = 1.0;
 let screenBuffer1 = createScreenFramebuffer(gl,scale);
-let screenBuffer2 = createScreenFramebuffer(gl,scale);
+//let screenBuffer2 = createScreenFramebuffer(gl,scale);
 let userInput = initializeUserInput(canvas)
 
 function resizeCanvas() {
@@ -30,7 +30,7 @@ function resizeCanvas() {
 	canvas.height = displayHeight * screenScale;
 
 	screenBuffer1 = createScreenFramebuffer(gl,scale);
-	screenBuffer2 = createScreenFramebuffer(gl,scale);
+	//screenBuffer2 = createScreenFramebuffer(gl,scale);
 	userInput = initializeUserInput(canvas)
 	gl.viewport(0,0,canvas.width,canvas.height);
 }
@@ -68,15 +68,18 @@ const particleProgramInfo = {
 };
 
 //####################################################################
+const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+/*
 const affineFilter = getPostProcessingFilter(gl,"AFFINE")
 const quantizeFilter = getPostProcessingFilter(gl,"QUANTIZE")
 const gaussian3Filter = getPostProcessingFilter(gl,"GAUSSIAN3")
 const gaussian5Filter = getPostProcessingFilter(gl,"GAUSSIAN5")
-const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+
 const transformFilter = getPostProcessingFilter(gl,"TRANSFORM")
 const maximumFilter = getPostProcessingFilter(gl,"MAXIMUM")
 const paintFilter = getPostProcessingFilter(gl,"PAINT8")
 const ditherFilter = getPostProcessingFilter(gl,"DITHER")
+*/
 //###################################################################
 
 let aspectRatio = canvas.width/canvas.height;

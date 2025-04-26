@@ -2,6 +2,7 @@ import {loadShader, initShaderProgram, loadTexture} from "../libraries/my-shader
 import {prepare_textures_and_framebuffers} from "./prep-textures-framebuffers.js"
 import {getPostProcessingFilter,createScreenFramebuffer} from "../libraries/post-processing.js"
 import {initializeUserInput} from "../libraries/user-input.js"
+import {MelFilter} from "../libraries/sound-processing.js";
 
 //###---COMMON CODE---###
 
@@ -96,6 +97,7 @@ const particleProgramInfo = {
 		dataSampler: gl.getUniformLocation(particleProgram, "uDataSampler"),
 		freqSampler: gl.getUniformLocation(particleProgram, "uFreqSampler"),
 		logFlag: gl.getUniformLocation(particleProgram, "uLogFlag"),
+		freqStatistic: gl.getUniformLocation(particleProgram,"uFreqStat"),
 	},
 };
 
@@ -110,6 +112,7 @@ let startTime = new Date().getTime();
 const frameLimit = 90; // PAL/NTSC TV?
 
 const average = list => list.reduce((prev, curr) => prev + curr) / list.length;
+const sum = list => list.reduce((prev, curr) => prev + curr);
 let timesList = [];
 
 const particle_num_sqd = 11;
@@ -179,17 +182,21 @@ const audioCtx = new AudioContext({sampleRate: 44100});
 console.log("sample_rate: " + audioCtx.sampleRate)
 const analyser = audioCtx.createAnalyser()
 analyser.fftSize = 1024;
-analyser.smoothingTimeConstant = 0.7;
+analyser.smoothingTimeConstant = 0.6;
 
 let mic = null
 
 const bufferLength = analyser.frequencyBinCount;
+console.log(bufferLength)
 const freqData = new Uint8Array(bufferLength);
 analyser.getByteTimeDomainData(freqData);
 
 let freqTex = createDataTexture(gl,freqData);
 gl.activeTexture(gl.TEXTURE1);
 gl.bindTexture(gl.TEXTURE_2D, freqTex);
+
+let melFilter = new MelFilter(audioCtx.sampleRate,analyser.fftSize,128)
+let melTex = melFilter.getFreqTex(gl)
 
 navigator.mediaDevices
   .getUserMedia({
@@ -212,6 +219,9 @@ function useMic(stream){
 	const frameLimit = 60; // PAL/NTSC TV?
 	const minDelta = 1.0/frameLimit;
 	let frames = 0.0;
+	let freqStatistic = 0.0;
+
+	logFlag = 1.0
 
 	function render() {
 		
@@ -221,13 +231,35 @@ function useMic(stream){
 		//console.log(lacedIndicies);
 		
 		if (delayMilliseconds > 1.0/frameLimit){ //THROTTLE FRAMERATE
+
+			frames++;
 			
 			startTime = endTime
 			analyser.getByteFrequencyData(freqData)
 			gl.activeTexture(gl.TEXTURE1);
-			gl.bindTexture(gl.TEXTURE_2D, freqTex);
-			gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, freqData.length, 1, 0, gl.LUMINANCE,
-				gl.UNSIGNED_BYTE, new Uint8Array(freqData));
+			if (logFlag > 0){
+				console.log("1:\n"+freqData)
+				//let dbs = freqData.map(x => (-100 + (x/255)*(-30+100)))
+				let dbs = new Float32Array(freqData)
+				dbs = dbs.map(x => (-100 + (x/255)*(-30+100)))
+				console.log("2:\n"+dbs)
+				melTex = melFilter.updateFreqTex(gl,dbs)
+				gl.bindTexture(gl.TEXTURE_2D,melTex)
+			} else {
+				gl.bindTexture(gl.TEXTURE_2D, freqTex);
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, freqData.length, 1, 0, gl.LUMINANCE,
+					gl.UNSIGNED_BYTE, new Uint8Array(freqData));
+			}
+			/*
+			if (frames%2 == 0){
+				//let maxInterval = Math.max(...freqData,100)
+				let sumInterval = Math.max(sum(freqData)/256,0)
+				//freqStatistic = freqStatistic + 0.9*(maxInterval-freqStatistic)
+				//freqStatistic = freqStatistic + 0.9*(sumInterval-freqStatistic)
+				freqStatistic = sumInterval
+				console.log(freqStatistic)
+			}
+			*/
 
 			gl.useProgram(dataProgram);
 			gl.activeTexture(gl.TEXTURE0);
@@ -238,18 +270,22 @@ function useMic(stream){
 			gl.uniform1f(dataProgramInfo.uniformLocations.aspect,canvas.width/canvas.height);
 			setPositionAttribute(gl, positionBuffer, dataProgramInfo) 
 			gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-			let fadeCoeff = 0.999
+			
+			let fadeCoeff = 0.95
 			affineFilter.setAffineTransform(gl,[fadeCoeff,fadeCoeff,fadeCoeff,1],[0.02,0.02,0.02,0.0])
 			//affineFilter.setAffineTransform(gl,[0.88,0.88,0.88,1])
 			affineFilter.applyFilter(gl,screenBuffer2.texture,screenBuffer1.framebuffer,scale)
-
+			
+			
 			gl.useProgram(particleProgram);
 			gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer1.framebuffer);
+			//gl.clearColor(0.0,0.0,0.0,0.0);
+			//gl.clear(gl.COLOR_BUFFER_BIT)
 			gl.viewport(0, 0, scale*gl.canvas.width, scale*gl.canvas.height);
 			gl.uniform1i(particleProgramInfo.uniformLocations.dataSampler, 0);
 			gl.uniform1i(particleProgramInfo.uniformLocations.freqSampler, 1);
 			gl.uniform1f(particleProgramInfo.uniformLocations.logFlag, logFlag);
+			gl.uniform1f(particleProgramInfo.uniformLocations.freqStatistic, freqStatistic);
 			setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
 			gl.enable(gl.BLEND)
 
@@ -295,7 +331,9 @@ function useMic(stream){
 				userInput.cap_flag = 0;
 			}
 		}
-		requestAnimationFrame(render);
+		if (frames > -1){
+			requestAnimationFrame(render);
+		}
 	}
 	requestAnimationFrame(render);
 }

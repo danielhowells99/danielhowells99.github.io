@@ -7,6 +7,7 @@ uniform sampler2D uDataSampler;
 uniform sampler2D uFreqSampler;
 
 uniform float uLogFlag;
+uniform float uFreqStat;
 varying float vVal;
 
 float f(float x){
@@ -18,13 +19,15 @@ float f(float x){
 void main() {
 	vec4 pointData = texture2D(uDataSampler, aIndexData.xy);
 	float freqIndex = aIndexData.z;
+	/*
 	if (uLogFlag > 0.0){
 		vVal = texture2D(uFreqSampler, vec2(f(freqIndex),0.5)).x;
-		vVal = (0.7 + 0.3*freqIndex*freqIndex)*vVal*vVal;
+		vVal = ((0.5+0.5*log(7.0*freqIndex)))*vVal*vVal;
+		vVal = vVal*vVal/uFreqStat;
 		gl_Position = vec4(pointData.xy,0.0,1.0);
 		return;
 	}
+	*/
 	vVal = texture2D(uFreqSampler, vec2(freqIndex,0.5)).x;
-	vVal = 0.8*vVal;
 	gl_Position = vec4(pointData.xy,0.0,1.0);
-}
+} 

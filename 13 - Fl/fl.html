@@ -1,15 +1,223 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>particleSim1</title>
-	  <link rel="stylesheet" href="../resources/myStyle.css">
-	  <link rel="icon" type="image/x-icon" href="../resources/favicon.ico">
-    <script src="fl.js" type="module"></script>
-	  <meta name="viewport" content="width=device-width, initial-scale=0.5, maximum-scale=1, user-scalable=0"/>
-  </head>
+<head>
+  <meta charset="UTF-8">
+  <title>WebGL Mel Spectrogram</title>
+  <style>
+    body, html { margin: 0; padding: 0; background: black; }
+    canvas { display: block; width: 100%; height: 100vh; }
+  </style>
+  <link rel="icon" type="image/x-icon" href="../resources/favicon.ico">
+</head>
+<body>
+  <canvas id="glcanvas"></canvas>
+  <script type="module">
+    import {MelFilter} from "../libraries/sound-processing.js";
 
-  <body class = "noBar">
-    <canvas id="glcanvas" oncontextmenu="return false;"></canvas>
-  </body>
+    const canvas = document.getElementById("glcanvas");
+    const gl = canvas.getContext("webgl");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const vs = `
+      attribute vec2 a_position;
+      varying vec2 v_uv;
+      void main() {
+        v_uv = a_position * 0.5 + 0.5;
+        gl_Position = vec4(a_position, 0, 1);
+      }
+    `;
+
+    const fs = `
+      precision mediump float;
+      varying vec2 v_uv;
+      uniform sampler2D u_tex;
+      vec3 hsv2rgb(vec3 c)
+      {
+          vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+          vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+          return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+      }
+      void main() {
+        float energy = texture2D(u_tex, v_uv).r;
+        float s = 10.0*energy;
+        vec3 color = hsv2rgb(vec3(1.0-s,1.0-s,s));
+        gl_FragColor = vec4(color,1.0);
+      }
+    `;
+
+    function createShader(gl, type, source) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      return shader;
+    }
+
+    function createProgram(gl, vsSource, fsSource) {
+      const vs = createShader(gl, gl.VERTEX_SHADER, vsSource);
+      const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
+      const program = gl.createProgram();
+      gl.attachShader(program, vs);
+      gl.attachShader(program, fs);
+      gl.linkProgram(program);
+      return program;
+    }
+
+    const program = createProgram(gl, vs, fs);
+    gl.useProgram(program);
+
+    const posBuf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+      -1, -1,  1, -1,  -1, 1,
+       1, -1,  1,  1, -1, 1
+    ]), gl.STATIC_DRAW);
+
+    const posLoc = gl.getAttribLocation(program, 'a_position');
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+    const tex = gl.createTexture();
+    const texWidth = 1024;
+
+    //console.log(canvas.width)
+
+    const melBands = 128;
+    const texHeight = melBands;
+    const textureData = new Uint8Array(texWidth * texHeight);
+
+    
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, texWidth, texHeight, 0, gl.LUMINANCE, gl.UNSIGNED_BYTE, textureData);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+    const texLoc = gl.getUniformLocation(program, "u_tex");
+    gl.uniform1i(texLoc, 0);
+    /*
+    function hzToMel(hz) {
+      return 2595 * Math.log10(1 + hz / 700);
+    }
+
+    function melToHz(mel) {
+      return 700 * (Math.pow(10, mel / 2595) - 1);
+    }
+    
+    function createMelFilterBank(numFilters, fftSize, sampleRate) {
+      const melMin = hzToMel(0);
+      const melMax = hzToMel(sampleRate / 2);
+      const melPoints = [];
+      for (let i = 0; i < numFilters + 2; i++) {
+        melPoints.push(melMin + (i / (numFilters + 1)) * (melMax - melMin));
+      }
+
+      const hzPoints = melPoints.map(melToHz);
+      const bins = hzPoints.map(freq => Math.floor((fftSize + 1) * freq / sampleRate));
+
+      const filters = [];
+      for (let i = 0; i < numFilters; i++) {
+        const start = bins[i];
+        const center = bins[i + 1];
+        const end = bins[i + 2];
+        const filter = new Array(fftSize / 2).fill(0);
+        for (let j = start; j < center; j++) {
+          filter[j] = (j - start) / (center - start);
+        }
+        for (let j = center; j < end; j++) {
+          filter[j] = (end - j) / (end - center);
+        }
+        filters.push(filter);
+      }
+      return filters;
+    }
+    
+    const sampleRate = 44100;
+    const melMin = hzToMel(0);
+    const melMax = hzToMel(sampleRate / 2);
+    const melPoints = [];
+    const numFilters = melBands
+    for (let i = 0; i < numFilters + 2; i++) {
+      melPoints.push(melMin + (i / (numFilters + 1)) * (melMax - melMin));
+    }
+
+    const fftSize = 2048
+
+    const hzPoints = melPoints.map(melToHz);
+    const bins = hzPoints.map(freq => Math.floor((fftSize + 1) * freq / sampleRate));
+
+    function melFilter(numFilters, bins, freqData) {
+      const filters = [];
+      for (let i = 0; i < numFilters; i++) {
+        let filter = 0;
+        const start = bins[i];
+        const center = bins[i + 1];
+        const end = bins[i + 2];
+        for (let j = start; j < center; j++) {
+          filter += ((j - start) / (center - start))*freqData[j];
+        }
+        for (let j = center; j < end; j++) {
+          filter += ((end - j) / (end - center))*freqData[j];
+        }
+        filters.push(filter);
+      }
+      return filters;
+    }
+    */
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)({sampleRate: 44100});
+    const analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 2048;
+
+    const bufferLength = analyser.frequencyBinCount;
+    const freqData = new Float32Array(bufferLength);
+    //const melFilters = createMelFilterBank(melBands, analyser.fftSize, audioCtx.sampleRate);
+    let MyFilter = new MelFilter(audioCtx.sampleRate,analyser.fftSize,128)
+    console.log(MyFilter)
+
+    let col = 0;
+
+    async function startAudio() {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: {sampleRate: 44100} });
+      const mic = audioCtx.createMediaStreamSource(stream);
+      mic.connect(analyser);
+      mic.connect(audioCtx.destination)
+
+      const draw = () => {
+        analyser.getFloatFrequencyData(freqData);
+        //analyser.getByteFrequencyData(freqData);
+        //console.log(freqData)
+        //const mags = freqData.map(dB => Math.pow(10, dB / 20));
+        
+        /*
+        const melEnergies = melFilters.map(filter =>
+          filter.reduce((sum, w, i) => sum + w * mags[i], 0)
+        );
+        */
+        //const melEnergies = melFilter(melBands,bins,mags)
+        
+        const melEnergies = MyFilter.applyFilter(freqData)
+        if (col == 0) console.log(melEnergies)
+        
+        
+        melEnergies.forEach((e, i) => {
+          //const norm = Math.min(1, e / 0.1);
+          textureData[i * texWidth + col] = e;
+        });
+        
+
+        col = (col + 1) % texWidth;
+
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, texWidth, texHeight, gl.LUMINANCE, gl.UNSIGNED_BYTE, textureData);
+
+        gl.viewport(0,0,canvas.width,canvas.height)
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        requestAnimationFrame(draw);
+      };
+
+      draw();
+    }
+
+    startAudio();
+  </script>
+</body>
 </html>

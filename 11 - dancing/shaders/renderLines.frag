@@ -14,9 +14,11 @@ vec3 hsv2rgb(vec3 c)
 
 void main() {
 	float s = vVal;
-	float ss = s*s;
+	float ss = (1.0-uLogFlag)*s*s + 2.5*uLogFlag*s;
 	
 	vec3 outCol = hsv2rgb(vec3((0.75+ss),0.7+0.3*cos(6.28*ss),0.6-0.4*cos(6.28*ss)));
+	//vec3 outCol = hsv2rgb(vec3(1.0-ss,1.0-ss,ss));
+	//vec3 outCol = vec3(ss,2.0*ss,3.0*ss);
 	gl_FragColor = vec4(outCol,0.4*ss);
 	//gl_FragColor = vec4(vec3(1.0),0.4*ss);
-}
+} 

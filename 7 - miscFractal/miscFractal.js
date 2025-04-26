@@ -18,15 +18,17 @@ function main() {
 		);
 		return;
 	}
-
+	/*
 	const affineFilter = getPostProcessingFilter(gl,"AFFINE")
 	const gaussian3Filter = getPostProcessingFilter(gl,"GAUSSIAN3")
 	const gaussian5Filter = getPostProcessingFilter(gl,"GAUSSIAN5")
-	const colourFilter = getPostProcessingFilter(gl,"COLOUR")
 	const TransformFilter = getPostProcessingFilter(gl,"TRANSFORM")
 	const maximumFilter = getPostProcessingFilter(gl,"MAXIMUM")
 	const paintFilter = getPostProcessingFilter(gl,"PAINT8")
 	const ditherFilter = getPostProcessingFilter(gl,"DITHER")
+	*/
+
+	const colourFilter = getPostProcessingFilter(gl,"COLOUR")
 
 
 

@@ -13,21 +13,28 @@ let aspectRatio = canvas.width/canvas.height;
 let logSelect = 1.0;
 let invertFreq = 0.0;
 let circle_toggle = 1.0;
-
+let transformToggle = 0.0;
+/*
 const affineFilter = getPostProcessingFilter(gl,"AFFINE")
 const gaussian3Filter = getPostProcessingFilter(gl,"GAUSSIAN3")
 const gaussian5Filter = getPostProcessingFilter(gl,"GAUSSIAN5")
-const colourFilter = getPostProcessingFilter(gl,"COLOUR")
 const TransformFilter = getPostProcessingFilter(gl,"TRANSFORM")
 const maximumFilter = getPostProcessingFilter(gl,"MAXIMUM")
 const paintFilter = getPostProcessingFilter(gl,"PAINT8")
 const ditherFilter = getPostProcessingFilter(gl,"DITHER")
+*/
+const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+
+let freqStat = 0.0
+let freqStat2 = 0.0
 
 let scale = 2;
 let screenBuffer1 = createScreenFramebuffer(gl,scale);
 let screenBuffer2 = createScreenFramebuffer(gl,scale);
+/*
 let screenBuffer3 = createScreenFramebuffer(gl,1.0);
 let screenBuffer4 = createScreenFramebuffer(gl,1.0);
+*/
 
 let userInput = initializeUserInput(canvas)
     
@@ -44,8 +51,10 @@ function resizeCanvas() {
 	
 	screenBuffer1 = createScreenFramebuffer(gl,scale);
 	screenBuffer2 = createScreenFramebuffer(gl,scale);
+	/*
 	screenBuffer3 = createScreenFramebuffer(gl,1.0);
 	screenBuffer4 = createScreenFramebuffer(gl,1.0);
+	*/
 
 	userInput = initializeUserInput(canvas)
 }
@@ -64,6 +73,9 @@ document.addEventListener("keypress", function onEvent(event) {
 	}
 	if (event.key == "b" || event.key == "B"){
 		invertFreq = invertFreq^1;
+	}
+	if (event.key == "t" || event.key == "T"){
+		transformToggle = transformToggle^1;
 	}
 	if (event.key == "o" || event.key == "O"){
 		resizeCanvas()
@@ -103,6 +115,8 @@ const linear_freqProgramInfo = {
 		shiftVal: gl.getUniformLocation(linear_freqProgram,"uShiftVal"),
 		logSelect: gl.getUniformLocation(linear_freqProgram,"uLogSelect"),
 		invertFreq: gl.getUniformLocation(linear_freqProgram,"uInvertFreq"),
+		freqStat: gl.getUniformLocation(linear_freqProgram,"uFreqStat"),
+		transformToggle: gl.getUniformLocation(linear_freqProgram,"uTransformToggle"),
 	},
 };
 
@@ -124,6 +138,7 @@ analyser.fftSize = 1024;
 analyser.smoothingTimeConstant = 0.65;
 
 let mic = null
+const average = list => list.reduce((prev, curr) => prev + curr) / list.length;
 
 const bufferLength = analyser.frequencyBinCount;
 const freqData = new Uint8Array(bufferLength);
@@ -227,13 +242,17 @@ function useMic(stream){
 		let rotMatrix = [cosa,-sina,sina,cosa]
 	
 		//TO FB1
+		
 		gl.useProgram(circle_freqProgram)
 		gl.activeTexture(gl.TEXTURE0);
 		gl.bindTexture(gl.TEXTURE_2D, freqTex);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, freqData.length, 1, 0, gl.LUMINANCE,
 			gl.UNSIGNED_BYTE, new Uint8Array(freqData));
+		
+
 		gl.uniform1i(circle_freqProgramInfo.uniformLocations.dataSampler,0);
 		gl.uniform1f(circle_freqProgramInfo.uniformLocations.aspect, aspectRatio);
+
 		gl.uniform1i(circle_freqProgramInfo.uniformLocations.logSelect, logSelect);
 		gl.uniform1i(circle_freqProgramInfo.uniformLocations.invertFreq, invertFreq);
 		gl.uniformMatrix2fv(circle_freqProgramInfo.uniformLocations.rotMatrix, false, rotMatrix);
@@ -256,10 +275,20 @@ function useMic(stream){
 		gl.bindTexture(gl.TEXTURE_2D, freqTex);
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.LUMINANCE, freqData.length, 1, 0, gl.LUMINANCE,
 			gl.UNSIGNED_BYTE, new Uint8Array(freqData));
+		
+
+		//console.log(freqData.length)
+
+		freqStat += 0.1*(Math.max(...freqData)/256 - freqStat);
+		freqStat2 += 0.1*(Math.log(1.0+10.0*average(freqData)/256) - freqStat2);
+		//console.log(freqStat)
+		gl.uniform2fv(linear_freqProgramInfo.uniformLocations.freqStat, [freqStat,freqStat2]);
+
 		gl.uniform1i(linear_freqProgramInfo.uniformLocations.dataSampler,0);
 		gl.uniform1f(linear_freqProgramInfo.uniformLocations.shiftVal, shiftVal);
 		gl.uniform1i(linear_freqProgramInfo.uniformLocations.logSelect, logSelect);
 		gl.uniform1i(linear_freqProgramInfo.uniformLocations.invertFreq, invertFreq);
+		gl.uniform1i(linear_freqProgramInfo.uniformLocations.transformToggle, transformToggle);
 		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer1.framebuffer);
 		gl.viewport(0, 0, screenBuffer1.width, screenBuffer1.height);
 		setPositionAttribute(gl, linearPositionBuffer, linear_freqProgramInfo)

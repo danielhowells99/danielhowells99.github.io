@@ -112,9 +112,9 @@ function render() {
 		setPositionAttribute(gl, positionBuffer, dataProgramInfo) 
 		gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 		
-		affineFilter.setAffineTransform(gl,[1.4,1.4,1.4,1.0])
-		affineFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
-		paintFilter.applyFilter(gl,screenBuffer2.texture,screenBuffer1.framebuffer)
+		paintFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
+		affineFilter.setAffineTransform(gl,[2.0,2.0,2.0,1.0])
+		affineFilter.applyFilter(gl,screenBuffer2.texture,screenBuffer1.framebuffer)
 		colourFilter.applyFilter(gl,screenBuffer1.texture,null)
 
 		if (userInput.cap_flag == 1){

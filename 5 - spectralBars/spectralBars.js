@@ -20,7 +20,7 @@ let aspectRatio = canvas.width/canvas.height;
 
 let sb_scale = 1.0;
 let screenBuffer1 = createScreenFramebuffer(gl,sb_scale);
-let screenBuffer2 = createScreenFramebuffer(gl,sb_scale);
+//let screenBuffer2 = createScreenFramebuffer(gl,sb_scale);
 
 let userInput = initializeUserInput(canvas,false)
 
@@ -31,22 +31,26 @@ document.addEventListener("keypress", function onEvent(event) {
 		}
 	}
 });
-
+/*
 const affineFilter = getPostProcessingFilter(gl,"AFFINE")
 const gaussian3Filter = getPostProcessingFilter(gl,"GAUSSIAN3")
 const gaussian5Filter = getPostProcessingFilter(gl,"GAUSSIAN5")
+*/
 const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+//const paintFilter = getPostProcessingFilter(gl,"PAINT8")
+/*
 const TransformFilter = getPostProcessingFilter(gl,"TRANSFORM")
 const maximumFilter = getPostProcessingFilter(gl,"MAXIMUM")
-const paintFilter = getPostProcessingFilter(gl,"PAINT8")
+
 const ditherFilter = getPostProcessingFilter(gl,"DITHER")
+*/
 
 function resizeCanvas() {
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 	gl.viewport(0,0,canvas.width,canvas.height);
 	screenBuffer1 = createScreenFramebuffer(gl,sb_scale);
-	screenBuffer2 = createScreenFramebuffer(gl,sb_scale);
+	//screenBuffer2 = createScreenFramebuffer(gl,sb_scale);
 	userInput = initializeUserInput(canvas,false)
 
 	minCanvDim = Math.min(canvas.width,canvas.height);
@@ -142,8 +146,8 @@ function useMic(stream){
 			//console.log(dataArray)
 
 			//ditherFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
-			paintFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
-			colourFilter.applyFilter(gl,screenBuffer2.texture,null)
+			//paintFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
+			colourFilter.applyFilter(gl,screenBuffer1.texture,null)
 
 			//-----
 			if (userInput.cap_flag == 1){

@@ -18,7 +18,7 @@ if (!ext) {
 let scale = 1.0;
 let screenScale = 1.0;
 let screenBuffer1 = createScreenFramebuffer(gl,scale);
-let screenBuffer2 = createScreenFramebuffer(gl,scale);
+//let screenBuffer2 = createScreenFramebuffer(gl,scale);
 let minCanvDim = canvas.height;
 
 let userInput = initializeUserInput(canvas,false)
@@ -33,7 +33,7 @@ function resizeCanvas() {
 	canvas.height = displayHeight * screenScale;
 
 	screenBuffer1 = createScreenFramebuffer(gl,scale);
-	screenBuffer2 = createScreenFramebuffer(gl,scale);
+	//screenBuffer2 = createScreenFramebuffer(gl,scale);
 	minCanvDim = Math.min(canvas.height,canvas.width)
 
 	userInput = initializeUserInput(canvas,false)
@@ -43,15 +43,16 @@ function resizeCanvas() {
 window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
-
+const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+/*
 const affineFilter = getPostProcessingFilter(gl,"AFFINE")
 const gaussian3Filter = getPostProcessingFilter(gl,"GAUSSIAN3")
 const gaussian5Filter = getPostProcessingFilter(gl,"GAUSSIAN5")
-const colourFilter = getPostProcessingFilter(gl,"COLOUR")
 const TransformFilter = getPostProcessingFilter(gl,"TRANSFORM")
 const maximumFilter = getPostProcessingFilter(gl,"MAXIMUM")
 const paintFilter = getPostProcessingFilter(gl,"PAINT8")
 const ditherFilter = getPostProcessingFilter(gl,"DITHER")
+*/
 //####################################################################
 
 //###################################################################
@@ -190,8 +191,8 @@ function render() {
 		gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
 		gl.disable(gl.BLEND)
 
-		paintFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
-		colourFilter.applyFilter(gl,screenBuffer2.texture,null)
+		//paintFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
+		colourFilter.applyFilter(gl,screenBuffer1.texture,null)
 
 		// swap which texture we are rendering from and to
 		var t = pt1;

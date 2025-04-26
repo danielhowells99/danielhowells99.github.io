@@ -17,9 +17,11 @@ if (!ext) {
 let scale = 1.0;
 let screenScale = 1.0;
 let screenBuffer1 = createScreenFramebuffer(gl,scale);
+/*
 let screenBuffer2 = createScreenFramebuffer(gl,scale);
 let screenBuffer3 = createScreenFramebuffer(gl,scale);
 let screenBuffer4 = createScreenFramebuffer(gl,scale);
+*/
 
 
 let userInput = initializeUserInput(canvas)
@@ -34,9 +36,11 @@ function resizeCanvas() {
 	canvas.height = displayHeight * screenScale;
 
 	screenBuffer1 = createScreenFramebuffer(gl,scale);
+	/*
 	screenBuffer2 = createScreenFramebuffer(gl,scale);
 	screenBuffer3 = createScreenFramebuffer(gl,scale);
 	screenBuffer4 = createScreenFramebuffer(gl,scale);
+	*/
 	userInput = initializeUserInput(canvas)
 	gl.viewport(0,0,canvas.width,canvas.height);
 }
@@ -72,15 +76,17 @@ const particleProgramInfo = {
 
 let aspectRatio = canvas.width/canvas.height;
 
+const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+/*
 const affineFilter = getPostProcessingFilter(gl,"AFFINE")
 const gaussian3Filter = getPostProcessingFilter(gl,"GAUSSIAN3")
 const gaussian5Filter = getPostProcessingFilter(gl,"GAUSSIAN5")
-const colourFilter = getPostProcessingFilter(gl,"COLOUR")
+
 const TransformFilter = getPostProcessingFilter(gl,"TRANSFORM")
 const maximumFilter = getPostProcessingFilter(gl,"MAXIMUM")
 const paintFilter = getPostProcessingFilter(gl,"PAINT8")
 const ditherFilter = getPostProcessingFilter(gl,"DITHER")
-
+*/
 const particle_num = 1200*1200;
 const particle_num_sqd = Math.ceil(Math.sqrt(particle_num));
 const particle_data = []
@@ -177,25 +183,26 @@ function render() {
 		setParticleIndexAttribute(gl,indexBuffer,particleProgramInfo)
 		gl.blendFuncSeparate(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA,gl.ONE,gl.ONE)
 		gl.drawArrays(gl.POINTS, 0, particle_num_sqd*particle_num_sqd);  
-		
-
-		gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer3.framebuffer);
-		gl.clearColor(0.0,0.0,0.0,1.0);
-		gl.clear(gl.COLOR_BUFFER_BIT)
-		gaussian5Filter.applyFilter(gl,screenBuffer2.texture,screenBuffer3.framebuffer)
-		gl.disable(gl.BLEND)	
-		affineFilter.setAffineTransform(gl,[0.97,0.97,0.97,1],[0.02,0.02,0.02,0.0])
-		affineFilter.applyFilter(gl,screenBuffer3.texture,screenBuffer2.framebuffer)
-		
-
-		maximumFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.texture,screenBuffer3.framebuffer)
 		gl.disable(gl.BLEND)
+		
+
+		//gl.bindFramebuffer(gl.FRAMEBUFFER, screenBuffer3.framebuffer);
+		//gl.clearColor(0.0,0.0,0.0,1.0);
+		//gl.clear(gl.COLOR_BUFFER_BIT)
+		//gaussian5Filter.applyFilter(gl,screenBuffer2.texture,screenBuffer3.framebuffer)
+		//gl.disable(gl.BLEND)	
+		//affineFilter.setAffineTransform(gl,[0.97,0.97,0.97,1],[0.02,0.02,0.02,0.0])
+		//affineFilter.applyFilter(gl,screenBuffer3.texture,screenBuffer2.framebuffer)
+		
+
+		//maximumFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.texture,screenBuffer3.framebuffer)
+		
 		//affineFilter.setAffineTransform(gl,[1,1,1,1],[0.0,0.0,0.0,0.0])
-		affineFilter.applyFilter(gl,screenBuffer3.texture,screenBuffer2.framebuffer)
+		//affineFilter.applyFilter(gl,screenBuffer3.texture,screenBuffer2.framebuffer)
 
 		//paintFilter.applyFilter(gl,screenBuffer2.texture,screenBuffer3.framebuffer)
 		//gaussian5Filter.applyFilter(gl,screenBuffer4.texture,screenBuffer2.framebuffer)
-		colourFilter.applyFilter(gl,screenBuffer3.texture,null)
+		colourFilter.applyFilter(gl,screenBuffer1.texture,null)
 		
 		// swap which texture we are rendering from and to
 		var t = pt1;

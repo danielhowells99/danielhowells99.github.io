@@ -14,7 +14,7 @@ if (gl === null) {
 
 let scale = 1.0;
 let screenBuffer1 = createScreenFramebuffer(gl,scale);
-let screenBuffer2 = createScreenFramebuffer(gl,scale);
+//let screenBuffer2 = createScreenFramebuffer(gl,scale);
 let userInput = initializeUserInput(canvas)
 
 function resizeCanvas() {
@@ -26,7 +26,7 @@ function resizeCanvas() {
 	canvas.height = displayHeight;
 	
 	screenBuffer1 = createScreenFramebuffer(gl,scale);
-	screenBuffer2 = createScreenFramebuffer(gl,scale);
+	//screenBuffer2 = createScreenFramebuffer(gl,scale);
 	userInput = initializeUserInput(canvas)
 	window.scrollTo(0,1)
 }
@@ -35,10 +35,10 @@ window.addEventListener("resize", resizeCanvas);
 resizeCanvas();
 
 //const affineFilter = getPostProcessingFilter(gl,"AFFINE")
-const paintFilter = getPostProcessingFilter(gl,"PAINT4")
-const gaussianFilter = getPostProcessingFilter(gl,"GAUSSIAN5")
+//const paintFilter = getPostProcessingFilter(gl,"PAINT4")
+//const gaussianFilter = getPostProcessingFilter(gl,"GAUSSIAN5")
 const colourFilter = getPostProcessingFilter(gl,"COLOUR")
-const ditherFilter = getPostProcessingFilter(gl,"DITHER")
+//const ditherFilter = getPostProcessingFilter(gl,"DITHER")
 //affineFilter.setPassThrough(gl)
 
 const liquidShaderProgram = initShaderProgram(gl, 'shaders/liquidShader.vert', 'shaders/liquidShader.frag');
@@ -83,8 +83,8 @@ function render() {
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
 
-	ditherFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
-	gaussianFilter.applyFilter(gl,screenBuffer2.texture,screenBuffer1.framebuffer)
+	//ditherFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
+	//gaussianFilter.applyFilter(gl,screenBuffer2.texture,screenBuffer1.framebuffer)
 	//paintFilter.applyFilter(gl,screenBuffer1.texture,screenBuffer2.framebuffer)
 	colourFilter.applyFilter(gl,screenBuffer1.texture,null)
 	
