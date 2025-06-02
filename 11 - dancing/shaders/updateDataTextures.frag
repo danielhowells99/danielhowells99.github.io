@@ -54,4 +54,4 @@ void main() {
 	
 	position /= transformVector;
 	gl_FragColor = vec4(position,velocity);
-}
+} 

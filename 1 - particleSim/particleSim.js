@@ -95,8 +95,10 @@ const index_data = []
 for (let i = 0; i < particle_num_sqd*particle_num_sqd; i++){
 	particle_data.push(0.4*(-1+Math.random()*2))
 	particle_data.push(0.4*(-1+Math.random()*2))
-	particle_data.push(0.8*(-1+Math.random()*2))
-	particle_data.push(0.8*(-1+Math.random()*2))
+	//particle_data.push(0.0*(-1+Math.random()*2))
+	//particle_data.push(0.0*(-1+Math.random()*2))
+	particle_data.push(0.0)
+	particle_data.push(0.0)
 	index_data.push(((i%particle_num_sqd)+0.5)/particle_num_sqd)
 	index_data.push((Math.floor(i/particle_num_sqd)+0.5)/particle_num_sqd)
 }

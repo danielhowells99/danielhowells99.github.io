@@ -16,18 +16,28 @@ float f(float x){
 	return (pow(c+1.0,x)-1.0)/c;
 }
 
+float g(float val,float index){
+	float gain = pow(index,0.4);
+	float compress = log(1.0+1.4*val);
+	return 4.0*gain*compress;
+}
+
+float h(float val,float index){
+	return 2.5*val;
+}
+
 void main() {
 	vec4 pointData = texture2D(uDataSampler, aIndexData.xy);
 	float freqIndex = aIndexData.z;
-	/*
+	
 	if (uLogFlag > 0.0){
-		vVal = texture2D(uFreqSampler, vec2(f(freqIndex),0.5)).x;
-		vVal = ((0.5+0.5*log(7.0*freqIndex)))*vVal*vVal;
-		vVal = vVal*vVal/uFreqStat;
+		vVal = texture2D(uFreqSampler, vec2(freqIndex,0.5)).x;
+		//vVal = ((0.3 + exp(freqIndex)))*vVal;
+		vVal = g(vVal,freqIndex);
+		//vVal = h(vVal,freqIndex);
 		gl_Position = vec4(pointData.xy,0.0,1.0);
 		return;
 	}
-	*/
 	vVal = texture2D(uFreqSampler, vec2(freqIndex,0.5)).x;
 	gl_Position = vec4(pointData.xy,0.0,1.0);
 } 

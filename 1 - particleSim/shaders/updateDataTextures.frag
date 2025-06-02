@@ -31,10 +31,10 @@ void main() {
 	
 	vec2 force = 18.0*(uMouseForce*mouseDisplacement/(mouseDist + 1.0/2048.0));//SETTING1
 	//vec2 force = 16.0*uMouseForce*mouseDisplacement/(mouseDist+ 1.0/2048.0);//SETTING2
-	//vec2 force = -10.0*uMouseForce*mouseDisplacement/(mouseDist);//SETTING2
+	//vec2 force = 100.0*uMouseForce*mouseDisplacement/(mouseDist);//SETTING2
 	
-	//float k0 = 12.0; //SETTING 1
-	float k0 = 60.0; //SETTING 2
+	float k0 = 12.0; //SETTING 1
+	//float k0 = 60.0; //SETTING 2
 	
 	float boundaryFactor = 0.875; //SETTING 1
 	//float boundaryFactor = 1.0;//SETTING2
@@ -44,27 +44,31 @@ void main() {
 	float boundaryY = boundaryFactor*transformVector.y;
 	
 	if (position.x >= boundaryX){
-		force.x += -k0*(position.x-boundaryX);
+		//force.x += -k0*(position.x-boundaryX);
 		//position.x -= 2.0*(position.x-boundaryX);
 		//velocity.x *= -0.5;
+		position.x = -boundaryX + (position.x-boundaryX);
 	}
 	
 	else if (position.x <= -boundaryX){
-		force.x += -k0*(position.x+boundaryX);
+		//force.x += -k0*(position.x+boundaryX);
 		//position.x -= 2.0*(position.x+boundaryX);
 		//velocity.x *= -0.5;
+		position.x = boundaryX + (position.x+boundaryX);
 	}
 	
 	if (position.y >= boundaryY){
-		force.y += -k0*(position.y-boundaryY);
+		//force.y += -k0*(position.y-boundaryY);
 		//position.y -= 2.0*(position.y-boundaryY);
 		//velocity.y *= -0.5;
+		position.y = -boundaryY + (position.y-boundaryY);
 	}
 	
 	else if (position.y <= -boundaryY){
-		force.y += -k0*(position.y+boundaryY);
+		//force.y += -k0*(position.y+boundaryY);
 		//position.y -= 2.0*(position.y+boundaryY);
 		//velocity.y *= -0.5;
+		position.y = boundaryY + (position.y+boundaryY);
 	}
 	
 	
@@ -77,8 +81,8 @@ void main() {
 	}
 	*/
 	
-	//velocity = pow(0.81,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
-	velocity = pow(0.88,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
+	velocity = pow(0.81,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING1
+	//velocity = pow(0.88,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	//velocity = pow(0.95,30.0*uDeltaTime)*velocity + uDeltaTime*force;//SETTING2
 	
 	position += uDeltaTime*velocity;

@@ -181,8 +181,8 @@ let pt2 = textures.dataTexture2
 const audioCtx = new AudioContext({sampleRate: 44100});
 console.log("sample_rate: " + audioCtx.sampleRate)
 const analyser = audioCtx.createAnalyser()
-analyser.fftSize = 1024;
-analyser.smoothingTimeConstant = 0.6;
+analyser.fftSize = 2048;
+analyser.smoothingTimeConstant = 0.4;
 
 let mic = null
 
@@ -195,7 +195,9 @@ let freqTex = createDataTexture(gl,freqData);
 gl.activeTexture(gl.TEXTURE1);
 gl.bindTexture(gl.TEXTURE_2D, freqTex);
 
-let melFilter = new MelFilter(audioCtx.sampleRate,analyser.fftSize,128)
+let melBins = 128
+
+let melFilter = new MelFilter(audioCtx.sampleRate,analyser.fftSize,melBins)
 let melTex = melFilter.getFreqTex(gl)
 
 navigator.mediaDevices
@@ -223,6 +225,8 @@ function useMic(stream){
 
 	logFlag = 1.0
 
+	let maxVals = new Array(melBins).fill(128);
+
 	function render() {
 		
 		let endTime = new Date().getTime();
@@ -238,11 +242,24 @@ function useMic(stream){
 			analyser.getByteFrequencyData(freqData)
 			gl.activeTexture(gl.TEXTURE1);
 			if (logFlag > 0){
-				console.log("1:\n"+freqData)
+				//console.log("1:\n"+freqData)
 				//let dbs = freqData.map(x => (-100 + (x/255)*(-30+100)))
 				let dbs = new Float32Array(freqData)
+				//const avg = dbs.reduce((prev, curr) => prev + curr) / dbs.length;
+				//const max = dbs.reduce((prev, curr) => Math.max(prev,curr));
+				//dbs = dbs.map(x => avg*x/max)
+				/*
+				dbs.forEach((val, i) => {
+					maxVals[i] = Math.max(maxVals[i], val,140);
+				});
+				dbs = dbs.map((val, i) => 255*val/maxVals[i]);
+				//console.log(maxVals)
+				maxVals = maxVals.map(val => 0.99*val)
+				*/
+				//dbs = maxVals.map(x => (-100 + (x/255)*(-30+100)))
+				
 				dbs = dbs.map(x => (-100 + (x/255)*(-30+100)))
-				console.log("2:\n"+dbs)
+				//console.log("2:\n"+dbs)
 				melTex = melFilter.updateFreqTex(gl,dbs)
 				gl.bindTexture(gl.TEXTURE_2D,melTex)
 			} else {
@@ -305,6 +322,8 @@ function useMic(stream){
 			gl.clearColor(0.02,0.0,0.07,1.0);
 			gl.clear(gl.COLOR_BUFFER_BIT)
 
+			//dilateFilter.applyFilter(gl,screenBuffer3.texture,screenBuffer4.framebuffer)
+			//dilateFilter.applyFilter(gl,screenBuffer4.texture,screenBuffer3.framebuffer)
 			dilateFilter.applyFilter(gl,screenBuffer3.texture,null)
 			
 			

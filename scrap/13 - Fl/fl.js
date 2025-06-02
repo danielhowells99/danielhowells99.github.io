@@ -53,7 +53,7 @@ function hzToMel(hz) {
   
 	const bufferLength = analyser.frequencyBinCount; // fftSize / 2
 	const freqData = new Float32Array(bufferLength);
-	const melBands = 40; // e.g., 40 Mel bands
+	const melBands = 128; // e.g., 40 Mel bands
 	const melFilters = createMelFilterBank(melBands, analyser.fftSize, audioContext.sampleRate);
   
 	function draw() {
