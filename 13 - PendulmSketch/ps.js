@@ -5,9 +5,32 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const centerX = canvas.width / 2;
-const centerY = canvas.height / 2;
+let centerX = canvas.width / 2;
+let centerY = canvas.height / 2;
 const CONSTANT = 332.5;
+
+let minDim = centerY;
+
+let framesDrawn = 0.0;
+let waitFrames = 0.0;
+let maxWaitFrames = 120.0;
+
+function resizeCanvas() {
+	let displayWidth = window.innerWidth;
+	let displayHeight = window.innerHeight;
+	canvas.style.width = displayWidth + 'px';
+	canvas.style.height = displayHeight + 'px';
+	canvas.width = displayWidth;
+	canvas.height = displayHeight;
+
+	centerX = canvas.width / 2;
+	centerY = canvas.height / 2;	
+	minDim = Math.min(centerX,centerY);
+	framesDrawn = 10000;
+	waitFrames = maxWaitFrames
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
 
 let g = 9.8
 let l1 = CONSTANT*(4/9)
@@ -47,10 +70,8 @@ ctx.fillStyle = 'black'
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 let startTime = new Date().getTime();
 
-let framesDrawn = 0.0;
+
 let waiting = false
-let waitFrames = 0.0;
-let maxWaitFrames = 120.0;
 
 let fadeImage;
 
@@ -110,8 +131,8 @@ function animate() {
 				const point2_x = point1_x + l2*Math.sin(y[1])/CONSTANT;
 				const point2_y = point1_y + l2*Math.cos(y[1])/CONSTANT;
 
-				const ellipseRadius1 = 0.25*(2.0 + 6.0*Math.abs(y[2]))
-				const ellipseRadius2 = 1.25*(2.0 + 6.0*Math.abs(y[3]))
+				const ellipseRadius1 = Math.max(0.25*(2.0 + 6.0*Math.abs(y[2])),1.0)
+				const ellipseRadius2 = Math.max(1.25*(2.0 + 6.0*Math.abs(y[3])),1.0)
 
 				const rotangle = Math.PI + y[1]
 				
@@ -125,8 +146,8 @@ function animate() {
 				ctx.fill();
 				*/
 
-				const x2 = affine(point2_x,centerY,centerX)
-				const y2 = affine(point2_y,centerY,centerY)
+				const x2 = affine(point2_x,minDim,centerX)
+				const y2 = affine(point2_y,minDim,centerY)
 
 				ctx.fillStyle = 'white';
 				ctx.beginPath();
