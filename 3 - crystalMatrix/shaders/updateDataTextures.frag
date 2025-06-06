@@ -54,7 +54,7 @@ void main() {
 		
 			if(sqDist > 0.0000001){
 				float dist = sqrt(sqDist);
-				force += 0.000015*testDisp*dist;
+				force += 0.0*0.000015*testDisp*dist;
 				if(dist <= objRad){
 					float ddd = (objRad - dist);
 					force += -18.0*(testDisp/dist)*ddd;
